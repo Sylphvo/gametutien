@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bộ UI – Vạn Kiếm Độ Kiếp</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <h1>Bộ UI (UI Kit)</h1>
+  <nav>
+    <a href="index.html">Tổng quan</a>
+    <a href="gdd.html">Cốt truyện &amp; Thế giới</a>
+    <a href="gameplay.html">Gameplay</a>
+    <a href="tu-luyen.html">Tu luyện</a>
+    <a href="chien-dau.html">Chiến đấu</a>
+    <a href="noi-dung.html">Nội dung ch.5–19</a>
+    <a href="he-thong-phu.html">Hướng dẫn &amp; Cài đặt</a>
+    <a href="vfx.html">VFX</a>
+    <a href="am-thanh.html">Âm thanh</a>
+    <a href="ui-quang-cao.html">UI &amp; Quảng cáo</a>
+    <a href="ui-kit.html" class="active">Bộ UI</a>
+    <a href="cong-cu-asset.html">Công cụ Asset</a>
+    <a href="can-bang.html">Cân bằng</a>
+    <a href="ky-thuat.html">Kỹ thuật</a>
+    <a href="phat-hanh.html">Phát hành</a>
+  </nav>
+</header>
+<main>
+  <p>Trang <a href="ui-quang-cao.html">UI &amp; Quảng cáo</a> mô tả <b>màn hình nào có gì</b>. Trang này mô tả <b>các mảnh dựng nên màn hình</b>:
+  ảnh họa sĩ cần vẽ, prefab dùng chung, font, màu và quy tắc hiệu năng. Mọi màn hình đều lắp từ bộ này, không vẽ riêng từng màn.</p>
+
+  <h2>1. Hệ thống thiết kế</h2>
+  <h3>1.1. Màu</h3>
+  <table>
+    <tr><th>Token</th><th>Mã màu</th><th>Mẫu</th><th>Dùng cho</th></tr>
+    <tr><td><code>Jade.Panel</code></td><td><code>#0D2622E6</code></td><td><span style="display:inline-block;width:40px;height:16px;background:#0D2622E6;border:1px solid #555"></span></td><td>Nền khung, pop-up</td></tr>
+    <tr><td><code>Gold.Border</code></td><td><code>#D4AF37</code></td><td><span style="display:inline-block;width:40px;height:16px;background:#D4AF37"></span></td><td>Viền, tiêu đề, nút chính</td></tr>
+    <tr><td><code>Text.Main</code></td><td><code>#F2E8D0</code></td><td><span style="display:inline-block;width:40px;height:16px;background:#F2E8D0"></span></td><td>Chữ chính</td></tr>
+    <tr><td><code>Text.Muted</code></td><td><code>#9FB5AE</code></td><td><span style="display:inline-block;width:40px;height:16px;background:#9FB5AE"></span></td><td>Chữ phụ, mô tả</td></tr>
+    <tr><td><code>Bar.HP</code></td><td><code>#C0392B</code></td><td><span style="display:inline-block;width:40px;height:16px;background:#C0392B"></span></td><td>Thanh máu</td></tr>
+    <tr><td><code>Bar.EXP</code></td><td><code>#3FC1A5</code></td><td><span style="display:inline-block;width:40px;height:16px;background:#3FC1A5"></span></td><td>Thanh Linh Lực</td></tr>
+    <tr><td><code>Bar.Rage</code></td><td><code>#E8A33D</code></td><td><span style="display:inline-block;width:40px;height:16px;background:#E8A33D"></span></td><td>Thanh Nộ</td></tr>
+    <tr><td><code>Theme.ThanhLoi</code></td><td><code>#3FD18F</code></td><td><span style="display:inline-block;width:40px;height:16px;background:#3FD18F"></span></td><td>Viền HUD khi Thanh Lôi</td></tr>
+    <tr><td><code>Theme.KimLoi</code></td><td><code>#F5C542</code></td><td><span style="display:inline-block;width:40px;height:16px;background:#F5C542"></span></td><td>Viền HUD khi Kim Lôi</td></tr>
+    <tr><td><code>Theme.HongLoi</code></td><td><code>#E5484D</code></td><td><span style="display:inline-block;width:40px;height:16px;background:#E5484D"></span></td><td>Viền HUD khi Hồng Lôi</td></tr>
+  </table>
+  <p>Các màu nằm trong ScriptableObject <code>UITheme</code>. Họa sĩ vẽ viền khung bằng màu <b>trắng/xám</b> để code tô màu theo theme (Image.color),
+  chỉ phần trang trí cố định mới vẽ màu vàng đồng sẵn.</p>
+
+  <h3>1.2. Font</h3>
+  <ul>
+    <li>Dùng <b>TextMeshPro</b>. Font phải có đủ chữ tiếng Việt có dấu.</li>
+    <li>Đề xuất: font tiêu đề kiểu thư pháp/serif có hỗ trợ tiếng Việt; font nội dung Be Vietnam Pro hoặc Noto Serif (cả hai giấy phép SIL OFL, dùng thương mại được). Kiểm tra giấy phép nếu chọn font khác.</li>
+    <li>Font Asset dạng <b>Dynamic</b>, hoặc Static có bộ ký tự Latin + Vietnamese. Kiểm tra các chữ ằ, ẫ, ự, ỹ hiển thị đúng.</li>
+    <li>Viền và đổ bóng chữ làm bằng <b>Material Preset</b> của TMP (Outline, Underlay). Không dùng component Outline/Shadow của uGUI vì nhân đôi số đỉnh.</li>
+  </ul>
+  <table>
+    <tr><th>Kiểu chữ</th><th>Cỡ (tại 1920×1080)</th><th>Material Preset</th></tr>
+    <tr><td>Tiêu đề pop-up</td><td>56</td><td><code>TMP_Title_GoldOutline</code></td></tr>
+    <tr><td>Nút chính</td><td>44</td><td><code>TMP_Button_DarkOutline</code></td></tr>
+    <tr><td>Nội dung</td><td>32</td><td><code>TMP_Body_Shadow</code></td></tr>
+    <tr><td>Chú thích</td><td>26</td><td><code>TMP_Body_Shadow</code></td></tr>
+    <tr><td>Số sát thương</td><td>40 (chí mạng 56)</td><td><code>TMP_Damage_Outline</code></td></tr>
+  </table>
+
+  <h2>2. Danh sách ảnh cần vẽ</h2>
+  <p>Kích thước vẽ đúng theo độ phân giải tham chiếu 1920×1080. Tên file theo quy ước ở <a href="cong-cu-asset.html">Công cụ Asset</a> (hậu tố <code>_9s</code> để tự đặt viền 9-slice).</p>
+  <table>
+    <tr><th>Thành phần</th><th>File</th><th>Kích thước</th><th>Kiểu Image</th><th>Ghi chú</th></tr>
+    <tr><td>Khung pop-up</td><td><code>ui_panel_jade_9s64.png</code></td><td>256×256</td><td>Sliced</td><td>Góc có hoa văn trong vùng 64 px</td></tr>
+    <tr><td>Khung nhỏ (ô, tooltip)</td><td><code>ui_frame_small_9s24.png</code></td><td>96×96</td><td>Sliced</td><td>—</td></tr>
+    <tr><td>Nút thường</td><td><code>ui_btn_normal_9s40.png</code>, <code>_pressed</code>, <code>_disabled</code></td><td>320×112</td><td>Sliced</td><td>3 trạng thái, Sprite Swap</td></tr>
+    <tr><td>Nút lớn XUẤT CHINH</td><td><code>ui_btn_battle.png</code> + <code>ui_btn_battle_glow_fx.png</code></td><td>480×160</td><td>Simple</td><td>Lớp glow Additive nhấp nháy</td></tr>
+    <tr><td>Nút kỹ năng tròn</td><td><code>ui_skill_ring.png</code></td><td>200×200</td><td>Simple</td><td>Dash, Transform, Tribulation dùng chung khung</td></tr>
+    <tr><td>Lớp cooldown</td><td><code>ui_skill_cooldown.png</code></td><td>200×200</td><td>Filled, Radial 360</td><td>Hình tròn đen 60% alpha</td></tr>
+    <tr><td>Khung thanh</td><td><code>ui_bar_frame_9s20.png</code></td><td>600×48</td><td>Sliced</td><td>HP, EXP, Nộ, Boss</td></tr>
+    <tr><td>Ruột thanh</td><td><code>ui_bar_fill.png</code></td><td>560×32</td><td>Filled, Horizontal</td><td>Vẽ màu trắng, tô màu bằng code</td></tr>
+    <tr><td>Thẻ Kỳ Ngộ</td><td><code>ui_card_common.png</code>, <code>_rare</code>, <code>_evolve</code></td><td>420×600</td><td>Simple</td><td>Thẻ tiến hóa viền vàng</td></tr>
+    <tr><td>Khung avatar</td><td><code>ui_avatar_frame.png</code> + <code>ui_avatar_mask.png</code></td><td>160×160</td><td>Simple + Mask</td><td>—</td></tr>
+    <tr><td>Icon kỹ năng / thẻ / đan dược / linh thú / phi kiếm</td><td><code>icon_*.png</code></td><td>128×128</td><td>Simple</td><td>Vẽ trên nền trong suốt, chừa lề 8 px</td></tr>
+    <tr><td>Icon tiền tệ</td><td><code>icon_linhthach.png</code>, <code>icon_linhchau.png</code></td><td>64×64</td><td>Simple</td><td>—</td></tr>
+    <tr><td>Icon xem quảng cáo</td><td><code>icon_ad_video.png</code></td><td>48×48</td><td>Simple</td><td>Gắn cạnh mọi nút Rewarded</td></tr>
+    <tr><td>Joystick</td><td><code>ui_joy_base.png</code>, <code>ui_joy_handle.png</code></td><td>300×300, 120×120</td><td>Simple</td><td>Bán trong suốt</td></tr>
+    <tr><td>Chân dung hội thoại</td><td><code>portrait_*.png</code></td><td>cao 1024</td><td>Simple</td><td>Hàn Lập, Nam Cung Uyển, Mặc Đại Phu…</td></tr>
+    <tr><td>Khung hội thoại</td><td><code>ui_dialogue_9s48.png</code></td><td>256×160</td><td>Sliced</td><td>—</td></tr>
+    <tr><td>Điểm chương trên bản đồ</td><td><code>ui_chapter_node_locked/open/cleared.png</code></td><td>128×128</td><td>Simple</td><td>3 trạng thái</td></tr>
+  </table>
+
+  <h2>3. Prefab dùng chung</h2>
+  <p>Đặt ở <code>Prefabs/UI/Kit/</code>. Mỗi màn hình dùng <b>Prefab Variant</b> của các prefab gốc, không nhân bản rồi sửa.</p>
+  <table>
+    <tr><th>Prefab</th><th>Thành phần</th><th>Script</th></tr>
+    <tr><td><code>UI_Panel</code></td><td>Khung Sliced + tiêu đề + nút đóng</td><td><code>UIPanel</code> (mở/đóng có tween scale 0.9→1, 0.15 giây)</td></tr>
+    <tr><td><code>UI_Button</code> → <code>UI_Button_Primary</code>, <code>UI_Button_Ad</code></td><td>Khung, chữ TMP; bản Ad có thêm <code>icon_ad_video</code></td><td><code>UIButton</code> (âm thanh bấm, chống bấm liên tục 0.3 giây)</td></tr>
+    <tr><td><code>UI_SkillButton</code></td><td>Khung tròn, icon, lớp cooldown, chữ số giây</td><td><code>SkillButton</code> (cập nhật <code>fillAmount</code>, trạng thái sáng/rung)</td></tr>
+    <tr><td><code>UI_Bar</code></td><td>Khung + ruột Filled + ruột trễ (hiện phần máu vừa mất)</td><td><code>UIBar</code> (<code>SetValue(float normalized)</code>)</td></tr>
+    <tr><td><code>UI_Card</code></td><td>Khung theo độ hiếm, icon, tên, mô tả, cấp</td><td><code>UpgradeCardUI</code></td></tr>
+    <tr><td><code>UI_CurrencyCounter</code></td><td>Icon + số, có nút <code>+</code> tùy chọn</td><td><code>CurrencyCounter</code> (đếm số tăng dần)</td></tr>
+    <tr><td><code>UI_Avatar</code></td><td>Avatar có mask + khung + tên cảnh giới</td><td>—</td></tr>
+    <tr><td><code>UI_DamagePopup</code></td><td>TMP world-space</td><td><code>DamagePopup</code> (lấy từ <code>ObjectPooler</code>)</td></tr>
+    <tr><td><code>UI_Joystick</code></td><td>Base + handle</td><td><code>FloatingJoystick</code></td></tr>
+    <tr><td><code>UI_Toast</code></td><td>Thông báo ngắn (hết quảng cáo, mất mạng)</td><td><code>Toast</code></td></tr>
+  </table>
+
+  <h3>Đổi màu theo Biến Thân</h3>
+  <pre><code>using UnityEngine;
+using UnityEngine.UI;
+
+/// &lt;summary&gt;Gắn vào Image cần đổi màu theo trạng thái Biến Thân (viền HUD, khung avatar).&lt;/summary&gt;
+public class ThemeTint : MonoBehaviour
+{
+    [SerializeField] private Image target;
+    [SerializeField] private Color defaultColor = Color.white;
+
+    private void OnEnable()  =&gt; TransformationHandler.OnTransformationChanged += Apply;
+    private void OnDisable() =&gt; TransformationHandler.OnTransformationChanged -= Apply;
+
+    private void Apply(Color hudColor) =&gt; target.color = hudColor;
+
+    public void ResetColor() =&gt; target.color = defaultColor;
+}</code></pre>
+  <p><code>OnTransformationChanged</code> là static event (đã chốt ở <a href="ky-thuat.html">Kỹ thuật</a> mục 4.1). Khi hết Biến Thân, event gửi màu mặc định nên không cần gọi <code>ResetColor()</code> bằng tay.</p>
+
+  <h2>4. Sprite Atlas</h2>
+  <table>
+    <tr><th>Atlas</th><th>Nội dung</th><th>Nạp khi</th></tr>
+    <tr><td><code>Atlas_UI_Common</code></td><td>Khung, nút, thanh, icon tiền tệ, icon quảng cáo</td><td>Luôn nạp</td></tr>
+    <tr><td><code>Atlas_UI_Lobby</code></td><td>Bottom bar, bản đồ chương, Động Phủ, Kiếm Trủng</td><td>Ở Lobby</td></tr>
+    <tr><td><code>Atlas_UI_Combat</code></td><td>Nút kỹ năng, joystick, thẻ Kỳ Ngộ, thanh boss</td><td>Trong trận</td></tr>
+    <tr><td><code>Atlas_Icons</code></td><td>Icon kỹ năng, phi kiếm, linh thú, đan dược</td><td>Luôn nạp</td></tr>
+  </table>
+  <p>Chân dung hội thoại không đưa vào atlas (ảnh lớn, ít dùng cùng lúc). Thiết lập atlas: Android ASTC 4x4, tắt mip map, Padding 4.</p>
+
+  <h2>5. Quy tắc hiệu năng UI</h2>
+  <ul>
+    <li>Tách Canvas: <code>Canvas_Static</code> (khung, nút ít đổi), <code>Canvas_Dynamic</code> (thanh máu, đồng hồ, số), <code>Canvas_Popup</code>. Một phần tử thay đổi sẽ làm vẽ lại cả Canvas chứa nó.</li>
+    <li>Tắt <b>Raycast Target</b> ở mọi Image/Text chỉ để trang trí.</li>
+    <li>Không dùng Layout Group trên phần tử cập nhật mỗi frame.</li>
+    <li>Pop-up ẩn bằng <code>CanvasGroup.alpha = 0</code> + tắt <code>blocksRaycasts</code>, hoặc tắt cả Canvas. Không <code>Instantiate</code> pop-up mỗi lần mở.</li>
+    <li>Số sát thương lấy từ pool, giới hạn 30 số cùng lúc.</li>
+    <li>Pop-up đặt <code>Time.timeScale = 0</code> thì tween UI phải dùng thời gian unscaled.</li>
+  </ul>
+
+  <h2>6. Cảnh kiểm tra UI Kit</h2>
+  <p>Tạo scene <code>Scenes/UIKit_Preview</code> chứa mọi prefab ở mục 3 với dữ liệu giả. Dùng để:</p>
+  <ul>
+    <li>Kiểm tra chữ tiếng Việt, độ dài chữ dài nhất (ví dụ "Nhận x2 Linh Thạch (Xem QC)").</li>
+    <li>Xem trên các tỉ lệ 16:9, 20:9 và máy có tai thỏ (Device Simulator) với <code>SafeAreaHandler</code>.</li>
+    <li>Thử đổi Thanh Lôi / Kim Lôi / Hồng Lôi bằng nút debug.</li>
+  </ul>
+
+  <h2>7. Quy trình làm một màn hình mới</h2>
+  <ol>
+    <li>Họa sĩ vẽ mockup toàn màn hình tại 1920×1080.</li>
+    <li>Tách ra các mảnh còn thiếu so với mục 2. Ưu tiên dùng lại mảnh có sẵn.</li>
+    <li>Xuất PNG theo quy ước tên, kéo vào <code>Art/UI/</code>. Công cụ tự áp thiết lập import và viền 9-slice.</li>
+    <li>Dựng màn từ Prefab Variant ở mục 3, thêm vào atlas tương ứng.</li>
+    <li>Kiểm tra trong <code>UIKit_Preview</code> và Device Simulator.</li>
+  </ol>
+</main>
+<footer>Tài liệu nội bộ – Vạn Kiếm Độ Kiếp</footer>
+</body>
+</html>
