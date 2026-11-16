@@ -1,0 +1,65 @@
+:root {
+  --bg: #0f1115;
+  --panel: #171a21;
+  --text: #e6e6e6;
+  --muted: #9aa3b2;
+  --gold: #e8c26b;
+  --jade: #5fd3a6;
+  --border: #2a2f3a;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: "Segoe UI", Roboto, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.65;
+}
+header {
+  background: linear-gradient(90deg, #1b1f2a, #241d12);
+  border-bottom: 1px solid var(--border);
+  padding: 16px 32px;
+}
+header h1 { margin: 0; color: var(--gold); font-size: 1.5rem; }
+nav { margin-top: 8px; }
+nav a {
+  color: var(--muted);
+  text-decoration: none;
+  margin-right: 18px;
+  font-size: 0.95rem;
+}
+nav a:hover, nav a.active { color: var(--jade); }
+main { max-width: 1000px; margin: 0 auto; padding: 24px 32px 64px; }
+h2 { color: var(--gold); border-bottom: 1px solid var(--border); padding-bottom: 6px; margin-top: 36px; }
+h3 { color: var(--jade); }
+table { width: 100%; border-collapse: collapse; margin: 16px 0; }
+th, td { border: 1px solid var(--border); padding: 8px 10px; text-align: left; vertical-align: top; }
+th { background: var(--panel); color: var(--gold); }
+tr:nth-child(even) td { background: #13161c; }
+code { background: #222733; padding: 1px 5px; border-radius: 4px; font-family: Consolas, monospace; }
+pre {
+  background: #11141a;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 14px;
+  overflow-x: auto;
+}
+pre code { background: none; padding: 0; }
+.note {
+  background: #1d2430;
+  border-left: 4px solid var(--jade);
+  padding: 10px 14px;
+  margin: 16px 0;
+  border-radius: 4px;
+}
+.warn { border-left-color: #e07a5f; }
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+.card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px;
+}
+.card a { color: var(--gold); font-weight: 600; text-decoration: none; }
+.card p { color: var(--muted); margin: 6px 0 0; }
+footer { text-align: center; color: var(--muted); font-size: 0.85rem; padding: 24px; border-top: 1px solid var(--border); }
