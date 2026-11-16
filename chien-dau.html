@@ -10,92 +10,76 @@
 <header>
   <h1>Chiến đấu</h1>
   <nav>
-    <a href="index.html">Tổng quan</a>
-    <a href="gdd.html">Cốt truyện &amp; Thế giới</a>
-    <a href="gameplay.html">Gameplay</a>
-    <a href="tu-luyen.html">Tu luyện</a>
-    <a href="chien-dau.html" class="active">Chiến đấu</a>
-    <a href="noi-dung.html">Nội dung ch.5–19</a>
-    <a href="he-thong-phu.html">Hướng dẫn &amp; Cài đặt</a>
-    <a href="vfx.html">VFX</a>
-    <a href="am-thanh.html">Âm thanh</a>
-    <a href="ui-quang-cao.html">UI &amp; Quảng cáo</a>
-    <a href="ui-kit.html">Bộ UI</a>
-    <a href="cong-cu-asset.html">Công cụ Asset</a>
-    <a href="can-bang.html">Cân bằng</a>
-    <a href="ky-thuat.html">Kỹ thuật</a>
-    <a href="phat-hanh.html">Phát hành</a>
   </nav>
 </header>
 <main>
   <h2>1. Phi kiếm</h2>
-  <p>Mỗi thanh kiếm chạy state machine riêng:</p>
+  <p>Mỗi thanh kiếm chạy state machine riêng (cả ngoài thế giới và trong Bí Cảnh):</p>
   <pre><code>Orbiting  ──(có quái trong DetectionRadius)──▶  Attacking  ──(trúng / hết tầm)──▶  Returning  ──▶  Orbiting</code></pre>
+  <p>Số kiếm = 3 + công pháp (Đại Diễn Quyết, Phân Kiếm Quyết) + thẻ Phân Kiếm Thuật (trong Bí Cảnh). Tối đa 36 trên màn hình.</p>
   <table>
-    <tr><th>Phi kiếm (Kiếm Trủng)</th><th>Thuộc tính</th><th>Đặc điểm</th><th>Mở khóa</th></tr>
-    <tr><td>Phi kiếm phàm phẩm</td><td>—</td><td>Kiếm khởi đầu</td><td>Mặc định</td></tr>
-    <tr><td>Thanh Trúc Phong Vân Kiếm</td><td>Lôi + Mộc</td><td>Mỗi đòn có 15% phóng tia điện nhỏ. Điều kiện tiến hóa Đại Canh Kiếm Trận.</td><td>Chương 4</td></tr>
-    <tr><td>Lôi Kiếm</td><td>Lôi</td><td>Sét lan sang 2 mục tiêu gần</td><td>Linh Thạch</td></tr>
-    <tr><td>Hỏa Kiếm</td><td>Hỏa</td><td>Thiêu đốt theo thời gian</td><td>Linh Thạch</td></tr>
-    <tr><td>Băng Kiếm</td><td>Băng</td><td>Làm chậm, 3 lần trúng thì đóng băng 1 giây</td><td>Linh Thạch</td></tr>
+    <tr><th>Phi kiếm (Kiếm Trủng)</th><th>Hiệu ứng riêng</th><th>Mở khóa</th></tr>
+    <tr><td>Phàm phẩm</td><td>—</td><td>Mặc định</td></tr>
+    <tr><td>Thanh Trúc Phong Vân Kiếm</td><td>15% mỗi đòn phóng tia điện 0.5× sang 1 quái</td><td>Thưởng chương 4</td></tr>
+    <tr><td>Lôi Kiếm</td><td>Sét lan 2 mục tiêu</td><td>800 Linh Thạch</td></tr>
+    <tr><td>Hỏa Kiếm</td><td>Thiêu đốt 3 s</td><td>800</td></tr>
+    <tr><td>Băng Kiếm</td><td>Làm chậm; 3 lần trúng đóng băng 1 s</td><td>1.000</td></tr>
   </table>
+  <p>Hành của phi kiếm (để tính khắc chế) lấy từ công pháp chủ tu, không lấy từ phi kiếm. Hiệu ứng riêng của phi kiếm cộng thêm.</p>
 
-  <h2>2. Thuộc tính và khắc chế</h2>
-  <table>
-    <tr><th>Thuộc tính</th><th>Mạnh với (×1.5)</th><th>Yếu với (×0.7)</th></tr>
-    <tr><td>Lôi</td><td>Ma tu, quỷ vật, Ma Tộc</td><td>Yêu thú hệ Thổ</td></tr>
-    <tr><td>Hỏa</td><td>Mộc Tộc, quái hệ Băng</td><td>Yêu thú biển</td></tr>
-    <tr><td>Băng</td><td>Yêu thú biển, quái hệ Hỏa</td><td>Ma Tộc (dung nham)</td></tr>
-  </table>
-  <p>Kim Lôi (Tịch Tà Thần Lôi) gây ×2.0 lên ma tu và quỷ vật, thay cho ×1.5 của Lôi thường.</p>
-  <pre><code>SatThuong = CongGoc × HeSoKiem × HeSoKyNgo × HeSoThuocTinh × HeSoBienThan
-SatThuongNhan = SatThuongQuai × HeSoChuong × (1 − GiamSatThuong)</code></pre>
+  <h2>2. Công thức sát thương</h2>
+  <pre><code>SatThuong = Công(L) × HeSoKiem (hoặc hệ số công pháp) × (1 + bonus Kiếm Tâm + bonus thẻ Kỳ Ngộ)
+          × HeSoNguHanh × HeSoLoi × HeSoBienThan × HeSoTangLoiKiep × HeSoChenhLechLevel × (chí mạng ? SatThuongChiMang : 1)
 
-  <h2>3. Thẻ Kỳ Ngộ</h2>
-  <p>Mỗi lần đầy EXP chọn 1 trong 3 thẻ. Thẻ có cấp tối đa 5.</p>
+SatThuongNhan = Chạm(quái, L) × HeSoChenhLechLevelNhan × (1 − GiamSatThuong)      // GiamSatThuong tối đa 60%</code></pre>
+  <ul>
+    <li><code>Công(L)</code>, <code>Chạm(quái, L)</code>: <a href="tu-luyen.html">Tu luyện</a> mục 3.</li>
+    <li><code>HeSoNguHanh</code>: ×1.5 / ×1 / ×0.7 (<a href="tong-mon.html">Tông môn</a> mục 1).</li>
+    <li><code>HeSoLoi</code>: ×1.5 lên Ma/Quỷ khi đòn là Lôi (chủ tu Trung tâm, Tịch Tà Thần Lôi, thẻ Lôi Văn); Kim Lôi ×2.</li>
+    <li><code>HeSoBienThan</code>, <code>HeSoTangLoiKiep</code>: chỉ trong Bí Cảnh.</li>
+    <li><code>HeSoChenhLechLevel</code>: Tu luyện mục 4.</li>
+    <li>Chí mạng gốc 5%, sát thương chí mạng 150%.</li>
+  </ul>
+
+  <h2>3. Thẻ Kỳ Ngộ (chỉ trong Bí Cảnh)</h2>
+  <p>Mỗi lần đầy EXP trong trận chọn 1 trong 3 thẻ. Thẻ cấp tối đa 5. Trọng số ở <a href="can-bang.html">Cân bằng</a> mục 5.</p>
   <table>
     <tr><th>Thẻ</th><th>Nhóm</th><th>Hiệu quả mỗi cấp</th></tr>
     <tr><td>Phân Kiếm Thuật</td><td>Phi kiếm</td><td>+1 phi kiếm</td></tr>
     <tr><td>Ngự Phong Quyết</td><td>Phi kiếm</td><td>+10% tốc độ bay</td></tr>
-    <tr><td>Thanh Nguyên Kiếm Quyết</td><td>Phi kiếm</td><td>+12% sát thương phi kiếm</td></tr>
-    <tr><td>Đại Diễn Quyết</td><td>Phi kiếm</td><td>+10% <code>DetectionRadius</code></td></tr>
-    <tr><td>Lôi Văn</td><td>Thuộc tính</td><td>Thêm thuộc tính Lôi cho phi kiếm</td></tr>
-    <tr><td>Hỏa Văn</td><td>Thuộc tính</td><td>Thêm thuộc tính Hỏa cho phi kiếm</td></tr>
+    <tr><td>Kiếm Ý</td><td>Phi kiếm</td><td>+12% sát thương phi kiếm</td></tr>
+    <tr><td>Thần Thức Khuếch Tán</td><td>Phi kiếm</td><td>+10% <code>DetectionRadius</code></td></tr>
+    <tr><td>Lôi Văn</td><td>Thuộc tính</td><td>Phi kiếm thêm sét lan (đòn Lôi)</td></tr>
+    <tr><td>Hỏa Văn</td><td>Thuộc tính</td><td>Phi kiếm thêm thiêu đốt</td></tr>
     <tr><td>Luyện Thể</td><td>Sinh tồn</td><td>+10% HP tối đa</td></tr>
-    <tr><td>Thân Pháp</td><td>Sinh tồn</td><td>+6% tốc độ di chuyển, −8% cooldown Dash</td></tr>
-    <tr><td>Tẩy Luyện</td><td>Đặc biệt</td><td>Đổi 1 thẻ đang có lấy 1 thẻ ngẫu nhiên khác cùng cấp</td></tr>
-    <tr><td>Thời Gian Pháp Tắc</td><td>Đặc biệt (chỉ Tiên Giới)</td><td>Mỗi 15 giây ngưng đọng quái trong vùng 2 giây</td></tr>
+    <tr><td>Thân Pháp</td><td>Sinh tồn</td><td>+6% tốc độ chạy, −8% cooldown Dash</td></tr>
+    <tr><td>Tẩy Luyện</td><td>Đặc biệt</td><td>Đổi 1 thẻ đang có lấy 1 thẻ khác cùng cấp</td></tr>
+    <tr><td>Thời Gian Pháp Tắc</td><td>Đặc biệt (Bí Cảnh Tiên Giới, sau chương 16)</td><td>Mỗi 15 s ngưng đọng quái thường trong vùng 2 s</td></tr>
   </table>
 
-  <h3>Tiến hóa</h3>
-  <p>Khi đủ điều kiện, thẻ tiến hóa xuất hiện trong lần chọn tiếp theo.</p>
+  <h3>Đại thành</h3>
+  <p>Thẻ Kỳ Ngộ cấp 5 + công pháp phụ đang đeo mở thẻ "Đại thành", chắc chắn chiếm 1 ô trong lần chọn kế tiếp:</p>
   <table>
-    <tr><th>Tiến hóa</th><th>Điều kiện</th><th>Hiệu quả</th></tr>
-    <tr><td><b>Đại Canh Kiếm Trận</b></td><td>Trang bị Thanh Trúc Phong Vân Kiếm + Thanh Nguyên Kiếm Quyết cấp 5 + ít nhất 12 phi kiếm</td><td>Mỗi 25 giây, toàn bộ phi kiếm bày trận quanh người, kiếm võng vàng chém liên tục mọi quái trong vùng trong 4 giây</td></tr>
-    <tr><td><b>Tịch Tà Thần Lôi</b></td><td>Lôi Văn cấp 5 + đã mở Kim Lôi</td><td>Sét lan vàng kim nhảy 5 mục tiêu, xóa buff của quái hệ Ma</td></tr>
-    <tr><td><b>Càn Lam Băng Diễm</b></td><td>Thần Luân Hư Thiên Đỉnh + Hỏa Văn cấp 5</td><td>Lửa xanh lam vừa thiêu vừa đóng băng, lan khi quái chết</td></tr>
+    <tr><th>Đại thành</th><th>Điều kiện</th><th>Hiệu quả trong trận</th></tr>
+    <tr><td>Đại Canh Kiếm Trận – Đại thành</td><td>Kiếm Ý cấp 5 + đeo Đại Canh Kiếm Trận</td><td>CD −50%, bán kính +1, sát thương mỗi nhát ×1.5. Hiển thị tới 72 kiếm bằng 1 Particle System</td></tr>
+    <tr><td>Tịch Tà Thần Lôi – Đại thành</td><td>Lôi Văn cấp 5 + đeo Tịch Tà Thần Lôi</td><td>+3 mục tiêu, xóa khiên của cả boss</td></tr>
+    <tr><td>Càn Lam Băng Diễm – Đại thành</td><td>Hỏa Văn cấp 5 + đeo Càn Lam Băng Diễm</td><td>Hình nón 150°, quái bị đóng băng chết thì nổ băng r=1.5, 1×</td></tr>
   </table>
-  <div class="note">Số phi kiếm trên màn hình giới hạn 36 để giữ 60 FPS. Đại Canh Kiếm Trận hiển thị 72 kiếm bằng một Particle System riêng, không dùng 72 GameObject.</div>
 
-  <h2>4. Kẻ địch</h2>
-  <table>
-    <tr><th>Giới diện</th><th>Quái thường</th><th>Hành vi</th></tr>
-    <tr><td>Nhân Giới</td><td>Yêu lang, yêu thú biển, đệ tử ma đạo, quỷ vật</td><td>Lao thẳng vào người chơi; đệ tử ma đạo bắn đạn từ xa</td></tr>
-    <tr><td>Linh Giới</td><td>Giác Xi, Dạ Xoa, Mộc Tộc, ma binh</td><td>Đi theo bầy, có loại tự nổ, có loại tạo khiên cho đồng đội</td></tr>
-    <tr><td>Tiên Giới</td><td>Tiên binh Thiên Đình, Man Hoang tộc</td><td>Dịch chuyển ngắn, bắn đạn theo hình mẫu</td></tr>
-  </table>
-  <p>Quái do <code>WaveSpawner</code> sinh theo bảng wave của từng Bí Cảnh, tăng dần mật độ theo thời gian.</p>
+  <h2>4. Quái</h2>
+  <p>Hành vi, nhãn phe và chỉ số gốc ở <a href="noi-dung.html">Quái &amp; Boss</a>. Hành (ngũ hành) của quái lấy theo vùng (<a href="the-gioi.html">Thế giới mở</a> mục 6).
+  Ngoài thế giới quái đứng theo nhóm; trong Bí Cảnh do <code>WaveSpawner</code> sinh theo wave.</p>
 
   <h2>5. Boss</h2>
   <table>
-    <tr><th>Boss</th><th>Chương</th><th>Cơ chế chính</th></tr>
-    <tr><td>Mặc Đại Phu</td><td>2</td><td>Bắn độc hình quạt; dưới 50% máu tung "đoạt xá" (vùng hút người chơi vào giữa, phải lướt ra)</td></tr>
-    <tr><td>Thủy Tổ Ma Tộc Nguyên Yểm</td><td>13</td><td>Triệu hồi ma binh, phủ ma khí giảm tầm nhìn</td></tr>
-    <tr><td>Thủy Tổ Bảo Hoa &amp; Lục Cực</td><td>14</td><td>Hai boss cùng lúc, phải tách ra đánh</td></tr>
-    <tr><td>Cổ Hoặc Kim</td><td>19</td><td>Ngưng đọng thời gian người chơi 1.5 giây (màn hình mất màu dần 1 giây trước để báo), tua ngược máu một lần ở 30%</td></tr>
+    <tr><th>Boss</th><th>Nơi</th><th>Cơ chế chính</th></tr>
+    <tr><td>Mặc Đại Phu</td><td>Bí Cảnh chương 2</td><td>Độc hình quạt; dưới 50% HP tung "Đoạt Xá" (hút về tâm, phải Dash ra)</td></tr>
+    <tr><td>Thủy Tổ Nguyên Yểm</td><td>Bí Cảnh chương 13</td><td>Gọi ma binh, ma khí giảm tầm nhìn</td></tr>
+    <tr><td>Thủy Tổ Bảo Hoa &amp; Lục Cực</td><td>Bí Cảnh chương 14</td><td>Hai boss cùng lúc</td></tr>
+    <tr><td>Cổ Hoặc Kim</td><td>Bí Cảnh chương 19</td><td>Ngưng đọng thời gian (màn hình mất màu dần 1 s trước), tua ngược máu một lần ở 30%</td></tr>
+    <tr><td>Boss thế giới</td><td>15 ô (Thế giới mở mục 7)</td><td>Có vùng đấu bán kính 12; ra khỏi vùng 5 s thì boss hồi đầy máu</td></tr>
   </table>
-  <div class="note">Mọi đòn diện rộng của boss phải có vùng cảnh báo hiển thị ít nhất 0.6 giây trước khi gây sát thương.
-  Code dùng chung <code>BossController</code> (trước đây gọi là <code>VoidBoss</code>), mỗi boss là một ScriptableObject cấu hình phase và chiêu.</div>
+  <div class="note">Mọi đòn diện rộng của boss có vùng cảnh báo ít nhất 0.6 s. Một class <code>BossController</code> chung, mỗi boss là một <code>BossData</code> ghép từ thư viện chiêu.</div>
 </main>
 <footer>Tài liệu nội bộ – Vạn Kiếm Độ Kiếp</footer>
 </body>
