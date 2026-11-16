@@ -10,113 +10,117 @@
 <header>
   <h1>Gameplay</h1>
   <nav>
-    <a href="index.html">Tổng quan</a>
-    <a href="gdd.html">Cốt truyện &amp; Thế giới</a>
-    <a href="gameplay.html" class="active">Gameplay</a>
-    <a href="tu-luyen.html">Tu luyện</a>
-    <a href="chien-dau.html">Chiến đấu</a>
-    <a href="noi-dung.html">Nội dung ch.5–19</a>
-    <a href="he-thong-phu.html">Hướng dẫn &amp; Cài đặt</a>
-    <a href="vfx.html">VFX</a>
-    <a href="am-thanh.html">Âm thanh</a>
-    <a href="ui-quang-cao.html">UI &amp; Quảng cáo</a>
-    <a href="ui-kit.html">Bộ UI</a>
-    <a href="cong-cu-asset.html">Công cụ Asset</a>
-    <a href="can-bang.html">Cân bằng</a>
-    <a href="ky-thuat.html">Kỹ thuật</a>
-    <a href="phat-hanh.html">Phát hành</a>
   </nav>
 </header>
 <main>
-  <h2>1. Điều khiển (cảm ứng, đa chạm)</h2>
+  <h2>1. Hai chế độ</h2>
   <table>
-    <tr><th>Thao tác</th><th>Hành động</th></tr>
-    <tr><td>Chạm và kéo ở nửa trái màn hình</td><td>Floating Joystick: di chuyển</td></tr>
-    <tr><td><code>Btn_Dash</code></td><td>Lướt né đòn. Khi đeo cánh Phong Lôi Sí, cú lướt để lại vệt sét gây sát thương.</td></tr>
-    <tr><td><code>Btn_Transform</code></td><td>Biến Thân, sáng khi đầy thanh Nộ</td></tr>
-    <tr><td><code>Btn_Tribulation</code></td><td>Độ Kiếp, chỉ hiện khi đủ Tu Vi</td></tr>
-    <tr><td>Tự động</td><td>Phi kiếm tự tìm và tấn công kẻ địch</td></tr>
+    <tr><th></th><th>Thế giới mở</th><th>Bí Cảnh</th></tr>
+    <tr><td>Scene</td><td><code>World</code> + các scene ô nạp cộng dồn</td><td><code>Combat</code> (đấu trường riêng)</td></tr>
+    <tr><td>Mục tiêu</td><td>Khám phá, lên level, nhiệm vụ, tông môn, boss thế giới, linh thảo</td><td>Sống sót và hạ boss trong 10–15 phút</td></tr>
+    <tr><td>Quái</td><td>Theo nhóm cố định trong ô, hồi sau 45 s, không mạnh dần theo thời gian</td><td>Sinh liên tục theo wave, mạnh dần theo phút</td></tr>
+    <tr><td>Thẻ Kỳ Ngộ, Tiểu Lôi Kiếp, Biến Thân</td><td>Không</td><td>Có</td></tr>
+    <tr><td>Công pháp, phi kiếm, linh thú, Thần Luân, Cánh</td><td>Có</td><td>Có</td></tr>
+    <tr><td>Level</td><td colspan="2">Dùng chung level vĩnh viễn; EXP từ cả hai chế độ</td></tr>
   </table>
 
-  <h2>2. Vòng lặp trong trận (10–15 phút)</h2>
+  <h2>2. Điều khiển (cảm ứng, đa chạm)</h2>
   <table>
-    <tr><th>Bước</th><th>Nội dung</th></tr>
-    <tr><td>1. Khởi đầu</td><td>Hàn Lập xuất hiện ở giữa Bí Cảnh với 3 phi kiếm bay quanh quỹ đạo. Cảnh giới khởi đầu là bậc 1 của chương (xem <a href="gdd.html">bảng chương</a>).</td></tr>
-    <tr><td>2. Chiến đấu</td><td>Người chơi di chuyển né đòn. Phi kiếm dò kẻ địch gần nhất trong <code>DetectionRadius</code>, lao tới đâm xuyên/chém, rồi bay về quỹ đạo.</td></tr>
-    <tr><td>3. Linh Châu &amp; Kỳ Ngộ</td><td>Quái chết rơi <b>Linh Châu</b> (EXP) và <b>Linh Thạch</b> (tiền tệ). Đầy EXP thì game dừng (<code>Time.timeScale = 0</code>) và hiện 3 thẻ Kỳ Ngộ (xem <a href="chien-dau.html">Chiến đấu</a>).</td></tr>
-    <tr><td>4. Độ Kiếp</td><td>Lên cấp cũng tích Tu Vi. Đủ Tu Vi thì nút Độ Kiếp xuất hiện. Sống sót 10 giây Lôi Kiếp để đột phá lên bậc tiếp theo, hồi đầy máu và mở Biến Thân mới. Tối đa 3 lần mỗi trận.</td></tr>
-    <tr><td>5. Boss</td><td>Phút 5: boss tinh anh. Phút 10: boss chương (nhân vật trong truyện). Diệt boss chương là qua Bí Cảnh.</td></tr>
-    <tr><td>6. Kết thúc</td><td><code>ResultPopup</code>: thời gian sống sót, cảnh giới đạt được, tổng sát thương, Linh Thạch.</td></tr>
+    <tr><th>Thao tác</th><th>Thế giới</th><th>Bí Cảnh</th></tr>
+    <tr><td>Kéo nửa trái màn hình</td><td colspan="2">Floating Joystick: di chuyển</td></tr>
+    <tr><td><code>Btn_Dash</code></td><td>Lướt; giữ 0.5 s để ngự khí phi hành (từ Trúc Cơ)</td><td>Lướt</td></tr>
+    <tr><td><code>Btn_Skill1–3</code></td><td colspan="2">Công pháp phụ chủ động đang đeo (ẩn nếu ô trống hoặc là bị động). Tự động thi triển nếu bật trong Cài đặt</td></tr>
+    <tr><td><code>Btn_Interact</code></td><td>Hiện khi đứng gần NPC, Truyền Tống, linh thảo, cổng Bí Cảnh</td><td>—</td></tr>
+    <tr><td><code>Btn_Transform</code>, <code>Btn_Tribulation</code></td><td>—</td><td>Như thiết kế cũ</td></tr>
+    <tr><td>Nút Bản đồ, Menu</td><td>Có</td><td>Chỉ nút tạm dừng</td></tr>
+    <tr><td>Tự động</td><td colspan="2">Phi kiếm tự tìm và đánh quái</td></tr>
   </table>
 
-  <h3>Rút lui ("Hàn Chạy Trốn")</h3>
-  <p>Menu tạm dừng có nút <b>Độn Thổ Phù</b>. Rút lui giữ 100% Linh Thạch đã nhặt nhưng không tính qua chương.
-  Chết mà không hồi sinh chỉ giữ 50%. Thiết kế này lấy từ tính cách cẩn trọng của Hàn Lập: bỏ chạy đúng lúc là quyết định hợp lý.</p>
+  <h2>3. Vòng lặp</h2>
+  <h3>3.1. Thế giới mở</h3>
+  <ol>
+    <li>Nhận nhiệm vụ (chính, tông môn) ở HUB hoặc NPC trong ô.</li>
+    <li>Đi tới khu có level hợp (banner và bản đồ báo màu), mở Truyền Tống Trận dọc đường.</li>
+    <li>Đánh quái, tinh anh, boss thế giới; nhặt linh thảo; nhận EXP, Linh Thạch, cống hiến.</li>
+    <li>Vào Bí Cảnh để lấy thưởng lớn hơn và tiến cốt truyện.</li>
+    <li>Về HUB/Động Phủ: học và nâng công pháp, nâng Động Phủ, Kiếm Trủng, luyện đan, đột phá ở Lôi Kiếp Đài.</li>
+  </ol>
+  <p>Chết ngoài thế giới: xem <a href="the-gioi.html">Thế giới mở</a> mục 9.</p>
 
-  <h2>3. Vòng lặp ngoài trận (meta)</h2>
-  <h3>3.1. Động Phủ – Linh Căn</h3>
-  <p>Dùng Linh Thạch nâng chỉ số vĩnh viễn. Mỗi chỉ số mang tên một công pháp của Hàn Lập.</p>
-  <table>
-    <tr><th>Nâng cấp</th><th>Công pháp</th><th>Hiệu quả mỗi cấp</th><th>Cấp tối đa</th></tr>
-    <tr><td>HP gốc</td><td>Phạm Thánh Chân Ma Công (luyện thể)</td><td>+5% HP</td><td>20</td></tr>
-    <tr><td>Công gốc</td><td>Thanh Nguyên Kiếm Quyết</td><td>+4% sát thương phi kiếm</td><td>20</td></tr>
-    <tr><td>Tốc độ phi kiếm</td><td>Đại Diễn Quyết (thần thức)</td><td>+3% tốc độ bay, +2% tầm dò</td><td>20</td></tr>
-    <tr><td>Tỷ lệ rơi Linh Thạch</td><td>Chưởng Thiên Bình</td><td>+3% Linh Thạch rơi</td><td>10</td></tr>
-  </table>
-  <p><b>Linh Căn</b> là mốc lớn trong Động Phủ, nâng bằng Linh Thạch và yêu cầu đã qua chương nhất định:</p>
-  <table>
-    <tr><th>Linh Căn</th><th>Điều kiện</th><th>Hệ số EXP trong trận</th></tr>
-    <tr><td>Tứ Linh Căn (khởi đầu)</td><td>—</td><td>×1.00</td></tr>
-    <tr><td>Tam Linh Căn</td><td>Qua chương 3</td><td>×1.10</td></tr>
-    <tr><td>Song Linh Căn</td><td>Qua chương 9</td><td>×1.25</td></tr>
-    <tr><td>Thiên Linh Căn</td><td>Qua chương 14</td><td>×1.50</td></tr>
-  </table>
-  <div class="note">Nguyên tác: Hàn Lập giữ ngụy linh căn suốt truyện. Việc nâng Linh Căn ở đây là để có cảm giác tiến bộ trong game, có thể đổi tên thành "Tẩy Tủy" nếu muốn bám nguyên tác.</div>
+  <h3>3.2. Bí Cảnh</h3>
+  <ol>
+    <li>Vào từ cổng: pop-up level gợi ý, thưởng, ô chọn đan (tối đa 1 viên).</li>
+    <li>Xuất hiện ở giữa đấu trường với 3 phi kiếm + phi kiếm cộng thêm từ công pháp. Level của người chơi giữ nguyên.</li>
+    <li>Quái rơi Linh Châu (EXP trong trận) và Linh Thạch. Đầy EXP trong trận → chọn 1 trong 3 thẻ Kỳ Ngộ.</li>
+    <li>Tu Vi trong trận đủ → Tiểu Lôi Kiếp → tầng Lôi Kiếp mới + Biến Thân (<a href="tu-luyen.html">Tu luyện</a> mục 6).</li>
+    <li>Phút 5 boss tinh anh, phút 10 boss chính. Hạ boss chính là qua Bí Cảnh.</li>
+    <li>Kết thúc: <code>ResultPopup</code> (thời gian, tổng sát thương, Linh Thạch, EXP, linh thảo, cống hiến) → về thế giới ở chỗ cổng.</li>
+  </ol>
+  <p><b>Rút lui (Độn Thổ Phù):</b> trong menu tạm dừng, giữ 100% Linh Thạch đã nhặt, không tính qua Bí Cảnh. Chết không hồi sinh: giữ 50%.</p>
 
-  <h3>3.2. Kiếm Trủng</h3>
-  <p>Mở khóa và nâng cấp phi kiếm, Thần Luân, Cánh. Trước mỗi trận trang bị 1 loại phi kiếm, 1 Thần Luân, 1 Cánh, 1 Linh Thú.</p>
+  <h3>3.3. Thưởng Bí Cảnh</h3>
   <table>
-    <tr><th>Ô</th><th>Ví dụ</th><th>Hiệu quả</th></tr>
-    <tr><td>Phi kiếm</td><td>Thanh Trúc Phong Vân Kiếm, Lôi Kiếm, Hỏa Kiếm, Băng Kiếm</td><td>Thuộc tính và chỉ số cơ bản của phi kiếm (xem <a href="chien-dau.html">Chiến đấu</a>)</td></tr>
-    <tr><td>Thần Luân</td><td>Hư Thiên Đỉnh</td><td>Mỗi 20 giây hút quái gần vào đỉnh và thiêu bằng Càn Lam Băng Diễm (sát thương + làm chậm)</td></tr>
-    <tr><td>Cánh</td><td>Phong Lôi Sí</td><td>Lướt xa hơn, để lại vệt sét</td></tr>
-    <tr><td>Linh Thú</td><td>Phệ Kim Trùng, Đề Hồn Thú…</td><td>Xem mục 3.4</td></tr>
+    <tr><th></th><th>Cốt truyện lần đầu</th><th>Cốt truyện chơi lại</th><th>Bí Cảnh vùng</th></tr>
+    <tr><td>Linh Thạch</td><td>Bảng ở <a href="gdd.html">Cốt truyện</a></td><td>20% số đó</td><td><code>20 + 4 × level Bí Cảnh</code></td></tr>
+    <tr><td>EXP vĩnh viễn</td><td>30% Need</td><td>15% Need</td><td>15% Need</td></tr>
+    <tr><td>Linh thảo</td><td>1 của vùng (100%)</td><td>30%</td><td>1 (60%)</td></tr>
+    <tr><td>Cống hiến</td><td>—</td><td>—</td><td>+30 nếu là thành viên tông môn của vùng</td></tr>
   </table>
+  <p>Linh Thạch nhặt trong trận cộng thêm. Người chơi cao hơn level Bí Cảnh quá 5: EXP chỉ còn 5% Need.</p>
 
-  <h3>3.3. Chưởng Thiên Bình &amp; Luyện Đan</h3>
+  <h2>4. Hệ thống ngoài chiến đấu</h2>
+  <p>Mở từ nút Menu (khi không có quái đuổi trong 8 unit) hoặc các công trình ở HUB.</p>
+
+  <h3>4.1. Động Phủ</h3>
+  <table>
+    <tr><th>Nâng cấp</th><th>Mỗi cấp</th><th>Cấp tối đa</th></tr>
+    <tr><td>Tôi Thể</td><td>+5% HP</td><td>20</td></tr>
+    <tr><td>Kiếm Tâm</td><td>+4% sát thương phi kiếm</td><td>20</td></tr>
+    <tr><td>Thần Niệm</td><td>+3% tốc độ bay kiếm, +2% tầm dò</td><td>20</td></tr>
+    <tr><td>Phúc Duyên</td><td>+3% Linh Thạch rơi</td><td>10</td></tr>
+  </table>
+  <p>Giá ở <a href="can-bang.html">Cân bằng</a> mục 10. Linh Căn ở <a href="tu-luyen.html">Tu luyện</a> mục 7.</p>
+
+  <h3>4.2. Công pháp &amp; Tông môn</h3>
+  <p>1 ô chủ tu + 3 ô phụ, học ở tông môn bằng cống hiến và Linh Thạch. Chi tiết ở <a href="tong-mon.html">Tông môn &amp; Công pháp</a>.</p>
+
+  <h3>4.3. Kiếm Trủng</h3>
+  <table>
+    <tr><th>Ô</th><th>Mở</th><th>Ví dụ</th></tr>
+    <tr><td>Phi kiếm</td><td>Lv 1</td><td>Phàm phẩm, Thanh Trúc Phong Vân Kiếm, Lôi Kiếm, Hỏa Kiếm, Băng Kiếm</td></tr>
+    <tr><td>Thần Luân</td><td>Lv 21</td><td>Hư Thiên Đỉnh</td></tr>
+    <tr><td>Cánh</td><td>Lv 61</td><td>Phong Lôi Sí</td></tr>
+    <tr><td>Linh Thú</td><td>Có linh thú đầu tiên</td><td>Huyết Ngọc Tri Nhện, Phệ Kim Trùng, Lục Dực Sương Ngô, Đề Hồn Thú</td></tr>
+  </table>
+  <p>Phi kiếm trong Kiếm Trủng cho hệ số sát thương và hiệu ứng riêng (ví dụ Lôi Kiếm sét lan). Hành để tính khắc chế lấy từ công pháp chủ tu, không lấy từ phi kiếm.
+  Số liệu linh thú, Thần Luân, Cánh, đồng đội ở <a href="noi-dung.html">Quái &amp; Boss</a> mục 8–9.</p>
+
+  <h3>4.4. Chưởng Thiên Bình &amp; Luyện Đan</h3>
   <ul>
-    <li>Chưởng Thiên Bình tích 1 giọt <b>Lục Dịch</b> mỗi 8 giờ thực (tính cả khi tắt game), chứa tối đa 3 giọt.</li>
-    <li>Động Phủ có 3 ô <b>linh điền</b>. Gieo linh thảo (rơi từ boss), tưới Lục Dịch để thảo dược đạt tuổi đủ luyện đan ngay.</li>
-    <li>Luyện đan ra đan dược dùng trước trận (mỗi trận dùng tối đa 1 viên):</li>
+    <li>Chưởng Thiên Bình tích 1 giọt Lục Dịch mỗi 8 giờ thực (cấp 2: 6 h, mở khi phi thăng Linh Giới; cấp 3: 4 h, thưởng chương 18), tối đa 3 giọt.</li>
+    <li>Động Phủ có 3 ô linh điền. Linh thảo nhặt ngoài thế giới dùng trực tiếp để luyện đan; gieo vào linh điền để nhân đôi: sau 24 h thực (hoặc 1 giọt Lục Dịch) thu được 2 cây.</li>
+    <li>Luyện ở Đan Phòng (HUB) hoặc Động Phủ.</li>
   </ul>
   <table>
-    <tr><th>Đan dược</th><th>Hiệu quả trong trận</th></tr>
-    <tr><td>Trúc Cơ Đan</td><td>Lần Độ Kiếp đầu cần ít hơn 20% Tu Vi</td></tr>
-    <tr><td>Giáng Trần Đan</td><td>Lôi Kiếp ngắn còn 8 giây</td></tr>
-    <tr><td>Tuyết Phách Hoàn</td><td>Bắt đầu trận với 1 thẻ Kỳ Ngộ ngẫu nhiên</td></tr>
-    <tr><td>Huyền Thiên Đan</td><td>Hồi sinh 1 lần không cần xem quảng cáo</td></tr>
-    <tr><td>Định Nhan Đan</td><td>Trang phục (chỉ đổi ngoại hình)</td></tr>
+    <tr><th>Đan</th><th>Công dụng</th></tr>
+    <tr><td>Trúc Cơ Đan</td><td>Bắt buộc để đột phá Lv 10 → 11</td></tr>
+    <tr><td>Giáng Trần Đan</td><td>Thiên Kiếp ở Lôi Kiếp Đài rút còn 12 s; trong Bí Cảnh: Tiểu Lôi Kiếp còn 8 s</td></tr>
+    <tr><td>Tuyết Phách Hoàn</td><td>Thiên Kiếp: −20% sát thương mỗi tia; trong Bí Cảnh: bắt đầu với 1 thẻ Kỳ Ngộ ngẫu nhiên</td></tr>
+    <tr><td>Huyền Thiên Đan</td><td>Hồi sinh tại chỗ 1 lần không cần quảng cáo (thế giới hoặc Bí Cảnh)</td></tr>
+    <tr><td>Định Nhan Đan</td><td>Mở trang phục "Thanh Sam"</td></tr>
   </table>
-  <table>
-    <tr><th>Cấp Chưởng Thiên Bình</th><th>Mở ở</th><th>Thời gian/giọt</th></tr>
-    <tr><td>1</td><td>Chương 1</td><td>8 giờ</td></tr>
-    <tr><td>2</td><td>Chương 10</td><td>6 giờ</td></tr>
-    <tr><td>3</td><td>Chương 18</td><td>4 giờ</td></tr>
-  </table>
-  <div class="note">Thời gian thực phải lấy từ server hoặc kiểm tra chênh lệch giờ hệ thống để chống chỉnh đồng hồ điện thoại.</div>
+  <p>Công thức ở <a href="can-bang.html">Cân bằng</a> mục 11 và <a href="noi-dung.html">Quái &amp; Boss</a> mục 11.</p>
 
-  <h3>3.4. Linh Thú</h3>
+  <h3>4.5. Nhiệm vụ</h3>
   <table>
-    <tr><th>Linh thú</th><th>Mở ở</th><th>Hành vi trong trận</th><th>Tiến hóa</th></tr>
-    <tr><td>Huyết Ngọc Tri Nhện</td><td>Chương 3</td><td>Nhả tơ làm chậm quái, +10% Linh Thạch rơi</td><td>1 giai đoạn</td></tr>
-    <tr><td>Phệ Kim Trùng</td><td>Chương 5</td><td>Bầy trùng bám quái, giảm giáp, ăn khiên của boss</td><td>Ấu trùng → Trưởng thành → Phệ Kim Trùng Vương (cho ăn Lục Dịch + Linh Thạch)</td></tr>
-    <tr><td>Lục Dực Sương Ngô</td><td>Chương 7</td><td>Định kỳ đóng băng vùng quanh người chơi</td><td>2 giai đoạn</td></tr>
-    <tr><td>Đề Hồn Thú</td><td>Chương 8</td><td>Hút hồn quái hệ Âm/Ma, ×2 sát thương lên quỷ vật</td><td>Khỉ nhỏ → … → Hình Thú</td></tr>
+    <tr><th>Loại</th><th>Nguồn</th><th>Ghi chú</th></tr>
+    <tr><td>Chính</td><td>19 chương (<a href="gdd.html">Cốt truyện</a>)</td><td>Luôn hiện 1 nhiệm vụ đang theo dõi bên trái HUD, có mũi tên chỉ hướng</td></tr>
+    <tr><td>Tông môn hằng ngày</td><td>Mỗi tông môn đã gia nhập</td><td>3 nhiệm vụ/ngày (<a href="tong-mon.html">Tông môn</a> mục 2.3)</td></tr>
   </table>
+  <p>Kiểu bước nhiệm vụ: tới ô, nói chuyện NPC, hạ N quái (id, ô), hạ tinh anh/boss, nhặt N vật phẩm, qua Bí Cảnh, đạt level.</p>
 
-  <h3>3.5. Chế độ Vô Tận</h3>
-  <p>Mở sau chương 19. Trận không giới hạn thời gian, quái mạnh dần, lưu kỷ lục thời gian sống sót. Luật chi tiết ở <a href="he-thong-phu.html">Hướng dẫn &amp; Cài đặt</a> mục 2.</p>
-  <p>Số liệu linh thú, Thần Luân, Cánh và đồng đội ở <a href="noi-dung.html">Nội dung ch.5–19</a> mục 8–9.</p>
+  <h3>4.6. Chế độ Vô Tận</h3>
+  <p>Mở sau chương 19, vào ở HUB Tiên Giới. Luật ở <a href="he-thong-phu.html">Hướng dẫn &amp; Cài đặt</a> mục 2.</p>
 </main>
 <footer>Tài liệu nội bộ – Vạn Kiếm Độ Kiếp</footer>
 </body>
