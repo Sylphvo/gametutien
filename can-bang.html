@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cân bằng – Vạn Kiếm Độ Kiếp</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <h1>Dữ liệu cân bằng (chương 1–4)</h1>
+  <nav>
+    <a href="index.html">Tổng quan</a>
+    <a href="gdd.html">Cốt truyện &amp; Thế giới</a>
+    <a href="gameplay.html">Gameplay</a>
+    <a href="tu-luyen.html">Tu luyện</a>
+    <a href="chien-dau.html">Chiến đấu</a>
+    <a href="noi-dung.html">Nội dung ch.5–19</a>
+    <a href="he-thong-phu.html">Hướng dẫn &amp; Cài đặt</a>
+    <a href="vfx.html">VFX</a>
+    <a href="am-thanh.html">Âm thanh</a>
+    <a href="ui-quang-cao.html">UI &amp; Quảng cáo</a>
+    <a href="ui-kit.html">Bộ UI</a>
+    <a href="cong-cu-asset.html">Công cụ Asset</a>
+    <a href="can-bang.html" class="active">Cân bằng</a>
+    <a href="ky-thuat.html">Kỹ thuật</a>
+    <a href="phat-hanh.html">Phát hành</a>
+  </nav>
+</header>
+<main>
+  <div class="note">Chương 5–19, hệ số cảnh giới (áp cả cho chương 1–4), hành vi và nhãn của quái ở trang <a href="noi-dung.html">Nội dung ch.5–19</a>.</div>
+  <div class="note">Đây là bộ số khởi điểm để có bản chơi được, chưa qua playtest. Mọi giá trị nằm trong ScriptableObject.
+  Đơn vị khoảng cách là <b>unit</b> của Unity (1 unit = 100 px với PPU 100). Thời gian tính bằng giây.</div>
+
+  <h2>1. Mục tiêu cân bằng</h2>
+  <table>
+    <tr><th>Chương</th><th>Người chơi mới, chưa nâng cấp</th><th>Nâng cấp Động Phủ cần có để qua dễ</th></tr>
+    <tr><td>1</td><td>Qua trong 1–2 lần chơi</td><td>0</td></tr>
+    <tr><td>2</td><td>Qua trong 2–3 lần</td><td>~4 cấp tổng</td></tr>
+    <tr><td>3</td><td>Khó, thường thua ở phút 8–10</td><td>~10 cấp tổng</td></tr>
+    <tr><td>4</td><td>Rất khó</td><td>~18 cấp tổng + 1 phi kiếm nâng cấp</td></tr>
+  </table>
+
+  <h2>2. Chỉ số nhân vật gốc (<code>PlayerBaseStats</code>)</h2>
+  <table>
+    <tr><th>Chỉ số</th><th>Giá trị</th></tr>
+    <tr><td>HP tối đa</td><td>100</td></tr>
+    <tr><td>Công gốc</td><td>10</td></tr>
+    <tr><td>Tốc độ di chuyển</td><td>3.5 unit/s</td></tr>
+    <tr><td>Bán kính hút Linh Châu</td><td>1.5 unit</td></tr>
+    <tr><td>Bất tử sau khi bị đánh</td><td>0.5 s</td></tr>
+    <tr><td>Dash: quãng đường / cooldown / bất tử</td><td>3 unit / 3 s / 0.25 s</td></tr>
+    <tr><td>Số phi kiếm khởi đầu</td><td>3 (tối đa 36 trên màn hình)</td></tr>
+    <tr><td>Bán kính quỹ đạo kiếm</td><td>1.2 unit</td></tr>
+    <tr><td>Tốc độ xoay quỹ đạo</td><td>180 độ/s</td></tr>
+    <tr><td>Tốc độ bay khi tấn công</td><td>12 unit/s</td></tr>
+    <tr><td><code>DetectionRadius</code></td><td>5 unit</td></tr>
+    <tr><td>Thời gian nghỉ mỗi kiếm sau một đòn</td><td>0.8 s</td></tr>
+    <tr><td>Xuyên mục tiêu mỗi lần lao</td><td>1 (kiếm quay về sau khi trúng)</td></tr>
+  </table>
+
+  <h2>3. EXP, Tu Vi, Nộ</h2>
+  <pre><code>EXP cần để lên cấp n → n+1 = 5 + 4 × n
+Tu Vi = tổng EXP đã nhặt trong trận (không reset khi lên cấp)
+Ngưỡng Độ Kiếp: 300 / 900 / 2000 Tu Vi (≈ cấp 11 / 21 / 30)</code></pre>
+  <table>
+    <tr><th>Linh Châu</th><th>EXP</th><th>Rơi từ</th></tr>
+    <tr><td>Nhỏ (xanh)</td><td>1</td><td>Quái thường</td></tr>
+    <tr><td>Vừa (lam)</td><td>5</td><td>Quái tinh anh nhỏ, gộp 5 viên nhỏ khi quá 150 viên trên màn</td></tr>
+    <tr><td>Lớn (tím)</td><td>50</td><td>Boss tinh anh</td></tr>
+  </table>
+  <table>
+    <tr><th>Nguồn Nộ (tối đa 100)</th><th>Lượng</th></tr>
+    <tr><td>Mỗi đòn phi kiếm trúng</td><td>+0.5</td></tr>
+    <tr><td>Mỗi lần bị đánh</td><td>+4</td></tr>
+    <tr><td>Hạ boss tinh anh</td><td>+50</td></tr>
+  </table>
+  <p>Biến Thân tiêu toàn bộ Nộ. Chưa mở trạng thái nào thì <code>Btn_Transform</code> bị khóa.</p>
+
+  <h2>4. Phi kiếm</h2>
+  <pre><code>SatThuongMoiDon = CongGoc × (1 + 0.04 × capCongDongPhu) × HeSoKiem × (1 + TongBonusKyNgo) × HeSoThuocTinh × HeSoBienThan</code></pre>
+  <table>
+    <tr><th>Phi kiếm</th><th>HeSoKiem</th><th>Hiệu ứng thêm</th><th>Giá mở</th><th>Nâng cấp (mỗi cấp, tối đa 10)</th></tr>
+    <tr><td>Phàm phẩm</td><td>1.0</td><td>—</td><td>Mặc định</td><td>+5% HeSoKiem</td></tr>
+    <tr><td>Thanh Trúc Phong Vân Kiếm</td><td>1.2</td><td>15% phóng tia điện 0.5× sát thương sang 1 quái gần</td><td>Thưởng chương 4</td><td>+6% HeSoKiem</td></tr>
+    <tr><td>Lôi Kiếm</td><td>1.1</td><td>Sét lan 2 mục tiêu, mỗi lần lan 0.4×</td><td>800 Linh Thạch</td><td>+5%</td></tr>
+    <tr><td>Hỏa Kiếm</td><td>1.0</td><td>Thiêu 3 s, mỗi giây 0.2×</td><td>800</td><td>+5%</td></tr>
+    <tr><td>Băng Kiếm</td><td>0.9</td><td>Chậm 30% trong 2 s; 3 lần trúng thì đóng băng 1 s (boss: chỉ chậm)</td><td>1.000</td><td>+5%</td></tr>
+  </table>
+  <pre><code>GiaNangKiem(cap) = 100 × 1.35^(cap − 1)     // cấp 1→2 = 100, cấp 9→10 ≈ 1.100</code></pre>
+
+  <h2>5. Thẻ Kỳ Ngộ</h2>
+  <table>
+    <tr><th>Thẻ</th><th>Trọng số</th><th>Mỗi cấp (tối đa 5)</th></tr>
+    <tr><td>Phân Kiếm Thuật</td><td>10</td><td>+1 phi kiếm</td></tr>
+    <tr><td>Ngự Phong Quyết</td><td>10</td><td>+10% tốc độ bay, −5% thời gian nghỉ</td></tr>
+    <tr><td>Thanh Nguyên Kiếm Quyết</td><td>10</td><td>+12% sát thương</td></tr>
+    <tr><td>Đại Diễn Quyết</td><td>8</td><td>+10% <code>DetectionRadius</code></td></tr>
+    <tr><td>Lôi Văn</td><td>6</td><td>Cấp 1: thêm hệ Lôi (sét lan 1 mục tiêu 0.3×); mỗi cấp sau +1 mục tiêu</td></tr>
+    <tr><td>Hỏa Văn</td><td>6</td><td>Cấp 1: thiêu 2 s 0.15×/s; mỗi cấp sau +0.05×</td></tr>
+    <tr><td>Luyện Thể</td><td>8</td><td>+10% HP tối đa, hồi 10% HP ngay</td></tr>
+    <tr><td>Thân Pháp</td><td>8</td><td>+6% tốc độ chạy, −8% cooldown Dash</td></tr>
+    <tr><td>Tẩy Luyện</td><td>3</td><td>Đổi 1 thẻ đang có lấy 1 thẻ ngẫu nhiên cùng cấp</td></tr>
+  </table>
+  <ul>
+    <li>3 thẻ không trùng nhau; bỏ thẻ đã cấp 5.</li>
+    <li>Khi đủ điều kiện tiến hóa (xem <a href="chien-dau.html">Chiến đấu</a>), thẻ tiến hóa chắc chắn chiếm 1 trong 3 ô.</li>
+    <li>Hết thẻ để chọn thì thay bằng "Linh Thạch +20" hoặc "Hồi 30% HP".</li>
+  </ul>
+
+  <h2>6. Quái chương 1–4</h2>
+  <table>
+    <tr><th>Id</th><th>Tên</th><th>HP</th><th>Sát thương chạm</th><th>Tốc độ</th><th>Hành vi</th><th>EXP</th><th>Linh Thạch</th></tr>
+    <tr><td><code>en_soi</code></td><td>Yêu Lang</td><td>12</td><td>6</td><td>2.2</td><td>Lao thẳng</td><td>1</td><td>8% rơi 1</td></tr>
+    <tr><td><code>en_soi_dau</code></td><td>Lang Đầu Đàn (tinh anh nhỏ)</td><td>60</td><td>10</td><td>2.6</td><td>Lao thẳng, cứ 4 s lao nhanh 1 lần (cảnh báo 0.6 s)</td><td>5</td><td>100% rơi 3</td></tr>
+    <tr><td><code>en_doc_trung</code></td><td>Độc Trùng</td><td>8</td><td>4</td><td>3.0</td><td>Đi zigzag, chết để lại vũng độc 2 s (2 sát thương/0.5 s)</td><td>1</td><td>6% rơi 1</td></tr>
+    <tr><td><code>en_khoi_loi</code></td><td>Khôi Lỗi Gỗ</td><td>40</td><td>8</td><td>1.4</td><td>Chậm, trâu</td><td>2</td><td>10% rơi 1</td></tr>
+    <tr><td><code>en_huyet_doi</code></td><td>Huyết Dơi</td><td>10</td><td>5</td><td>3.4</td><td>Bay theo bầy 6–8 con, lượn vòng rồi lao vào</td><td>1</td><td>6% rơi 1</td></tr>
+    <tr><td><code>en_ma_tu</code></td><td>Đệ tử Ma Đạo</td><td>30</td><td>6 (đạn)</td><td>1.8</td><td>Giữ khoảng cách 5 unit, mỗi 2.5 s bắn 1 đạn tốc độ 5</td><td>3</td><td>15% rơi 2</td></tr>
+    <tr><td><code>en_ma_tu_no</code></td><td>Huyết Nô (tự nổ)</td><td>20</td><td>18 (nổ, bán kính 1.2)</td><td>2.8</td><td>Đến gần 1 unit thì đứng 0.6 s (cảnh báo) rồi nổ</td><td>2</td><td>10% rơi 1</td></tr>
+  </table>
+  <pre><code>HP thực tế     = HP gốc × enemyStatMultiplier(chương) × (1 + 0.12 × phútĐãQua)
+Sát thương thực = Sát thương gốc × enemyStatMultiplier(chương) × (1 + 0.05 × phútĐãQua)</code></pre>
+  <table>
+    <tr><th>Chương</th><th><code>enemyStatMultiplier</code></th><th>Thưởng qua lần đầu</th><th>Thưởng chơi lại</th></tr>
+    <tr><td>1</td><td>1.0</td><td>150 Linh Thạch</td><td>30</td></tr>
+    <tr><td>2</td><td>1.3</td><td>250</td><td>50</td></tr>
+    <tr><td>3</td><td>1.7</td><td>400</td><td>80</td></tr>
+    <tr><td>4</td><td>2.2</td><td>600</td><td>120</td></tr>
+  </table>
+
+  <h2>7. Bảng wave</h2>
+  <p>Mỗi dòng là một khoảng thời gian. <code>WaveSpawner</code> sinh quái ở vòng tròn bán kính 11 unit quanh người chơi (ngoài màn hình),
+  không vượt quá "Tối đa cùng lúc".</p>
+  <h3>Chương 1 – Thất Huyền Môn</h3>
+  <table>
+    <tr><th>Phút</th><th>Mỗi lần sinh / chu kỳ</th><th>Tối đa cùng lúc</th><th>Thành phần</th></tr>
+    <tr><td>0–2</td><td>3 con / 2.0 s</td><td>40</td><td>100% Yêu Lang</td></tr>
+    <tr><td>2–4</td><td>4 / 1.8 s</td><td>60</td><td>80% Yêu Lang, 20% Độc Trùng</td></tr>
+    <tr><td>4–5</td><td>5 / 1.6 s</td><td>70</td><td>70% Yêu Lang, 30% Độc Trùng; phút 4:30 thêm 2 Lang Đầu Đàn</td></tr>
+    <tr><td>5</td><td colspan="3"><b>Boss tinh anh</b>: Lang Vương (xem mục 8). Ngừng sinh quái mới tới khi boss chết hoặc sau 60 s.</td></tr>
+    <tr><td>5–8</td><td>6 / 1.5 s</td><td>90</td><td>60% Yêu Lang, 30% Độc Trùng, 10% Khôi Lỗi Gỗ</td></tr>
+    <tr><td>8–10</td><td>8 / 1.3 s</td><td>110</td><td>50% Yêu Lang, 30% Độc Trùng, 20% Khôi Lỗi Gỗ; mỗi phút 3 Lang Đầu Đàn</td></tr>
+    <tr><td>10</td><td colspan="3"><b>Boss chương</b>: Yêu Lang Đầu Đàn Huyết Nhãn. Quái thường tiếp tục sinh với 50% mật độ.</td></tr>
+  </table>
+
+  <h3>Chương 2 – Mật thất Mặc phủ</h3>
+  <table>
+    <tr><th>Phút</th><th>Mỗi lần sinh / chu kỳ</th><th>Tối đa cùng lúc</th><th>Thành phần</th></tr>
+    <tr><td>0–3</td><td>4 / 1.8 s</td><td>60</td><td>60% Độc Trùng, 40% Khôi Lỗi Gỗ</td></tr>
+    <tr><td>3–5</td><td>5 / 1.6 s</td><td>80</td><td>50% Độc Trùng, 30% Khôi Lỗi Gỗ, 20% Huyết Dơi (bầy)</td></tr>
+    <tr><td>5</td><td colspan="3"><b>Boss tinh anh</b>: Khôi Lỗi Đồng</td></tr>
+    <tr><td>5–10</td><td>7 / 1.4 s</td><td>110</td><td>40% Độc Trùng, 30% Khôi Lỗi Gỗ, 30% Huyết Dơi</td></tr>
+    <tr><td>10</td><td colspan="3"><b>Boss chương</b>: Mặc Đại Phu</td></tr>
+  </table>
+
+  <h3>Chương 3 – Huyết Sắc Cấm Địa</h3>
+  <table>
+    <tr><th>Phút</th><th>Mỗi lần sinh / chu kỳ</th><th>Tối đa cùng lúc</th><th>Thành phần</th></tr>
+    <tr><td>0–3</td><td>5 / 1.6 s</td><td>80</td><td>50% Yêu Lang, 30% Huyết Dơi, 20% Độc Trùng</td></tr>
+    <tr><td>3–5</td><td>6 / 1.5 s</td><td>100</td><td>40% Yêu Lang, 30% Huyết Dơi, 20% Khôi Lỗi Gỗ, 10% Đệ tử Ma Đạo</td></tr>
+    <tr><td>5</td><td colspan="3"><b>Boss tinh anh</b>: Huyết Văn Mãng</td></tr>
+    <tr><td>5–10</td><td>8 / 1.3 s</td><td>130</td><td>30% Yêu Lang, 30% Huyết Dơi, 20% Khôi Lỗi Gỗ, 20% Đệ tử Ma Đạo</td></tr>
+    <tr><td>10</td><td colspan="3"><b>Boss chương</b>: Huyết Văn Mãng Vương</td></tr>
+  </table>
+
+  <h3>Chương 4 – Việt Quốc thất thủ</h3>
+  <table>
+    <tr><th>Phút</th><th>Mỗi lần sinh / chu kỳ</th><th>Tối đa cùng lúc</th><th>Thành phần</th></tr>
+    <tr><td>0–3</td><td>6 / 1.5 s</td><td>100</td><td>60% Đệ tử Ma Đạo, 40% Huyết Nô</td></tr>
+    <tr><td>3–5</td><td>7 / 1.4 s</td><td>120</td><td>50% Đệ tử Ma Đạo, 30% Huyết Nô, 20% Huyết Dơi</td></tr>
+    <tr><td>5</td><td colspan="3"><b>Boss tinh anh</b>: Hộ pháp Ma Diễm Tông</td></tr>
+    <tr><td>5–10</td><td>9 / 1.2 s</td><td>150</td><td>40% Đệ tử Ma Đạo, 35% Huyết Nô, 25% Huyết Dơi</td></tr>
+    <tr><td>10</td><td colspan="3"><b>Boss chương</b>: Trưởng lão Hợp Hoan Tông</td></tr>
+  </table>
+  <div class="note">Giới hạn cứng toàn game: 150 quái cùng lúc, 300 đạn, 150 Linh Châu (quá thì gộp). Chương 4 đã chạm trần, các chương sau tăng độ khó bằng chỉ số và hành vi, không tăng số lượng.</div>
+
+  <h2>8. Boss</h2>
+  <p>HP boss dưới đây là giá trị cuối cùng, <b>không</b> nhân thêm hệ số phút. Telegraph tối thiểu 0.6 s.</p>
+  <table>
+    <tr><th>Boss</th><th>Chương / phút</th><th>HP</th><th>Chạm</th><th>Tốc độ</th><th>Chiêu (cooldown)</th><th>Thưởng</th></tr>
+    <tr><td>Lang Vương</td><td>1 / 5</td><td>600</td><td>12</td><td>2.4</td><td>Lao thẳng 8 unit (5 s, cảnh báo đường thẳng 0.8 s); Hú gọi 6 Yêu Lang (12 s)</td><td>Linh Châu lớn, 20 Linh Thạch</td></tr>
+    <tr><td>Yêu Lang Huyết Nhãn</td><td>1 / 10</td><td>2.500</td><td>15</td><td>2.6</td><td>Như Lang Vương; dưới 50% HP lao 2 lần liên tiếp và cào hình quạt 90° tầm 2.5 (4 s, cảnh báo 0.7 s)</td><td>Qua chương</td></tr>
+    <tr><td>Khôi Lỗi Đồng</td><td>2 / 5</td><td>1.000</td><td>14</td><td>1.5</td><td>Đập đất vòng tròn bán kính 2.5, 20 sát thương (4 s, cảnh báo 0.8 s)</td><td>Linh Châu lớn, 30 Linh Thạch</td></tr>
+    <tr><td>Mặc Đại Phu</td><td>2 / 10</td><td>4.000</td><td>10</td><td>2.0 (giữ khoảng cách 4)</td><td>
+      <b>Phase 1 (100–50%):</b> phun độc hình quạt 5 viên (3 s); triệu 4 Khôi Lỗi Gỗ (15 s).<br>
+      <b>Phase 2 (&lt;50%):</b> thêm <i>Đoạt Xá</i>: vòng hút bán kính 6 kéo người chơi về tâm 2.5 unit/s trong 3 s, tâm gây 30 sát thương mỗi 0.5 s; phải Dash ra ngoài (12 s, cảnh báo 1.0 s, màn hình viền tím).</td><td>Qua chương, mở Luyện đan</td></tr>
+    <tr><td>Huyết Văn Mãng</td><td>3 / 5</td><td>1.500</td><td>16</td><td>2.2</td><td>Trườn theo đường cong để lại vệt độc 3 s (6 s)</td><td>Linh Châu lớn, linh thảo <code>herb_huyet_sam</code></td></tr>
+    <tr><td>Huyết Văn Mãng Vương</td><td>3 / 10</td><td>6.000</td><td>18</td><td>2.4</td><td>Như trên; phun 3 luồng độc thẳng (5 s, cảnh báo 0.8 s); dưới 40% HP chui xuống đất rồi trồi lên dưới chân người chơi (8 s, cảnh báo vòng 1.0 s)</td><td>Qua chương, Huyết Ngọc Tri Nhện</td></tr>
+    <tr><td>Hộ pháp Ma Diễm Tông</td><td>4 / 5</td><td>2.200</td><td>16</td><td>2.0</td><td>Ném 3 cầu lửa rơi vào vị trí người chơi (4 s, cảnh báo vòng 0.8 s)</td><td>Linh Châu lớn, 40 Linh Thạch</td></tr>
+    <tr><td>Trưởng lão Hợp Hoan Tông</td><td>4 / 10</td><td>9.000</td><td>14</td><td>2.6</td><td>
+      <b>Phase 1:</b> bắn vòng 12 đạn hồng (3 s); dịch chuyển ra sau lưng người chơi (7 s, để lại dấu 0.6 s).<br>
+      <b>Phase 2 (&lt;50%):</b> <i>Mê Hồn</i>: đảo ngược joystick 3 s (14 s, cảnh báo biểu tượng trên đầu 1.0 s); tạo 2 ảo ảnh 1 HP bắn cùng chiêu.</td><td>Qua chương, Thanh Trúc Phong Vân Kiếm</td></tr>
+  </table>
+
+  <h2>9. Lôi Kiếp</h2>
+  <table>
+    <tr><th>Lần</th><th>Số tia trong 10 s</th><th>Sát thương mỗi tia</th><th>Bán kính tia</th><th>Ghi chú</th></tr>
+    <tr><td>1</td><td>8</td><td>15% HP tối đa</td><td>1.0</td><td>Tia rơi đều theo thời gian</td></tr>
+    <tr><td>2</td><td>14</td><td>18% HP tối đa</td><td>1.1</td><td>30% tia nhắm đúng vị trí người chơi lúc cảnh báo</td></tr>
+    <tr><td>3</td><td>22</td><td>20% HP tối đa</td><td>1.2</td><td>50% tia nhắm người chơi; 2 tia cuối đánh đồng thời</td></tr>
+  </table>
+  <p>Sét cũng gây sát thương lên quái trong vùng (500% Công gốc). Sát thương tính theo % HP để Lôi Kiếp không trở nên dễ khi nâng HP.</p>
+
+  <h2>10. Kinh tế Linh Thạch</h2>
+  <pre><code>GiaNangDongPhu(chiSo, cap) = Goc[chiSo] × 1.25^(cap − 1)</code></pre>
+  <table>
+    <tr><th>Nâng cấp Động Phủ</th><th>Goc</th><th>Cấp tối đa</th><th>Tổng để max (xấp xỉ)</th></tr>
+    <tr><td>HP gốc</td><td>50</td><td>20</td><td>~17.000</td></tr>
+    <tr><td>Công gốc</td><td>60</td><td>20</td><td>~20.500</td></tr>
+    <tr><td>Tốc độ phi kiếm</td><td>50</td><td>20</td><td>~17.000</td></tr>
+    <tr><td>Tỷ lệ rơi Linh Thạch</td><td>80</td><td>10</td><td>~2.700</td></tr>
+  </table>
+  <table>
+    <tr><th>Linh Căn</th><th>Giá</th><th>Điều kiện</th></tr>
+    <tr><td>Tam Linh Căn</td><td>3.000</td><td>Qua chương 3</td></tr>
+    <tr><td>Song Linh Căn</td><td>15.000</td><td>Qua chương 9</td></tr>
+    <tr><td>Thiên Linh Căn</td><td>60.000</td><td>Qua chương 14</td></tr>
+  </table>
+  <p>Ước tính một trận chương 1 kéo dài 10–12 phút, hạ khoảng 600–800 quái. Lần qua đầu nhận khoảng 230 Linh Thạch (rơi + boss + thưởng 150), chơi lại nhận khoảng 100.
+  Mười cấp Động Phủ chia đều 4 chỉ số tốn khoảng 800, tức người chơi cần khoảng 4–6 trận (tính cả thưởng qua chương 1 và 2) trước khi vào chương 3.</p>
+  <p>Quảng cáo nút <code>+</code> ở Lobby: +50 Linh Thạch, tối đa 5 lần/ngày.</p>
+
+  <h2>11. Linh thảo &amp; đan dược sớm</h2>
+  <table>
+    <tr><th>Linh thảo</th><th>Rơi từ</th></tr>
+    <tr><td><code>herb_thanh_linh</code> Thanh Linh Thảo</td><td>Boss chương 1, 2 (100%), chơi lại (30%)</td></tr>
+    <tr><td><code>herb_huyet_sam</code> Huyết Sâm</td><td>Boss chương 3 (100%), chơi lại (30%)</td></tr>
+    <tr><td><code>herb_tu_diep</code> Tử Diệp Hoa</td><td>Boss chương 4 (100%), chơi lại (30%)</td></tr>
+  </table>
+  <p>Linh thảo gieo xong cần 24 giờ thực để chín, hoặc tưới 1 giọt Lục Dịch để chín ngay.</p>
+  <table>
+    <tr><th>Đan dược</th><th>Công thức</th><th>Mở khi</th></tr>
+    <tr><td>Trúc Cơ Đan</td><td>2 Thanh Linh Thảo + 1 Huyết Sâm</td><td>Qua chương 2</td></tr>
+    <tr><td>Tuyết Phách Hoàn</td><td>2 Thanh Linh Thảo</td><td>Qua chương 2</td></tr>
+    <tr><td>Giáng Trần Đan</td><td>1 Huyết Sâm + 2 Tử Diệp Hoa</td><td>Qua chương 4</td></tr>
+    <tr><td>Huyền Thiên Đan</td><td>Chưa mở ở chương 1–4</td><td>—</td></tr>
+  </table>
+
+  <h2>12. Hồi sinh</h2>
+  <ul>
+    <li>Mỗi trận: tối đa 1 lần hồi sinh bằng quảng cáo + 1 lần bằng Huyền Thiên Đan.</li>
+    <li>Hồi sinh: 100% HP, đẩy lùi quái trong bán kính 6, bất tử 3 s, xóa toàn bộ đạn trên màn.</li>
+  </ul>
+
+  <h2>13. Định dạng hội thoại</h2>
+  <p>Tài liệu chỉ có tóm tắt truyện. Lời thoại cần bạn hoặc biên kịch viết, nhập vào <code>DialogueData</code>:</p>
+  <pre><code>[CreateAssetMenu(menuName = "VKDK/Dialogue")]
+public class DialogueData : ScriptableObject
+{
+    public DialogueLine[] lines;
+}
+
+[System.Serializable]
+public class DialogueLine
+{
+    public string speakerId;      // "han_lap", "mac_dai_phu"
+    public bool portraitOnLeft;
+    [TextArea] public string text; // ≤ 120 ký tự mỗi dòng
+}</code></pre>
+  <p>Mỗi chương: intro 6–10 dòng, outro 4–6 dòng.</p>
+</main>
+<footer>Tài liệu nội bộ – Vạn Kiếm Độ Kiếp</footer>
+</body>
+</html>
