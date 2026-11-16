@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Phát hành – Vạn Kiếm Độ Kiếp</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <h1>Theo dõi, quyền riêng tư &amp; phát hành Google Play</h1>
+  <nav>
+    <a href="index.html">Tổng quan</a>
+    <a href="gdd.html">Cốt truyện &amp; Thế giới</a>
+    <a href="gameplay.html">Gameplay</a>
+    <a href="tu-luyen.html">Tu luyện</a>
+    <a href="chien-dau.html">Chiến đấu</a>
+    <a href="noi-dung.html">Nội dung ch.5–19</a>
+    <a href="he-thong-phu.html">Hướng dẫn &amp; Cài đặt</a>
+    <a href="vfx.html">VFX</a>
+    <a href="am-thanh.html">Âm thanh</a>
+    <a href="ui-quang-cao.html">UI &amp; Quảng cáo</a>
+    <a href="ui-kit.html">Bộ UI</a>
+    <a href="cong-cu-asset.html">Công cụ Asset</a>
+    <a href="can-bang.html">Cân bằng</a>
+    <a href="ky-thuat.html">Kỹ thuật</a>
+    <a href="phat-hanh.html" class="active">Phát hành</a>
+  </nav>
+</header>
+<main>
+  <div class="note warn">Quy định của Google thay đổi thường xuyên. Các mục dưới đây đúng tại thời điểm viết (11/2026); kiểm tra lại trong Play Console và tài liệu AdMob/Firebase trước khi phát hành.</div>
+
+  <h2>1. Analytics &amp; báo lỗi</h2>
+  <table>
+    <tr><th>Thành phần</th><th>Công cụ</th><th>Cài đặt</th></tr>
+    <tr><td>Analytics</td><td>Firebase Analytics</td><td>Firebase Unity SDK bản mới nhất (firebase.google.com/download/unity), import <code>FirebaseAnalytics.unitypackage</code>. Đặt <code>google-services.json</code> vào <code>Assets/</code></td></tr>
+    <tr><td>Báo lỗi</td><td>Firebase Crashlytics</td><td><code>FirebaseCrashlytics.unitypackage</code>, cùng phiên bản với Analytics</td></tr>
+  </table>
+  <ul>
+    <li>Firebase và Google Mobile Ads cùng dùng External Dependency Manager. Sau khi import, chạy lại <i>Android Resolver → Force Resolve</i>; nếu xung đột phiên bản thư viện thì giữ bản EDM chọn mới nhất.</li>
+    <li><code>AnalyticsService</code> là lớp bọc duy nhất gọi Firebase. Code gameplay chỉ gọi <code>AnalyticsService.Log(...)</code>, để có thể đổi công cụ sau này.</li>
+    <li>Khởi tạo trong scene <code>Boot</code> sau khi có kết quả UMP: gọi <code>FirebaseApp.CheckAndFixDependenciesAsync()</code>, rồi đặt consent mode của Analytics (<code>FirebaseAnalytics.SetConsent</code>) theo lựa chọn của người dùng.</li>
+    <li>Bản Editor và Development: không gửi sự kiện, chỉ ghi log.</li>
+    <li>Code gọi Firebase bọc trong <code>#if VKDK_FIREBASE</code>. Khi chưa cài Firebase, <code>AnalyticsService</code> dùng bản giả chỉ ghi log để project vẫn biên dịch và chơi được.</li>
+    <li>Ghi lỗi không gây crash bằng <code>Crashlytics.LogException</code>: lỗi đọc save, lỗi tải quảng cáo lặp lại, trạng thái không hợp lệ.</li>
+  </ul>
+
+  <h3>Sự kiện</h3>
+  <table>
+    <tr><th>Sự kiện</th><th>Tham số</th><th>Để trả lời câu hỏi</th></tr>
+    <tr><td><code>tutorial_step</code></td><td>step_id</td><td>Người chơi bỏ ở bước hướng dẫn nào</td></tr>
+    <tr><td><code>chapter_start</code></td><td>chapter, attempt, pill_id</td><td>Chương nào chơi lại nhiều</td></tr>
+    <tr><td><code>chapter_end</code></td><td>chapter, result (win/lose/retreat), duration_s, realm_index, level, kills, revives</td><td>Chương nào quá khó, thua ở phút nào</td></tr>
+    <tr><td><code>tribulation</code></td><td>chapter, index (1–3), result</td><td>Lôi Kiếp có quá khó không</td></tr>
+    <tr><td><code>boss_result</code></td><td>boss_id, result, time_to_kill_s</td><td>Boss nào chặn người chơi</td></tr>
+    <tr><td><code>card_pick</code></td><td>card_id, level, offered_ids</td><td>Thẻ nào mạnh/yếu</td></tr>
+    <tr><td><code>upgrade_buy</code></td><td>type, id, new_level, cost</td><td>Người chơi tiêu Linh Thạch vào đâu</td></tr>
+    <tr><td><code>pill_craft</code></td><td>pill_id</td><td>Luyện đan có được dùng không</td></tr>
+    <tr><td><code>ad_reward</code></td><td>placement, result (shown/failed/not_ready)</td><td>Điểm quảng cáo nào hiệu quả</td></tr>
+    <tr><td><code>endless_end</code></td><td>duration_s, realm_index</td><td>Mức độ gắn bó cuối game</td></tr>
+  </table>
+  <p>Không gửi thông tin cá nhân (tên, email) trong tham số sự kiện.</p>
+
+  <h3>Ngưỡng ổn định cần giữ</h3>
+  <p>Google Play hạ thứ hạng hiển thị nếu app vượt ngưỡng "hành vi xấu" của Android vitals: tỷ lệ crash người dùng nhận thấy khoảng 1.09% và ANR khoảng 0.47%.
+  Mục tiêu nội bộ: crash &lt; 0.5%, ANR &lt; 0.2%. Không gọi tác vụ nặng (đọc/ghi file lớn, khởi tạo SDK) đồng bộ trên main thread lúc mở app.</p>
+
+  <h2>2. Quyền riêng tư</h2>
+  <h3>2.1. Đồng ý (UMP)</h3>
+  <ol>
+    <li>Trong AdMob → <i>Privacy &amp; messaging</i>: tạo thông báo GDPR (EEA, Anh, Thụy Sĩ) và thông báo cho các bang Hoa Kỳ nếu phát hành ở đó.</li>
+    <li>Mỗi lần mở app: <code>ConsentInformation.Update()</code> → <code>ConsentForm.LoadAndShowConsentFormIfRequired()</code> → khi <code>ConsentInformation.CanRequestAds()</code> mới khởi tạo quảng cáo.</li>
+    <li>Nếu <code>PrivacyOptionsRequirementStatus</code> là Required: hiện nút "Tùy chọn quyền riêng tư" trong Cài đặt, gọi <code>ShowPrivacyOptionsForm()</code> (<a href="https://developers.google.com/admob/unity/privacy">nguồn</a>).</li>
+    <li>Thử bằng <code>ConsentDebugSettings</code> với thiết bị test và vùng giả lập EEA trong bản Development.</li>
+  </ol>
+
+  <h3>2.2. Đối tượng người chơi và nội dung quảng cáo</h3>
+  <ul>
+    <li>Đối tượng mục tiêu trong Play Console: <b>13 tuổi trở lên</b>. Nếu chọn cả nhóm dưới 13, game phải tuân thủ chính sách Families (SDK quảng cáo được chứng nhận cho trẻ em, cấu hình khác hẳn), tài liệu này không bao gồm trường hợp đó.</li>
+    <li>Trong code: <code>RequestConfiguration</code> đặt <code>MaxAdContentRating = T</code> để không hiện quảng cáo nội dung người lớn.</li>
+  </ul>
+
+  <h3>2.3. Chính sách quyền riêng tư</h3>
+  <p>Bắt buộc có URL công khai (Google Sites, GitHub Pages hoặc web của studio) và nhập vào Play Console + nút trong Cài đặt. Nội dung tối thiểu:</p>
+  <ol>
+    <li>Tên nhà phát triển và email liên hệ.</li>
+    <li>Dữ liệu game lưu trên máy (tiến trình chơi), không gửi lên server riêng.</li>
+    <li>Dịch vụ bên thứ ba và dữ liệu họ thu thập: Google AdMob (ID quảng cáo, thông tin thiết bị, IP/vị trí gần đúng, tương tác quảng cáo), Firebase Analytics (ID cài đặt, sự kiện trong app, thông tin thiết bị), Firebase Crashlytics (báo cáo lỗi, thông tin thiết bị). Kèm link chính sách của Google.</li>
+    <li>Mục đích: hiển thị quảng cáo, phân tích để cải thiện game, sửa lỗi.</li>
+    <li>Cách từ chối/đổi lựa chọn: nút Tùy chọn quyền riêng tư trong Cài đặt; đặt lại ID quảng cáo trong cài đặt Android.</li>
+    <li>Trẻ em: game không dành cho người dưới 13 tuổi.</li>
+    <li>Cách yêu cầu xóa dữ liệu: nút Xóa dữ liệu trong game (dữ liệu trên máy) và email liên hệ (dữ liệu analytics).</li>
+    <li>Ngày cập nhật chính sách.</li>
+  </ol>
+
+  <h3>2.4. Form Data Safety (Play Console)</h3>
+  <p>Khai theo dữ liệu mà AdMob và Firebase thu thập; Google có trang hướng dẫn riêng cho từng SDK, đối chiếu trước khi nộp.</p>
+  <table>
+    <tr><th>Loại dữ liệu</th><th>Thu thập</th><th>Chia sẻ</th><th>Mục đích</th></tr>
+    <tr><td>Vị trí gần đúng</td><td>Có (AdMob, qua IP)</td><td>Có</td><td>Quảng cáo, chống gian lận</td></tr>
+    <tr><td>Tương tác trong app</td><td>Có</td><td>Có</td><td>Phân tích, quảng cáo</td></tr>
+    <tr><td>Nhật ký sự cố, chẩn đoán</td><td>Có</td><td>Không</td><td>Phân tích, sửa lỗi</td></tr>
+    <tr><td>ID thiết bị hoặc ID khác (ID quảng cáo, ID cài đặt Firebase)</td><td>Có</td><td>Có</td><td>Quảng cáo, phân tích</td></tr>
+  </table>
+  <p>Mã hóa khi truyền: Có (SDK dùng HTTPS). Người dùng yêu cầu xóa được: Có (qua email).</p>
+
+  <h2>3. Thiết lập Play Console</h2>
+  <table>
+    <tr><th>Mục</th><th>Cần làm</th></tr>
+    <tr><td>Tài khoản</td><td>Tài khoản cá nhân tạo sau 13/11/2023 phải chạy <b>Closed testing với ít nhất 12 người thử, tham gia liên tục 14 ngày</b> trước khi xin quyền phát hành Production (<a href="https://support.google.com/googleplay/android-developer/answer/14151465">nguồn</a>). Nên mời 15–25 người</td></tr>
+    <tr><td>Target API</td><td>36 (Android 16)</td></tr>
+    <tr><td>Ký ứng dụng</td><td>Dùng Play App Signing. Tạo upload keystore trong Unity (<i>Player Settings → Publishing Settings → Keystore Manager</i>). Sao lưu keystore và mật khẩu ở nơi an toàn, <b>không</b> commit vào Git</td></tr>
+    <tr><td>Phiên bản</td><td><code>Bundle Version Code</code> tăng mỗi lần tải lên; <code>Version</code> dạng 1.0.0</td></tr>
+    <tr><td>Quảng cáo</td><td>Khai "App có quảng cáo". Khai sử dụng Advertising ID (plugin Google Mobile Ads tự thêm quyền <code>AD_ID</code>)</td></tr>
+    <tr><td>Phân loại nội dung</td><td>Làm bảng hỏi IARC trung thực: bạo lực kiểu giả tưởng, không máu thật, không mua bán trong app</td></tr>
+    <tr><td>Đối tượng</td><td>13+</td></tr>
+    <tr><td>app-ads.txt</td><td>Đặt file <code>app-ads.txt</code> (lấy nội dung trong AdMob) ở thư mục gốc website ghi trong trang cửa hàng. AdMob dùng file này để xác minh</td></tr>
+    <tr><td>Chính sách quyền riêng tư</td><td>Nhập URL ở mục 2.3</td></tr>
+    <tr><td>Data Safety</td><td>Mục 2.4</td></tr>
+  </table>
+
+  <h2>4. Trang cửa hàng</h2>
+  <table>
+    <tr><th>Thành phần</th><th>Yêu cầu</th></tr>
+    <tr><td>Tên app</td><td>≤ 30 ký tự</td></tr>
+    <tr><td>Mô tả ngắn</td><td>≤ 80 ký tự</td></tr>
+    <tr><td>Mô tả đầy đủ</td><td>≤ 4.000 ký tự</td></tr>
+    <tr><td>Icon</td><td>512×512 PNG 32-bit, ≤ 1 MB</td></tr>
+    <tr><td>Ảnh nổi bật</td><td>1024×500 JPG hoặc PNG không alpha</td></tr>
+    <tr><td>Ảnh chụp màn hình</td><td>Ít nhất 2 (nên 4–8) ảnh ngang 1920×1080 chụp trong game thật</td></tr>
+    <tr><td>Video</td><td>Không bắt buộc; link YouTube 30–60 s</td></tr>
+  </table>
+  <p>Icon trong game: <i>Player Settings → Icon</i> dùng Adaptive Icon của Android (lớp nền + lớp trước 432×432, nội dung chính nằm trong vùng 264×264 ở giữa).</p>
+
+  <h2>5. Danh sách kiểm tra trước khi phát hành</h2>
+  <ul>
+    <li>Thay toàn bộ Test Ad Unit ID trong <code>AdConfig</code> bằng ID thật. Thêm thiết bị của bạn làm thiết bị test trong AdMob. Không bấm quảng cáo thật.</li>
+    <li>Tắt Debug menu (bản Release không có <code>DEVELOPMENT_BUILD</code>).</li>
+    <li>Chạy <i>Tools → VKDK → FX Tool → Kiểm tra ngân sách texture</i>: 0 cảnh báo.</li>
+    <li>Thử trên ít nhất 3 máy: một máy RAM 3 GB, một máy có tai thỏ, một máy Android 16.</li>
+    <li>Thử mất mạng, xoay app vào nền giữa trận và giữa quảng cáo, tắt app khi đang lưu.</li>
+    <li>Kiểm tra save cũ đọc được ở bản mới (<code>saveVersion</code>).</li>
+    <li>Crashlytics nhận được crash thử (gọi crash có chủ đích trong bản Development).</li>
+    <li>Giấy phép: nội dung truyện (<i>Phàm Nhân Tu Tiên</i>), font, âm thanh, hình ảnh, asset Unreal. Lưu bằng chứng giấy phép.</li>
+    <li>Closed testing đủ 12+ người × 14 ngày, thu phản hồi, sửa lỗi nghiêm trọng.</li>
+  </ul>
+</main>
+<footer>Tài liệu nội bộ – Vạn Kiếm Độ Kiếp</footer>
+</body>
+</html>
