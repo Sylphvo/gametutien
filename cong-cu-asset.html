@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Công cụ Asset – Vạn Kiếm Độ Kiếp</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <h1>Quy trình PNG &amp; Công cụ Asset</h1>
+  <nav>
+    <a href="index.html">Tổng quan</a>
+    <a href="gdd.html">Cốt truyện &amp; Thế giới</a>
+    <a href="gameplay.html">Gameplay</a>
+    <a href="tu-luyen.html">Tu luyện</a>
+    <a href="chien-dau.html">Chiến đấu</a>
+    <a href="noi-dung.html">Nội dung ch.5–19</a>
+    <a href="he-thong-phu.html">Hướng dẫn &amp; Cài đặt</a>
+    <a href="vfx.html">VFX</a>
+    <a href="am-thanh.html">Âm thanh</a>
+    <a href="ui-quang-cao.html">UI &amp; Quảng cáo</a>
+    <a href="ui-kit.html">Bộ UI</a>
+    <a href="cong-cu-asset.html" class="active">Công cụ Asset</a>
+    <a href="can-bang.html">Cân bằng</a>
+    <a href="ky-thuat.html">Kỹ thuật</a>
+    <a href="phat-hanh.html">Phát hành</a>
+  </nav>
+</header>
+<main>
+  <p>Trang này gồm ba phần: phân tích hướng dẫn đưa file <code>.png</code> vào Unity 2D URP, quy trình chuẩn của dự án,
+  và đặc tả công cụ <b>VKDK Asset Tool</b> (Unity Editor) để tự động hóa quy trình đó.</p>
+
+  <h2>1. Phân tích hướng dẫn gốc</h2>
+  <p>Ý chính của hướng dẫn là đúng: PNG đưa thẳng vào Unity được, không cần đổi định dạng. Muốn giữ đúng hình như ảnh gốc thì cần tiền xử lý đúng loại ảnh và thiết lập import đúng.
+  Một số điểm cần sửa để chạy được trên URP và trên Android:</p>
+  <table>
+    <tr><th>Điểm trong hướng dẫn</th><th>Đánh giá</th><th>Áp dụng cho dự án</th></tr>
+    <tr><td>Ảnh hiệu ứng nền đen + Additive thì nền đen tự biến mất</td><td>Đúng. Blend Additive cộng màu, nên pixel đen (0,0,0) không làm thay đổi gì.</td><td>Giữ nguyên nền đen cho mọi flipbook bake từ Niagara. Không cần tách nền.</td></tr>
+    <tr><td>Không dùng Magic Wand xóa nền ảnh hiệu ứng</td><td>Đúng. Magic Wand cắt cứng và làm mất phần glow mờ.</td><td>Giữ nguyên.</td></tr>
+    <tr><td>Dùng blend Screen trong Photoshop để xóa nền đen</td><td>Chưa đủ. Screen chỉ là chế độ hòa trộn layer, không tạo kênh alpha khi xuất PNG.</td><td>Nếu cần alpha thật (ví dụ hiệu ứng ma khí dùng blend Alpha), dùng phép <b>Unmultiply</b>: nút có sẵn trong công cụ ở mục 3, hoặc GIMP <i>Colors → Color to Alpha</i> với màu đen.</td></tr>
+    <tr><td>Shader <code>Mobile/Particles/Additive</code></td><td>Sai cho URP. Đây là shader của Built-in pipeline, trên URP sẽ hiện màu hồng.</td><td>Particle System: <code>Universal Render Pipeline/Particles/Unlit</code>, Blending Mode Additive. SpriteRenderer: Shader Graph <code>SG_Sprite_Additive</code> (mục 2.3).</td></tr>
+    <tr><td><code>Sprite-Lit-Default</code> + đổi Blending Mode sang Additive</td><td>Sai. <code>Sprite-Lit-Default</code> không có tùy chọn Blending Mode.</td><td>Dùng <code>Sprite-Lit-Default</code> cho nhân vật/quái (nhận 2D Light). Dùng shader Additive riêng cho hiệu ứng.</td></tr>
+    <tr><td><code>Particles/Simple Lit</code></td><td>Không phù hợp. Trong 2D Renderer, 2D Light không chiếu lên shader này.</td><td>Dùng <code>Particles/Unlit</code>.</td></tr>
+    <tr><td>Compression: None cho mọi ảnh</td><td>Không phù hợp mobile. Ảnh 2048×2048 không nén tốn 16 MB RAM, nén ASTC 6x6 chỉ khoảng 1.8 MB.</td><td>UI/nhân vật: ASTC 4x4. Hiệu ứng: ASTC 6x6. Chỉ để không nén với pixel art nhỏ hoặc ảnh bị vỡ màu rõ sau khi nén (kiểm tra trên máy thật).</td></tr>
+    <tr><td>Alpha Is Transparency cho ảnh hiệu ứng</td><td>Không cần. Tùy chọn này chỉ chống viền tối ở ảnh có alpha; ảnh nền đen dùng Additive không dùng alpha.</td><td>Bật cho sprite và UI có nền trong suốt. Tắt cho flipbook nền đen.</td></tr>
+    <tr><td>Bật Bloom trong Global Volume</td><td>Đúng nhưng thiếu bước.</td><td>Cần đủ: URP Asset bật HDR, Camera bật Post Processing, Global Volume có Bloom (Threshold ~1, tắt High Quality Filtering để nhẹ trên mobile), màu Material đặt HDR Intensity 1.8–2.5 để vượt Threshold.</td></tr>
+    <tr><td>Tâm xoay phi kiếm đặt ở chuôi</td><td>Tùy cách dùng.</td><td>Phi kiếm bay quỹ đạo và lao vào mục tiêu: pivot ở <b>giữa</b>, vẽ mũi kiếm hướng lên để code dùng <code>transform.up = direction</code>. Kiếm vung cận chiến: pivot ở chuôi (hậu tố <code>_hilt</code>).</td></tr>
+    <tr><td>TexturePacker để gộp atlas</td><td>Dùng được nhưng không bắt buộc.</td><td>Dùng <b>Sprite Atlas</b> có sẵn của Unity. Chỉ cân nhắc TexturePacker khi cần tối ưu đóng gói sâu hơn (bản trả phí).</td></tr>
+    <tr><td>Remove.bg / Pixelcut / Photoroom</td><td>Nhanh cho nhân vật và vật phẩm viền rõ.</td><td>Kiểm tra viền sau khi tách ở nền tối và nền sáng. Đọc điều khoản sử dụng thương mại của dịch vụ.</td></tr>
+    <tr><td>Tách layer, lưu <code>.psb</code>, Skinning Editor</td><td>Đúng.</td><td>Cần cài cả hai package <b>2D PSD Importer</b> và <b>2D Animation</b>.</td></tr>
+    <tr><td>Thiết lập chưa được nhắc tới</td><td>Thiếu.</td><td>Tắt Generate Mip Maps cho sprite/UI, Wrap Mode = Clamp (chống viền lem ở mép flipbook), Pixels Per Unit thống nhất = 100, Max Size ≤ 2048.</td></tr>
+  </table>
+
+  <h2>2. Quy trình chuẩn của dự án</h2>
+  <h3>2.1. Chọn quy trình theo loại PNG</h3>
+  <table>
+    <tr><th>Loại PNG</th><th>Tiền xử lý</th><th>Đặt vào thư mục</th><th>Hiển thị bằng</th></tr>
+    <tr><td>Phi kiếm, pháp bảo (Thần Luân), vật phẩm</td><td>Tách nền nếu còn nền. Phi kiếm vẽ mũi hướng lên.</td><td><code>Art/Sprites/Weapons/</code>, <code>Art/Sprites/Items/</code></td><td>SpriteRenderer + <code>Sprite-Lit-Default</code></td></tr>
+    <tr><td>Quái, boss tĩnh</td><td>Tách nền</td><td><code>Art/Sprites/Enemies/</code></td><td>SpriteRenderer + <code>Sprite-Lit-Default</code></td></tr>
+    <tr><td>Nhân vật cần chuyển động (thở, bay, vung kiếm)</td><td>Tách tay, tóc, tà áo, cánh thành layer, vẽ bù phần bị che, lưu <code>.psb</code></td><td><code>Art/Characters/</code></td><td>2D PSD Importer → Skinning Editor gắn xương → Animation</td></tr>
+    <tr><td>Hiệu ứng nền đen (kiếm khí, sét, vòng trận)</td><td>Không tách nền</td><td><code>Art/VFX_Unreal/</code></td><td>Particle System + <code>M_FX_Additive_Template</code></td></tr>
+    <tr><td>Hiệu ứng cần blend Alpha (ma khí đen)</td><td>Unmultiply → file <code>_alpha.png</code></td><td><code>Art/VFX_Unreal/</code></td><td>Particle System, Blending Mode Alpha</td></tr>
+    <tr><td>Một tấm nhiều icon / vũ khí</td><td>—</td><td><code>Art/UI/Icons/</code> hoặc <code>Art/Sprites/</code></td><td>Sprite Editor → Slice (Automatic hoặc Grid By Cell Size)</td></tr>
+    <tr><td>Khung UI, nút</td><td>Xem <a href="ui-kit.html">Bộ UI</a></td><td><code>Art/UI/</code></td><td>UI Image (Sliced)</td></tr>
+  </table>
+
+  <h3>2.2. Quy ước đặt tên file</h3>
+  <p>Công cụ đọc hậu tố trong tên file để tự đặt thông số. Có thể ghép nhiều hậu tố.</p>
+  <table>
+    <tr><th>Hậu tố</th><th>Ý nghĩa</th><th>Ví dụ</th></tr>
+    <tr><td><code>_4x4</code>, <code>_6x6</code> (<code>_CxR</code>)</td><td>Flipbook C cột × R hàng</td><td><code>fx_slash_loi_4x4.png</code></td></tr>
+    <tr><td><code>_fx</code></td><td>Sprite hiệu ứng tĩnh dùng SpriteRenderer (vòng trận pháp, hào quang)</td><td><code>ring_tranphap_fx.png</code></td></tr>
+    <tr><td><code>_9s</code> + số</td><td>Khung 9-slice, viền bằng số pixel</td><td><code>ui_panel_jade_9s64.png</code></td></tr>
+    <tr><td><code>_hilt</code></td><td>Pivot ở giữa mép dưới (chuôi kiếm)</td><td><code>sword_canlam_hilt.png</code></td></tr>
+    <tr><td><code>_px</code></td><td>Pixel art: Filter Point, không nén</td><td><code>icon_coin_px.png</code></td></tr>
+  </table>
+  <div class="note">Tên file chỉ dùng chữ thường không dấu, số và dấu gạch dưới. Tên có dấu tiếng Việt dễ lỗi khi build và khi dùng Git trên các hệ điều hành khác nhau.</div>
+
+  <h3>2.3. Material &amp; shader dùng chung (tạo tay một lần)</h3>
+  <table>
+    <tr><th>Asset</th><th>Thiết lập</th><th>Dùng cho</th></tr>
+    <tr><td><code>M_FX_Additive_Template</code></td><td>Shader <code>Universal Render Pipeline/Particles/Unlit</code>, Surface Type Transparent, Blending Mode Additive, Base Color HDR Intensity 2</td><td>Mọi Particle System flipbook. Công cụ nhân bản material này.</td></tr>
+    <tr><td><code>M_FX_Alpha_Template</code></td><td>Như trên nhưng Blending Mode Alpha</td><td>Ma khí, khói tối</td></tr>
+    <tr><td><code>SG_Sprite_Additive</code></td><td>Shader Graph, target Sprite Unlit, Blend Mode Additive, thuộc tính <code>_Tint</code> kiểu HDR Color nhân với màu sprite</td><td>SpriteRenderer có hậu tố <code>_fx</code></td></tr>
+    <tr><td><code>Sprite-Lit-Default</code></td><td>Có sẵn của URP 2D</td><td>Nhân vật, quái, phi kiếm (nhận 2D Light)</td></tr>
+  </table>
+  <div class="note">Tùy chọn Blend Mode của Sprite Unlit target trong Shader Graph khác nhau giữa các phiên bản URP. Nếu bản URP đang dùng không có Additive, hiển thị hiệu ứng tĩnh bằng Particle System 1 hạt (Max Particles = 1) với <code>M_FX_Additive_Template</code>.</div>
+
+  <h3>2.4. Bảng thiết lập import</h3>
+  <table>
+    <tr><th>Thư mục / hậu tố</th><th>Texture Type</th><th>Filter</th><th>Mip Maps</th><th>Alpha Is Transparency</th><th>Android</th></tr>
+    <tr><td><code>Art/UI/**</code></td><td>Sprite (2D and UI)</td><td>Bilinear</td><td>Tắt</td><td>Bật</td><td>ASTC 4x4, Max 2048</td></tr>
+    <tr><td><code>Art/Sprites/**</code></td><td>Sprite (2D and UI), PPU 100</td><td>Bilinear</td><td>Tắt</td><td>Bật</td><td>ASTC 4x4, Max 2048</td></tr>
+    <tr><td><code>Art/Characters/*.psb</code></td><td>Do 2D PSD Importer quản lý</td><td>Bilinear</td><td>Tắt</td><td>—</td><td>ASTC 4x4 (đặt tay trong importer PSD)</td></tr>
+    <tr><td><code>Art/VFX_Unreal/**</code></td><td>Default (dùng làm texture cho material)</td><td>Bilinear</td><td>Tắt</td><td>Tắt</td><td>ASTC 6x6, Max 2048</td></tr>
+    <tr><td>Hậu tố <code>_fx</code></td><td>Sprite</td><td>Bilinear</td><td>Tắt</td><td>Tắt</td><td>ASTC 6x6</td></tr>
+    <tr><td>Hậu tố <code>_px</code></td><td>Sprite</td><td>Point</td><td>Tắt</td><td>Bật</td><td>RGBA32 (không nén)</td></tr>
+  </table>
+  <p>Mọi texture: Wrap Mode = Clamp.</p>
+
+  <h2>3. Công cụ VKDK Asset Tool</h2>
+  <h3>3.1. Chức năng</h3>
+  <table>
+    <tr><th>Thành phần</th><th>Loại</th><th>Chức năng</th></tr>
+    <tr><td><code>VkdkTexturePostprocessor</code></td><td>AssetPostprocessor (tự chạy)</td><td>Khi kéo PNG vào thư mục <code>Art/</code>, tự áp bảng 2.4, đặt pivot, viền 9-slice theo tên file. Chỉ áp ở lần import đầu, không ghi đè chỉnh tay về sau.</td></tr>
+    <tr><td><code>VkdkFxTool</code> – Tạo VFX</td><td>EditorWindow (menu <i>Tools → VKDK → FX Tool</i>)</td><td>Chọn flipbook → tạo Material từ template + Prefab Particle System có Texture Sheet Animation đúng lưới + gắn <code>AutoReturnToPool</code>.</td></tr>
+    <tr><td><code>VkdkFxTool</code> – Unmultiply</td><td>Nút trong cửa sổ</td><td>Chuyển ảnh nền đen sang PNG có alpha, giữ glow. Thay bước Photoshop.</td></tr>
+    <tr><td><code>VkdkFxTool</code> – Kiểm tra</td><td>Nút trong cửa sổ</td><td>Quét <code>Art/</code>, cảnh báo texture vượt 2048, không nén trên Android, còn bật mip map, hoặc tên có dấu/khoảng trắng.</td></tr>
+  </table>
+  <p>Đặt các script vào <code>Assets/_Project/Editor/AssetTools/</code>. Thư mục tên <code>Editor</code> không được đưa vào bản build.</p>
+
+  <h3>3.2. Tự áp thiết lập import</h3>
+  <pre><code>using System.IO;
+using System.Text.RegularExpressions;
+using UnityEditor;
+using UnityEngine;
+
+/// &lt;summary&gt;Tự áp thiết lập import cho PNG trong Assets/_Project/Art theo thư mục và hậu tố tên file.&lt;/summary&gt;
+public class VkdkTexturePostprocessor : AssetPostprocessor
+{
+    private const string Root = "Assets/_Project/Art/";
+
+    private void OnPreprocessTexture()
+    {
+        if (!assetPath.StartsWith(Root)) return;
+        var importer = (TextureImporter)assetImporter;
+        if (!importer.importSettingsMissing) return; // chỉ lần import đầu (chưa có file .meta)
+
+        string file = Path.GetFileNameWithoutExtension(assetPath).ToLowerInvariant();
+        bool isPixel = file.Contains("_px");
+        bool isFxSprite = file.Contains("_fx");
+
+        importer.mipmapEnabled = false;
+        importer.wrapMode = TextureWrapMode.Clamp;
+        importer.filterMode = isPixel ? FilterMode.Point : FilterMode.Bilinear;
+
+        // Flipbook cho Particle System: không cần là Sprite
+        if (assetPath.StartsWith(Root + "VFX_Unreal/"))
+        {
+            importer.textureType = TextureImporterType.Default;
+            importer.alphaIsTransparency = false;
+            SetAndroid(importer, TextureImporterFormat.ASTC_6x6, 2048);
+            return;
+        }
+
+        importer.textureType = TextureImporterType.Sprite;
+        importer.spriteImportMode = SpriteImportMode.Single;
+        importer.spritePixelsPerUnit = 100;
+        importer.alphaIsTransparency = !isFxSprite;
+
+        var settings = new TextureImporterSettings();
+        importer.ReadTextureSettings(settings);
+        settings.spriteAlignment = file.Contains("_hilt")
+            ? (int)SpriteAlignment.BottomCenter
+            : (int)SpriteAlignment.Center;
+
+        Match border = Regex.Match(file, @"_9s(\d+)");
+        if (border.Success)
+        {
+            float b = int.Parse(border.Groups[1].Value);
+            settings.spriteBorder = new Vector4(b, b, b, b); // trái, dưới, phải, trên
+            settings.spriteMeshType = SpriteMeshType.FullRect;
+        }
+        importer.SetTextureSettings(settings);
+
+        if (isPixel)
+            SetAndroid(importer, TextureImporterFormat.RGBA32, 2048);
+        else
+            SetAndroid(importer, isFxSprite ? TextureImporterFormat.ASTC_6x6 : TextureImporterFormat.ASTC_4x4, 2048);
+    }
+
+    private static void SetAndroid(TextureImporter importer, TextureImporterFormat format, int maxSize)
+    {
+        TextureImporterPlatformSettings android = importer.GetPlatformTextureSettings("Android");
+        android.overridden = true;
+        android.format = format;
+        android.maxTextureSize = maxSize;
+        importer.SetPlatformTextureSettings(android);
+    }
+}</code></pre>
+
+  <h3>3.3. Cửa sổ FX Tool</h3>
+  <pre><code>using System.IO;
+using System.Text.RegularExpressions;
+using UnityEditor;
+using UnityEngine;
+
+/// &lt;summary&gt;Tạo Material + Prefab VFX từ flipbook, Unmultiply nền đen, kiểm tra ngân sách texture.&lt;/summary&gt;
+public class VkdkFxTool : EditorWindow
+{
+    private const string MaterialDir = "Assets/_Project/Materials/FX";
+    private const string PrefabDir = "Assets/_Project/Prefabs/VFX";
+    private const string ArtDir = "Assets/_Project/Art";
+
+    private Material template;
+    private int defaultCols = 4, defaultRows = 4;
+    private float lifetime = 0.5f;
+
+    [MenuItem("Tools/VKDK/FX Tool")]
+    private static void Open() =&gt; GetWindow&lt;VkdkFxTool&gt;("VKDK FX Tool");
+
+    private void OnGUI()
+    {
+        template = (Material)EditorGUILayout.ObjectField("Material mẫu", template, typeof(Material), false);
+        defaultCols = EditorGUILayout.IntField("Số cột (nếu tên không có _CxR)", defaultCols);
+        defaultRows = EditorGUILayout.IntField("Số hàng (nếu tên không có _CxR)", defaultRows);
+        lifetime = EditorGUILayout.FloatField("Thời gian chạy (giây)", lifetime);
+        EditorGUILayout.HelpBox("Chọn một hoặc nhiều texture trong cửa sổ Project rồi bấm nút.", MessageType.Info);
+
+        using (new EditorGUI.DisabledScope(template == null))
+        {
+            if (GUILayout.Button("Tạo Material + Particle Prefab")) CreateVfxForSelection();
+        }
+        if (GUILayout.Button("Unmultiply nền đen → alpha (tạo file _alpha.png)")) UnmultiplySelection();
+        if (GUILayout.Button("Kiểm tra ngân sách texture")) ValidateTextures();
+    }
+
+    private void CreateVfxForSelection()
+    {
+        Directory.CreateDirectory(MaterialDir);
+        Directory.CreateDirectory(PrefabDir);
+
+        foreach (Texture2D tex in Selection.GetFiltered&lt;Texture2D&gt;(SelectionMode.Assets))
+        {
+            string name = Path.GetFileNameWithoutExtension(AssetDatabase.GetAssetPath(tex));
+            int cols = defaultCols, rows = defaultRows;
+            Match grid = Regex.Match(name, @"_(\d+)x(\d+)");
+            if (grid.Success) { cols = int.Parse(grid.Groups[1].Value); rows = int.Parse(grid.Groups[2].Value); }
+
+            var mat = new Material(template);
+            mat.SetTexture("_BaseMap", tex);
+            AssetDatabase.CreateAsset(mat, $"{MaterialDir}/M_{name}.mat");
+
+            var go = new GameObject("VFX_" + name);
+            var ps = go.AddComponent&lt;ParticleSystem&gt;();
+            ps.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+
+            ParticleSystem.MainModule main = ps.main;
+            main.duration = lifetime;
+            main.loop = false;
+            main.startLifetime = lifetime;
+            main.startSpeed = 0f;
+            main.maxParticles = 1;
+            main.stopAction = ParticleSystemStopAction.Callback; // AutoReturnToPool nhận OnParticleSystemStopped
+
+            ParticleSystem.EmissionModule emission = ps.emission;
+            emission.rateOverTime = 0f;
+            emission.SetBursts(new[] { new ParticleSystem.Burst(0f, 1) });
+
+            ParticleSystem.ShapeModule shape = ps.shape;
+            shape.enabled = false;
+
+            ParticleSystem.TextureSheetAnimationModule sheet = ps.textureSheetAnimation;
+            sheet.enabled = true;
+            sheet.mode = ParticleSystemAnimationMode.Grid;
+            sheet.numTilesX = cols;
+            sheet.numTilesY = rows;
+
+            go.GetComponent&lt;ParticleSystemRenderer&gt;().sharedMaterial = mat;
+            go.AddComponent&lt;AutoReturnToPool&gt;();
+
+            PrefabUtility.SaveAsPrefabAsset(go, $"{PrefabDir}/VFX_{name}.prefab");
+            DestroyImmediate(go);
+        }
+        AssetDatabase.SaveAssets();
+    }
+
+    private static void UnmultiplySelection()
+    {
+        foreach (Texture2D tex in Selection.GetFiltered&lt;Texture2D&gt;(SelectionMode.Assets))
+        {
+            string path = AssetDatabase.GetAssetPath(tex);
+            var img = new Texture2D(2, 2, TextureFormat.RGBA32, false);
+            img.LoadImage(File.ReadAllBytes(path)); // đọc file gốc, không cần bật Read/Write
+
+            Color32[] px = img.GetPixels32();
+            for (int i = 0; i &lt; px.Length; i++)
+            {
+                Color32 c = px[i];
+                int a = Mathf.Max(c.r, Mathf.Max(c.g, c.b)); // độ sáng lớn nhất thành alpha
+                px[i] = a == 0
+                    ? new Color32(0, 0, 0, 0)
+                    : new Color32((byte)(c.r * 255 / a), (byte)(c.g * 255 / a), (byte)(c.b * 255 / a), (byte)a);
+            }
+            img.SetPixels32(px);
+            img.Apply();
+
+            string outPath = Path.Combine(Path.GetDirectoryName(path), Path.GetFileNameWithoutExtension(path) + "_alpha.png");
+            File.WriteAllBytes(outPath, img.EncodeToPNG());
+            DestroyImmediate(img);
+            AssetDatabase.ImportAsset(outPath.Replace('\\', '/'));
+        }
+    }
+
+    private static void ValidateTextures()
+    {
+        int warnings = 0;
+        foreach (string guid in AssetDatabase.FindAssets("t:Texture2D", new[] { ArtDir }))
+        {
+            string path = AssetDatabase.GUIDToAssetPath(guid);
+            if (AssetImporter.GetAtPath(path) is not TextureImporter importer) continue;
+            TextureImporterPlatformSettings android = importer.GetPlatformTextureSettings("Android");
+            string file = Path.GetFileName(path);
+
+            if (!Regex.IsMatch(file, @"^[a-z0-9_]+\.(png|psb)$"))
+                { Debug.LogWarning($"Tên file nên viết thường, không dấu, không khoảng trắng: {path}"); warnings++; }
+            if (android.overridden &amp;&amp; android.maxTextureSize &gt; 2048)
+                { Debug.LogWarning($"Max Size &gt; 2048: {path}"); warnings++; }
+            if (!android.overridden)
+                { Debug.LogWarning($"Chưa override Android (chưa nén ASTC): {path}"); warnings++; }
+            if (importer.mipmapEnabled &amp;&amp; importer.textureType == TextureImporterType.Sprite)
+                { Debug.LogWarning($"Sprite đang bật mip map: {path}"); warnings++; }
+        }
+        Debug.Log($"VKDK: kiểm tra xong, {warnings} cảnh báo.");
+    }
+}</code></pre>
+  <div class="note">
+    <ul>
+      <li><code>AutoReturnToPool</code> là script runtime của dự án (xem <a href="ky-thuat.html">Kỹ thuật</a>). Script cần trả object về <code>ObjectPooler</code> trong <code>OnParticleSystemStopped()</code>.</li>
+      <li>Unmultiply chỉ cho kết quả đúng với ảnh được render trên nền đen thuần (như Niagara Baker). Ảnh có nền xám hoặc có bóng tối thật sẽ bị mất phần tối.</li>
+      <li>Code trên dùng cú pháp <code>is not</code> (C# 9), chạy được trên Unity 2021.2 trở lên.</li>
+    </ul>
+  </div>
+
+  <h3>3.4. Cách dùng hằng ngày</h3>
+  <ol>
+    <li>Tạo một lần: <code>M_FX_Additive_Template</code>, <code>M_FX_Alpha_Template</code>, <code>SG_Sprite_Additive</code>, Global Volume có Bloom.</li>
+    <li>Đặt tên PNG theo mục 2.2 rồi kéo vào đúng thư mục trong <code>Art/</code>. Thiết lập import được áp tự động.</li>
+    <li>Với flipbook: chọn file → <i>Tools → VKDK → FX Tool</i> → chọn template → <b>Tạo Material + Particle Prefab</b>.</li>
+    <li>Thêm tag của prefab mới vào <code>ObjectPooler</code>.</li>
+    <li>Trước khi build: bấm <b>Kiểm tra ngân sách texture</b> và sửa hết cảnh báo.</li>
+  </ol>
+</main>
+<footer>Tài liệu nội bộ – Vạn Kiếm Độ Kiếp</footer>
+</body>
+</html>
