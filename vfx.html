@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VFX – Vạn Kiếm Độ Kiếp</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <h1>VFX – Từ Unreal Niagara sang Unity 2D URP</h1>
+  <nav>
+    <a href="index.html">Tổng quan</a>
+    <a href="gdd.html">Cốt truyện &amp; Thế giới</a>
+    <a href="gameplay.html">Gameplay</a>
+    <a href="tu-luyen.html">Tu luyện</a>
+    <a href="chien-dau.html">Chiến đấu</a>
+    <a href="noi-dung.html">Nội dung ch.5–19</a>
+    <a href="he-thong-phu.html">Hướng dẫn &amp; Cài đặt</a>
+    <a href="vfx.html" class="active">VFX</a>
+    <a href="am-thanh.html">Âm thanh</a>
+    <a href="ui-quang-cao.html">UI &amp; Quảng cáo</a>
+    <a href="ui-kit.html">Bộ UI</a>
+    <a href="cong-cu-asset.html">Công cụ Asset</a>
+    <a href="can-bang.html">Cân bằng</a>
+    <a href="ky-thuat.html">Kỹ thuật</a>
+    <a href="phat-hanh.html">Phát hành</a>
+  </nav>
+</header>
+<main>
+  <p>Mục tiêu: hình ảnh cỡ Unreal, chạy 60 FPS trên Android tầm trung. Unity không đọc được file Niagara (<code>.uasset</code>),
+  nên hiệu ứng được render ra sprite sheet trong Unreal rồi phát lại bằng Particle System trong Unity.</p>
+  <div class="note warn">Asset mua trên Unreal Marketplace/Fab thường chỉ được phép dùng trong Unreal Engine. Kiểm tra license trước khi bake và đưa sang Unity.</div>
+
+  <h2>1. Tại Unreal Engine 5</h2>
+  <ul>
+    <li>Dựng hiệu ứng trong <b>Niagara System</b> trên nền đen tuyệt đối.</li>
+    <li>Dùng <b>Niagara Baker</b> xuất flipbook <code>.png</code>.</li>
+  </ul>
+  <table>
+    <tr><th>Loại</th><th>Ví dụ</th><th>Lưới</th><th>Độ phân giải</th></tr>
+    <tr><td>Ngắn</td><td>Vệt chém, tia lửa trúng đòn</td><td>4×4 (16 frame)</td><td>1024×1024</td></tr>
+    <tr><td>Lớn</td><td>Cột sét Lôi Kiếp, hào quang Hồng Lôi</td><td>6×6 (36 frame)</td><td>2048×2048</td></tr>
+  </table>
+
+  <h2>2. Tại Unity</h2>
+  <table>
+    <tr><th>Bước</th><th>Thiết lập</th></tr>
+    <tr><td>Import texture</td><td>Tab Android → bật <b>Override for Android</b> → Format <b>ASTC 6x6 block</b>. Công cụ <a href="cong-cu-asset.html">VKDK Asset Tool</a> tự áp khi file nằm trong <code>Art/VFX_Unreal/</code>.</td></tr>
+    <tr><td>Material</td><td>Shader <code>Universal Render Pipeline/Particles/Unlit</code>, Surface Type <code>Transparent</code>, Blending Mode <code>Additive</code>, HDR Color Intensity 1.8–2.5 để bắt sáng với URP Bloom</td></tr>
+    <tr><td>Prefab</td><td><code>ParticleSystem</code> với module <b>Texture Sheet Animation</b> khớp lưới 4×4 hoặc 6×6</td></tr>
+    <tr><td>Pooling</td><td>Gắn <code>AutoReturnToPool.cs</code> để trả prefab về <code>ObjectPooler</code> khi hết <code>duration</code></td></tr>
+  </table>
+  <div class="note">Các bước Material, Prefab và Pooling được <b>FX Tool</b> tạo tự động từ tên file (ví dụ <code>fx_slash_loi_4x4.png</code>). Không dùng shader <code>Mobile/Particles/Additive</code>: đó là shader của Built-in pipeline và hiện màu hồng trên URP.</div>
+
+  <h2>3. Danh sách hiệu ứng</h2>
+  <table>
+    <tr><th>Mã</th><th>Hiệu ứng</th><th>Cách làm</th><th>Lưới</th><th>Ưu tiên</th></tr>
+    <tr><th colspan="5">Chiến đấu</th></tr>
+    <tr><td>VFX_Slash</td><td>Vệt chém phi kiếm</td><td>Flipbook ngắn, màu theo thuộc tính kiếm</td><td>4×4</td><td>Cao</td></tr>
+    <tr><td>VFX_Hit</td><td>Tia lửa trúng đòn</td><td>Flipbook + vài hạt rời</td><td>4×4</td><td>Cao</td></tr>
+    <tr><td>VFX_SwordTrail</td><td>Vệt sau phi kiếm</td><td>Trail Renderer (không cần bake)</td><td>—</td><td>Cao</td></tr>
+    <tr><td>VFX_ChainLightning</td><td>Sét lan / Tịch Tà Thần Lôi</td><td>Line Renderer + flipbook tia sét, màu xanh (Lôi) hoặc vàng kim (Tịch Tà)</td><td>4×4</td><td>Cao</td></tr>
+    <tr><td>VFX_Burn / VFX_Freeze</td><td>Thiêu đốt / đóng băng</td><td>Flipbook lặp gắn trên quái</td><td>4×4</td><td>Trung bình</td></tr>
+    <tr><td>VFX_DaiCanhKiemTran</td><td>Đại Canh Kiếm Trận</td><td>1 Particle System phát 72 sprite kiếm xếp vòng tròn + flipbook kiếm võng vàng</td><td>6×6</td><td>Cao</td></tr>
+    <tr><td>VFX_HuThienDinh</td><td>Hư Thiên Đỉnh hút quái</td><td>Sprite đỉnh phóng to + flipbook xoáy + lửa lam Càn Lam Băng Diễm</td><td>6×6</td><td>Trung bình</td></tr>
+    <tr><td>VFX_PhongLoiSi</td><td>Lướt bằng Phong Lôi Sí</td><td>Vệt sét theo đường lướt (flipbook kéo dài)</td><td>4×4</td><td>Trung bình</td></tr>
+    <tr><td>VFX_TimeStop</td><td>Thời Gian Pháp Tắc</td><td>Vòng đồng hồ trên đất + post-process giảm bão hòa trong vùng</td><td>4×4</td><td>Thấp</td></tr>
+    <tr><th colspan="5">Tu luyện &amp; Biến Thân</th></tr>
+    <tr><td>VFX_Tribulation_Bolt</td><td>Cột sét Lôi Kiếp</td><td>Flipbook lớn + flash màn hình + rung camera</td><td>6×6</td><td>Cao</td></tr>
+    <tr><td>VFX_Telegraph</td><td>Vòng cảnh báo đỏ</td><td>Sprite vòng tròn fill theo thời gian (0.8 giây Lôi Kiếp, ≥0.6 giây boss)</td><td>—</td><td>Cao</td></tr>
+    <tr><td>VFX_Breakthrough</td><td>Đột phá</td><td>Cột sáng + sóng xung kích + burst hạt</td><td>6×6</td><td>Cao</td></tr>
+    <tr><td>VFX_Aura_ThanhLoi</td><td>Hào quang Thanh Lôi</td><td>Flipbook lặp xanh lục quanh nhân vật</td><td>6×6</td><td>Cao</td></tr>
+    <tr><td>VFX_Aura_KimLoi</td><td>Hào quang Kim Lôi</td><td>Flipbook lặp vàng kim + rồng sét</td><td>6×6</td><td>Cao</td></tr>
+    <tr><td>VFX_Aura_HongLoi</td><td>Hào quang Hồng Lôi</td><td>Flipbook lặp đỏ + rồng sét lớn</td><td>6×6</td><td>Cao</td></tr>
+    <tr><th colspan="5">Linh thú</th></tr>
+    <tr><td>VFX_PheKimTrung</td><td>Bầy Phệ Kim Trùng</td><td>Particle System sprite trùng, Noise module, bám mục tiêu</td><td>—</td><td>Trung bình</td></tr>
+    <tr><td>VFX_DeHonThu</td><td>Đề Hồn Thú hút hồn</td><td>Flipbook linh hồn bay về phía thú</td><td>4×4</td><td>Thấp</td></tr>
+    <tr><td>VFX_SuongNgo_Frost</td><td>Lục Dực Sương Ngô đóng băng vùng</td><td>Flipbook băng lan</td><td>4×4</td><td>Thấp</td></tr>
+    <tr><th colspan="5">UI &amp; ngoài trận</th></tr>
+    <tr><td>VFX_LinhChau_Pickup</td><td>Nhặt Linh Châu / Linh Thạch</td><td>Hạt nhỏ bay về nhân vật</td><td>—</td><td>Cao</td></tr>
+    <tr><td>VFX_ChuongThienBinh</td><td>Chưởng Thiên Bình tích Lục Dịch (Động Phủ)</td><td>UI Particle: ánh trăng rơi vào bình, giọt xanh ngưng tụ</td><td>4×4</td><td>Trung bình</td></tr>
+    <tr><td>VFX_Revive</td><td>Hồi sinh</td><td>Sóng đẩy lùi quái + vòng sáng bất tử 3 giây</td><td>6×6</td><td>Cao</td></tr>
+  </table>
+
+  <h2>4. Màu</h2>
+  <table>
+    <tr><th>Chủ đề</th><th>Màu</th></tr>
+    <tr><td>Lôi / Thanh Lôi</td><td>Xanh lục ngọc – trắng</td></tr>
+    <tr><td>Kim Lôi / Tịch Tà Thần Lôi</td><td>Vàng kim – trắng</td></tr>
+    <tr><td>Hồng Lôi</td><td>Đỏ – cam</td></tr>
+    <tr><td>Hỏa</td><td>Cam đỏ</td></tr>
+    <tr><td>Băng / Càn Lam Băng Diễm</td><td>Xanh lam nhạt – trắng</td></tr>
+    <tr><td>Ma khí</td><td>Đỏ máu / tím đen (blend Alpha, không Additive)</td></tr>
+    <tr><td>Thời Gian Pháp Tắc</td><td>Vàng nhạt – bạc, giảm bão hòa nền</td></tr>
+  </table>
+
+  <h2>5. Ngân sách hiệu năng (Android tầm trung)</h2>
+  <table>
+    <tr><th>Hạng mục</th><th>Giới hạn</th></tr>
+    <tr><td>Hạt mỗi Particle System</td><td>≤ 200 (bầy trùng ≤ 300)</td></tr>
+    <tr><td>Hiệu ứng đồng thời</td><td>~25</td></tr>
+    <tr><td>Flipbook lớn nhất</td><td>2048×2048, ASTC 6x6</td></tr>
+    <tr><td>Overdraw</td><td>Hạn chế quad lớn phủ màn hình; hào quang biến thân không quá 1/3 chiều cao màn hình</td></tr>
+  </table>
+</main>
+<footer>Tài liệu nội bộ – Vạn Kiếm Độ Kiếp</footer>
+</body>
+</html>
