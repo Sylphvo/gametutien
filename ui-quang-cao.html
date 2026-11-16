@@ -10,96 +10,100 @@
 <header>
   <h1>UI &amp; Quảng cáo (AdMob)</h1>
   <nav>
-    <a href="index.html">Tổng quan</a>
-    <a href="gdd.html">Cốt truyện &amp; Thế giới</a>
-    <a href="gameplay.html">Gameplay</a>
-    <a href="tu-luyen.html">Tu luyện</a>
-    <a href="chien-dau.html">Chiến đấu</a>
-    <a href="noi-dung.html">Nội dung ch.5–19</a>
-    <a href="he-thong-phu.html">Hướng dẫn &amp; Cài đặt</a>
-    <a href="vfx.html">VFX</a>
-    <a href="am-thanh.html">Âm thanh</a>
-    <a href="ui-quang-cao.html" class="active">UI &amp; Quảng cáo</a>
-    <a href="ui-kit.html">Bộ UI</a>
-    <a href="cong-cu-asset.html">Công cụ Asset</a>
-    <a href="can-bang.html">Cân bằng</a>
-    <a href="ky-thuat.html">Kỹ thuật</a>
-    <a href="phat-hanh.html">Phát hành</a>
   </nav>
 </header>
 <main>
-  <p>Ảnh, prefab, font và quy tắc dựng các màn hình dưới đây nằm ở trang <a href="ui-kit.html">Bộ UI</a>.</p>
+  <p>Ảnh, prefab, font và quy tắc dựng các màn hình ở trang <a href="ui-kit.html">Bộ UI</a>.</p>
 
   <h2>1. Phong cách &amp; Canvas</h2>
   <table>
     <tr><th>Mục</th><th>Giá trị</th></tr>
-    <tr><td>Phong cách</td><td>Cổ phong Tiên Hiệp, font chữ có viền/đổ bóng</td></tr>
-    <tr><td>Khung</td><td>Ngọc bích đậm bán trong suốt <code>#0D2622E6</code>
-      <span style="display:inline-block;width:14px;height:14px;background:#0D2622E6;border:1px solid #555;vertical-align:middle"></span></td></tr>
-    <tr><td>Viền</td><td>Vàng đồng <code>#D4AF37</code>
-      <span style="display:inline-block;width:14px;height:14px;background:#D4AF37;vertical-align:middle"></span></td></tr>
+    <tr><td>Phong cách</td><td>Cổ phong Tiên Hiệp, khung ngọc bích <code>#0D2622E6</code>, viền vàng đồng <code>#D4AF37</code>, chữ có viền/đổ bóng</td></tr>
     <tr><td>UI Scale Mode</td><td>Scale With Screen Size, Reference 1920 × 1080, Match 0.5</td></tr>
-    <tr><td>Safe Area</td><td>Bắt buộc gắn <code>SafeAreaHandler.cs</code> cho Panel gốc để né tai thỏ/camera đục lỗ</td></tr>
+    <tr><td>Safe Area</td><td><code>SafeAreaHandler.cs</code> trên Panel gốc của mọi Canvas</td></tr>
   </table>
 
-  <h2>2. Sảnh chính (<code>LobbyUI</code>)</h2>
+  <h2>2. HUD thế giới (<code>WorldHUD</code>)</h2>
   <table>
     <tr><th>Vùng</th><th>Thành phần</th></tr>
-    <tr><td>Top Bar (trái)</td><td>Avatar Hàn Lập + cảnh giới cốt truyện</td></tr>
-    <tr><td>Top Bar (phải)</td><td>Linh Thạch + nút <code>+</code> (xem QC nhận Linh Thạch) + nút Cài đặt</td></tr>
-    <tr><td>Center</td><td>Hàn Lập thiền/bay lơ lửng, phi kiếm đang trang bị xoay quanh, linh thú đứng cạnh</td></tr>
-    <tr><td>Bottom Bar</td><td>Nút <code>Kiếm Trủng</code> (phi kiếm, Thần Luân, Cánh, Linh Thú), nút <code>Động Phủ</code> (Linh Căn, Chưởng Thiên Bình, linh điền, luyện đan), nút lớn phát sáng <code>XUẤT CHINH</code></td></tr>
-    <tr><td>Banner Ad</td><td>Cố định sát mép dưới, tự ẩn khi vào trận</td></tr>
+    <tr><td>Trên trái</td><td>Avatar, HP, thanh EXP, "Kết Đan Trung kỳ (Lv 24)", Linh Thạch</td></tr>
+    <tr><td>Trái giữa</td><td><code>QuestTrackerUI</code>: nhiệm vụ đang theo dõi (tên, bước, tiến độ). Chạm để mở danh sách nhiệm vụ</td></tr>
+    <tr><td>Trên phải</td><td><code>MinimapUI</code> (bán kính 30 unit), tên ô và tọa độ dưới bản đồ nhỏ; nút Bản đồ, nút Menu</td></tr>
+    <tr><td>Giữa trên</td><td><code>ZoneBanner</code> khi vào ô mới (tên + gợi ý level có màu); thanh máu boss thế giới khi đang đánh boss</td></tr>
+    <tr><td>Dưới trái</td><td><code>FloatingJoystick</code> (hoặc cố định theo Cài đặt)</td></tr>
+    <tr><td>Dưới phải</td><td><code>Btn_Dash</code> (lớn), <code>Btn_Skill1–3</code> xếp vòng cung quanh Dash, <code>Btn_Interact</code> (hiện khi có thứ tương tác)</td></tr>
+    <tr><td>Trên đầu quái</td><td>Số level, màu theo chênh lệch (<a href="the-gioi.html">Thế giới mở</a> mục 4.4); tinh anh và boss có tên</td></tr>
+    <tr><td>Mũi tên cạnh màn hình</td><td>Chỉ hướng mục tiêu nhiệm vụ đang theo dõi khi nó ngoài màn hình</td></tr>
   </table>
-  <div class="note">File <code>.md</code> gốc gọi nút giữa là <code>Linh Căn</code>. Bản thống nhất đổi thành <code>Động Phủ</code> vì màn này giờ chứa cả Chưởng Thiên Bình và luyện đan; Linh Căn là một tab bên trong.</div>
 
-  <h2>3. Chọn chương (<code>ChapterSelectUI</code>)</h2>
+  <h2>3. Bản đồ lớn (<code>WorldMapUI</code>)</h2>
   <ul>
-    <li>Mở khi bấm <code>XUẤT CHINH</code>. Bản đồ cuộn ngang theo 3 giới diện, mỗi chương là một điểm trên bản đồ.</li>
-    <li>Chương đã qua có thể chơi lại để kiếm Linh Thạch và linh thảo.</li>
-    <li>Ô chọn đan dược dùng cho trận (tối đa 1 viên).</li>
+    <li>Toàn bộ 9 × 9 ô của tầng; kéo để cuộn, chụm để zoom (0.5×–2×).</li>
+    <li>Ô chưa tới phủ sương. Ô đã tới: tên, khoảng level với màu theo level người chơi, biểu tượng Truyền Tống (sáng nếu đã mở), cổng Bí Cảnh, boss thế giới (kèm thời gian hồi nếu vừa bị hạ), tông môn, mục tiêu nhiệm vụ.</li>
+    <li>Chạm Truyền Tống đã mở → nút "Truyền tống". Chạm ô → thông tin ô.</li>
+    <li>Thanh chọn tầng (Nhân / Linh / Tiên) chỉ hiện tầng đã mở; xem được tầng khác nhưng chỉ dịch chuyển trong tầng hiện tại.</li>
   </ul>
 
-  <h2>4. Hội thoại (<code>DialogueUI</code>)</h2>
-  <ul>
-    <li>Chân dung nhân vật trái/phải, khung chữ ngọc bích ở dưới, chạm để tiếp, nút <code>Bỏ qua</code> góc trên phải.</li>
-    <li>Hiện trước và sau trận theo dữ liệu chương.</li>
-  </ul>
+  <h2>4. Menu (<code>MainMenuUI</code>)</h2>
+  <p>Mở bằng nút Menu khi không có quái đuổi trong 8 unit. Dừng thời gian thế giới (<code>Time.timeScale = 0</code>) khi đang mở.</p>
+  <table>
+    <tr><th>Tab</th><th>Nội dung</th></tr>
+    <tr><td>Nhân vật</td><td>Level, cảnh giới, chỉ số (HP, Công, chí mạng, giảm sát thương, số kiếm), Linh Căn</td></tr>
+    <tr><td>Công pháp (<code>CongPhapUI</code>)</td><td>1 ô chủ tu + 3 ô phụ, danh sách đã học, cấp, mô tả theo cấp; chạm để đeo/tháo</td></tr>
+    <tr><td>Tông môn (<code>SectUI</code>)</td><td>Danh sách tông môn đã gia nhập (chính tông/khách khanh), cống hiến từng nơi, nhiệm vụ hằng ngày. Học/nâng công pháp chỉ làm được tại đại điện tông môn</td></tr>
+    <tr><td>Kiếm Trủng</td><td>Phi kiếm, Thần Luân, Cánh, Linh Thú</td></tr>
+    <tr><td>Động Phủ</td><td>Nâng cấp, Linh Căn, Chưởng Thiên Bình, linh điền, luyện đan</td></tr>
+    <tr><td>Hành trang</td><td>Linh thảo, đan dược, vật phẩm nhiệm vụ</td></tr>
+    <tr><td>Nhiệm vụ</td><td>Nhiệm vụ chính, nhiệm vụ tông môn; chọn nhiệm vụ để theo dõi</td></tr>
+    <tr><td>Cài đặt</td><td><a href="he-thong-phu.html">Hướng dẫn &amp; Cài đặt</a> mục 3</td></tr>
+  </table>
+  <p>Thanh trên của Menu: Linh Thạch + nút <code>+</code> (quảng cáo), Lục Dịch.</p>
 
-  <h2>5. Màn hình chiến đấu (<code>CombatHUD</code>)</h2>
+  <h2>5. Màn hình tại công trình</h2>
+  <table>
+    <tr><th>Màn hình</th><th>Mở khi</th><th>Nội dung</th></tr>
+    <tr><td><code>SectHallUI</code></td><td>Tương tác chấp sự ở đại điện tông môn</td><td>Gia nhập / đổi chính tông, học và nâng công pháp, nhận nhiệm vụ hằng ngày</td></tr>
+    <tr><td><code>TribulationAltarUI</code></td><td>Lôi Kiếp Đài ở HUB</td><td>Điều kiện đột phá, ô chọn đan hỗ trợ, nút bắt đầu Thiên Kiếp, đếm ngược khi phải chờ</td></tr>
+    <tr><td><code>TeleportUI</code></td><td>Truyền Tống Trận</td><td>Mở bản đồ lớn ở chế độ chọn điểm đến</td></tr>
+    <tr><td><code>RealmTeleportUI</code></td><td>Giới Diện Truyền Tống ở HUB</td><td>Chọn tầng đã mở</td></tr>
+    <tr><td><code>BiCanhEntryPopup</code></td><td>Cổng Bí Cảnh</td><td>Tên, level gợi ý (có màu), thưởng, ô chọn đan, nút Vào</td></tr>
+    <tr><td><code>ShopUI</code></td><td>Thương nhân</td><td>Mua linh thảo cơ bản bằng Linh Thạch (giá = 100 × tầng)</td></tr>
+    <tr><td><code>DialogueUI</code></td><td>NPC, nhiệm vụ</td><td>Chân dung trái/phải, khung chữ, chạm để tiếp, nút Bỏ qua</td></tr>
+  </table>
+
+  <h2>6. HUD Bí Cảnh (<code>CombatHUD</code>)</h2>
   <table>
     <tr><th>Vùng</th><th>Thành phần</th></tr>
-    <tr><td>Top-Left (<code>CharacterStatusHUD</code>)</td><td>Avatar, thanh HP, thanh Linh Lực (EXP), tên cảnh giới trong trận. Hàm <code>UpdateThemeColor(Color themeColor)</code> đổi màu viền theo Biến Thân.</td></tr>
-    <tr><td>Top-Center</td><td>Đồng hồ wave + thanh máu Boss (chỉ hiện khi Boss xuất hiện)</td></tr>
-    <tr><td>Top-Right</td><td>Nút tạm dừng (menu có <code>Độn Thổ Phù</code> để rút lui)</td></tr>
-    <tr><td>Bottom-Left</td><td><code>FloatingJoystick</code>, ẩn mặc định, hiện tại chỗ chạm ở nửa trái màn hình</td></tr>
-    <tr><td>Bottom-Right</td><td>
-      <ul>
-        <li><code>Btn_Dash</code>: lướt, có vòng đếm ngược cooldown</li>
-        <li><code>Btn_Transform</code>: Biến Thân, sáng rực khi đầy Nộ</li>
-        <li><code>Btn_Tribulation</code>: Độ Kiếp, chỉ hiện và rung nhẹ khi đủ Tu Vi</li>
-      </ul></td></tr>
+    <tr><td>Trên trái</td><td>Avatar, HP, thanh EXP trong trận (cấp trận), tầng Lôi Kiếp; viền đổi màu theo Biến Thân (<code>UpdateThemeColor</code>)</td></tr>
+    <tr><td>Giữa trên</td><td>Đồng hồ + thanh máu boss</td></tr>
+    <tr><td>Trên phải</td><td>Nút tạm dừng (có Độn Thổ Phù)</td></tr>
+    <tr><td>Dưới trái</td><td>Joystick</td></tr>
+    <tr><td>Dưới phải</td><td><code>Btn_Dash</code>, <code>Btn_Skill1–3</code>, <code>Btn_Transform</code>, <code>Btn_Tribulation</code> (chỉ hiện khi đủ Tu Vi, rung nhẹ)</td></tr>
   </table>
 
-  <h2>6. Pop-up</h2>
+  <h2>7. Pop-up</h2>
   <ul>
-    <li><b><code>UpgradeCardPopup</code>:</b> 3 thẻ Kỳ Ngộ ngang màn hình (<code>Card_1</code>, <code>Card_2</code>, <code>Card_3</code>). Thẻ tiến hóa có viền vàng.</li>
-    <li><b><code>RevivePopup</code>:</b> đếm ngược 5 giây. Nếu mang Huyền Thiên Đan thì có thêm nút hồi sinh miễn phí.</li>
-    <li><b><code>ResultPopup</code>:</b> thời gian sống sót, cảnh giới đạt được, tổng sát thương, Linh Thạch, linh thảo rơi; nút <code>Nhận Thường</code>.</li>
+    <li><code>UpgradeCardPopup</code>: 3 thẻ Kỳ Ngộ; thẻ Đại thành viền vàng.</li>
+    <li><code>RevivePopup</code>: đếm 5 s. Trong Bí Cảnh và ngoài thế giới (nội dung khác nhau, xem mục 8).</li>
+    <li><code>ResultPopup</code> (Bí Cảnh): thời gian, tổng sát thương, Linh Thạch, EXP, linh thảo, cống hiến; nút <code>Nhận Thường</code>.</li>
+    <li><code>LevelUpToast</code>: "Lên Lv 24" 2 s, không chặn chơi. Đột phá cảnh giới: hiệu ứng toàn màn hình 2 s.</li>
+    <li><code>QuestCompletePopup</code>: tên nhiệm vụ, thưởng; chương mới thì có hội thoại.</li>
   </ul>
 
-  <h2>7. Điểm đặt quảng cáo</h2>
+  <h2>8. Điểm đặt quảng cáo</h2>
   <table>
-    <tr><th>#</th><th>Loại</th><th>Vị trí</th><th>Nút / Điều kiện</th><th>Phần thưởng</th></tr>
-    <tr><td>—</td><td>Banner</td><td><code>LobbyUI</code></td><td>Cố định mép dưới, ẩn khi vào trận</td><td>—</td></tr>
-    <tr><td>—</td><td>Rewarded</td><td><code>LobbyUI</code> Top Bar</td><td>Nút <code>+</code> cạnh Linh Thạch</td><td>Thêm Linh Thạch</td></tr>
-    <tr><td>1</td><td>Rewarded</td><td><code>UpgradeCardPopup</code></td><td><code>Làm Mới (Xem QC)</code> → <code>AdMobManager.ShowRewardedAd()</code></td><td>Random lại 3 thẻ</td></tr>
+    <tr><th>#</th><th>Loại</th><th>Vị trí</th><th>Điều kiện</th><th>Thưởng</th></tr>
+    <tr><td>—</td><td>Banner</td><td>Dưới cùng các màn Menu, bản đồ lớn, <code>SectHallUI</code></td><td>Ẩn ngoài thế giới và trong Bí Cảnh</td><td>—</td></tr>
+    <tr><td>—</td><td>Rewarded</td><td>Nút <code>+</code> trên thanh Menu</td><td>5 lần/ngày</td><td><code>50 + 5 × level</code> Linh Thạch</td></tr>
+    <tr><td>1</td><td>Rewarded</td><td><code>UpgradeCardPopup</code></td><td><code>Làm Mới (Xem QC)</code></td><td>Random lại 3 thẻ</td></tr>
     <tr><td>2</td><td>Rewarded</td><td><code>UpgradeCardPopup</code></td><td><code>Nhận Cả 3 (Xem QC)</code>, 1 lần/trận</td><td>Nhận cả 3 thẻ</td></tr>
-    <tr><td>3</td><td>Rewarded</td><td><code>RevivePopup</code></td><td><code>Dùng Đan Hồi Sinh (Xem QC)</code></td><td>Hồi 100% HP, đẩy lùi quái, bất tử 3 giây</td></tr>
-    <tr><td>4</td><td>Rewarded</td><td><code>ResultPopup</code></td><td><code>Nhận x2 Linh Thạch (Xem QC)</code></td><td>x2 Linh Thạch</td></tr>
-    <tr><td>5</td><td>Interstitial</td><td><code>ResultPopup</code> → <code>LobbyUI</code></td><td>Cooldown ≥ 180 giây; bỏ qua ở ván đầu tiên; không hiện ngay sau một Rewarded</td><td>—</td></tr>
+    <tr><td>3a</td><td>Rewarded</td><td><code>RevivePopup</code> trong Bí Cảnh</td><td><code>Dùng Đan Hồi Sinh (Xem QC)</code>, 1 lần/trận</td><td>100% HP, đẩy lùi quái, bất tử 3 s</td></tr>
+    <tr><td>3b</td><td>Rewarded</td><td><code>RevivePopup</code> ngoài thế giới</td><td><code>Hồi sinh tại chỗ (Xem QC)</code>, 1 lần/10 phút</td><td>100% HP, bất tử 3 s, không mất Linh Thạch</td></tr>
+    <tr><td>4</td><td>Rewarded</td><td><code>ResultPopup</code></td><td><code>Nhận x2 Linh Thạch (Xem QC)</code></td><td>x2 Linh Thạch của Bí Cảnh</td></tr>
+    <tr><td>5</td><td>Interstitial</td><td>Khi rời <code>ResultPopup</code> về thế giới</td><td>Cooldown ≥ 180 s; bỏ qua Bí Cảnh đầu tiên; không ngay sau Rewarded</td><td>—</td></tr>
+    <tr><td>6</td><td>Rewarded</td><td>Hoàn thành nhiệm vụ tông môn hằng ngày</td><td><code>x2 Cống Hiến (Xem QC)</code>, 3 lần/ngày</td><td>+40 cống hiến</td></tr>
   </table>
-  <div class="note">Không hiện Interstitial giữa hội thoại cốt truyện hoặc ngay trước trận boss. Quảng cáo chỉ xuất hiện ở các điểm trong bảng.</div>
+  <div class="note">Không hiện Interstitial giữa hội thoại, trước boss, trong lúc Thiên Kiếp hoặc khi đang dịch chuyển. Quảng cáo chỉ xuất hiện ở các điểm trong bảng.</div>
 </main>
 <footer>Tài liệu nội bộ – Vạn Kiếm Độ Kiếp</footer>
 </body>
