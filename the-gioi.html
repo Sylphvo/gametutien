@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Thế giới mở – Vạn Kiếm Độ Kiếp</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <h1>Thế giới mở</h1>
+  <nav>
+  </nav>
+</header>
+<main>
+  <h2>1. Cấu trúc</h2>
+  <ul>
+    <li><b>Một bản đồ, 3 tầng:</b> Nhân Giới, Linh Giới, Tiên Giới dùng chung bố cục lưới. Mỗi tầng có tileset, quái, tông môn, NPC và khoảng level riêng.</li>
+    <li><b>5 vùng theo ngũ hành phương vị:</b> Trung tâm (Thổ + Lôi), Đông (Mộc), Tây (Kim), Nam (Hỏa), Bắc (Thủy/Băng).</li>
+    <li><b>Mỗi vùng chia thành khu nhỏ</b>, mỗi khu có gợi ý level. Vào khu nào cũng được, thiếu level thì bị phạt sát thương (xem <a href="tu-luyen.html">Tu luyện</a> mục 4).</li>
+    <li><b>Phi thăng</b> (Lv 50 → 51, Lv 90 → 91) mở tầng kế tiếp. Có thể quay về tầng dưới bằng Giới Diện Truyền Tống ở thành trung tâm.</li>
+    <li>Ngoài thế giới: phi kiếm và công pháp tự đánh quái. <b>Bí Cảnh</b> là trận sinh tồn 10–15 phút riêng (thẻ Kỳ Ngộ, Tiểu Lôi Kiếp, Biến Thân, boss).</li>
+  </ul>
+
+  <h2>2. Lưới bản đồ</h2>
+  <p>Mỗi tầng là lưới <b>9 × 9 ô</b>, mỗi ô <b>80 × 80 unit</b> (tổng 720 × 720 unit). Tọa độ ô <code>(x, y)</code>: x = 0 ở Tây → 8 ở Đông; y = 0 ở Nam → 8 ở Bắc.
+  Người chơi chạy 3.5 unit/s nên đi qua một ô mất khoảng 23 giây, đi từ trung tâm ra rìa khoảng 1.5 phút.</p>
+  <pre><code>        x: 0   1   2   3   4   5   6   7   8
+  y=8      ##  ##  ##  B3a B3b B3c ##  ##  ##
+  y=7      ##  ##  ##  B2a B2b B2c ##  ##  ##
+  y=6      ##  ##  TB  B1a B1b B1c ĐB  ##  ##
+  y=5      T3c T2c T1c TT  TT  TT  Đ1a Đ2a Đ3a
+  y=4      T3b T2b T1b TT  HUB TT  Đ1b Đ2b Đ3b
+  y=3      T3a T2a T1a TT  TT  TT  Đ1c Đ2c Đ3c
+  y=2      ##  ##  TN  N1c N1b N1a ĐN  ##  ##
+  y=1      ##  ##  ##  N2c N2b N2a ##  ##  ##
+  y=0      ##  ##  ##  N3c N3b N3a ##  ##  ##
+
+  HUB = thành trung tâm (an toàn)   TT = khu Trung tâm
+  B/Đ/N/T = Bắc/Đông/Nam/Tây, số = vòng (1 gần trung tâm, 3 ở rìa), a/b/c = vị trí trong vòng
+  ĐB/TB/ĐN/TN = cấm địa ở góc   ## = không đi được (núi, biển, vực)</code></pre>
+  <ul>
+    <li>49 ô đi được mỗi tầng: 9 Trung tâm (gồm HUB) + 4 vùng × 9 + 4 cấm địa.</li>
+    <li>Thứ tự a → b → c theo chiều kim đồng hồ khi đứng ở trung tâm nhìn ra.</li>
+    <li>Cấm địa ở góc nối với ô vòng 1 của hai vùng kề nó (ví dụ ĐB nối B1c và Đ1a).</li>
+    <li>Viền giữa các ô đi được để mở, có đường mòn nối tâm các ô để người chơi không bị kẹt.</li>
+  </ul>
+
+  <h2>3. Vùng, tên khu và tông môn</h2>
+  <p>Mỗi vòng có một tên; 3 ô trong vòng lấy tên vòng + hậu tố vị trí (ví dụ "Linh Thú Sơn – Bắc", "Linh Thú Sơn", "Linh Thú Sơn – Nam").
+  Tông môn đặt ở ô b của vòng 1 (Trung tâm: ở HUB). Tông môn có tên đánh dấu (đề xuất) là tên tự đặt cho game, không có trong nguyên tác.</p>
+
+  <h3>3.1. Tầng Nhân Giới (Lv 1–50)</h3>
+  <table>
+    <tr><th>Vùng</th><th>Hành</th><th>Tên vùng</th><th>Vòng 1</th><th>Vòng 2</th><th>Vòng 3</th><th>Tông môn</th></tr>
+    <tr><td>Trung tâm</td><td>Thổ + Lôi</td><td>Việt Quốc</td><td colspan="3">HUB: Hoàng Phong Cốc. Ô (4,3): làng Thất Huyền Môn. 7 ô còn lại: "Việt Quốc – &lt;hướng&gt;"</td><td>Hoàng Phong Cốc</td></tr>
+    <tr><td>Bắc</td><td>Thủy</td><td>Bắc Hải</td><td>Tinh Cung Hải Vực</td><td>Ngoại Hải</td><td>Bắc Cực Băng Nguyên</td><td>Tiểu Cực Cung</td></tr>
+    <tr><td>Đông</td><td>Mộc</td><td>Thanh Hư Sơn Mạch</td><td>Linh Thú Sơn</td><td>Thanh Hư Cổ Lâm</td><td>Vạn Độc Trạch</td><td>Thanh Hư Môn</td></tr>
+    <tr><td>Nam</td><td>Hỏa</td><td>Ma Diễm Địa</td><td>Biên Cảnh Nguyên Vũ</td><td>Ma Diễm Hỏa Sơn</td><td>Huyết Hỏa Cốc</td><td>Ma Diễm Tông</td></tr>
+    <tr><td>Tây</td><td>Kim</td><td>Cự Kiếm Lĩnh</td><td>Cự Kiếm Phong</td><td>Mộ Lan Thảo Nguyên</td><td>Kim Sa Đại Mạc</td><td>Cự Kiếm Môn</td></tr>
+  </table>
+
+  <h3>3.2. Tầng Linh Giới (Lv 51–90)</h3>
+  <table>
+    <tr><th>Vùng</th><th>Hành</th><th>Tên vùng</th><th>Vòng 1</th><th>Vòng 2</th><th>Vòng 3</th><th>Tông môn</th></tr>
+    <tr><td>Trung tâm</td><td>Thổ + Lôi</td><td>Phong Nguyên Đại Lục</td><td colspan="3">HUB: Thiên Uyên Thành. 8 ô còn lại: "Phong Nguyên – &lt;hướng&gt;"</td><td>Thiên Uyên Thành</td></tr>
+    <tr><td>Bắc</td><td>Thủy</td><td>Huyền Minh Hải</td><td>Hàn Triều Hải</td><td>Băng Phách Lĩnh</td><td>Huyền Minh Uyên</td><td>Băng Phách Cung (đề xuất)</td></tr>
+    <tr><td>Đông</td><td>Mộc</td><td>Huyền Vũ Đại Lục</td><td>Mộc Tộc Biên Lâm</td><td>Cổ Thụ Thánh Địa</td><td>Thiên Đằng Hải</td><td>Chân Thiền Môn</td></tr>
+    <tr><td>Nam</td><td>Hỏa</td><td>Huyết Thiên Đại Lục</td><td>Huyết Nguyên</td><td>Dạ Xoa Hỏa Lĩnh</td><td>Xích Viêm Hoang Mạc</td><td>Xích Viêm Cốc (đề xuất)</td></tr>
+    <tr><td>Tây</td><td>Kim</td><td>Giác Xi Lãnh Địa</td><td>Thiết Bích Quan</td><td>Giác Xi Cổ Thành</td><td>Canh Kim Sơn</td><td>Thiên Kiếm Các (đề xuất)</td></tr>
+  </table>
+
+  <h3>3.3. Tầng Tiên Giới (Lv 91–140)</h3>
+  <table>
+    <tr><th>Vùng</th><th>Hành</th><th>Tên vùng</th><th>Vòng 1</th><th>Vòng 2</th><th>Vòng 3</th><th>Tông môn</th></tr>
+    <tr><td>Trung tâm</td><td>Thổ + Lôi</td><td>Trung Thổ Tiên Vực</td><td colspan="3">HUB: Luân Hồi Điện (phân điện ẩn). 8 ô còn lại: "Trung Thổ – &lt;hướng&gt;" (lãnh địa Thiên Đình)</td><td>Luân Hồi Điện</td></tr>
+    <tr><td>Bắc</td><td>Thủy</td><td>Bắc Hàn Tiên Vực</td><td>Hàn Tuyết Nguyên</td><td>Băng Hồn Cốc</td><td>Vĩnh Đống Thiên Nhai</td><td>Bắc Hàn Tiên Cung (đề xuất)</td></tr>
+    <tr><td>Đông</td><td>Mộc</td><td>Thanh Mộc Tiên Vực</td><td>Trường Sinh Lâm</td><td>Cửu Nguyên Sơn</td><td>Kiến Mộc Chi Hải</td><td>Cửu Nguyên Quán</td></tr>
+    <tr><td>Nam</td><td>Hỏa</td><td>Chúc Long Tiên Vực</td><td>Xích Hà</td><td>Chúc Long Sơn</td><td>Thái Dương Hỏa Hải</td><td>Chúc Long Đạo</td></tr>
+    <tr><td>Tây</td><td>Kim</td><td>Man Hoang Tiên Vực</td><td>Man Hoang Biên Địa</td><td>Bát Tộc Lãnh Địa</td><td>Canh Kim Tiên Phong</td><td>Man Hoang Bát Đại Tộc</td></tr>
+  </table>
+
+  <h2>4. Gợi ý level</h2>
+  <h3>4.1. Bốn vùng hướng (giống nhau cho cả 4 hướng)</h3>
+  <table>
+    <tr><th>Ô</th><th>Nhân Giới</th><th>Linh Giới</th><th>Tiên Giới</th></tr>
+    <tr><td>Vòng 1 a / b / c</td><td>10–14 / 13–17 / 16–20</td><td>58–62 / 61–65 / 64–68</td><td>100–104 / 103–108 / 107–112</td></tr>
+    <tr><td>Vòng 2 a / b / c</td><td>20–25 / 24–30 / 29–35</td><td>68–71 / 71–75 / 74–78</td><td>112–116 / 116–121 / 120–125</td></tr>
+    <tr><td>Vòng 3 a / b / c</td><td>35–40 / 39–45 / 44–50</td><td>78–82 / 81–86 / 85–90</td><td>125–130 / 129–135 / 134–140</td></tr>
+  </table>
+
+  <h3>4.2. Trung tâm</h3>
+  <table>
+    <tr><th>Ô</th><th>Nhân Giới</th><th>Linh Giới</th><th>Tiên Giới</th></tr>
+    <tr><td>HUB (4,4)</td><td colspan="3">An toàn, không có quái</td></tr>
+    <tr><td>(4,3) Nam</td><td>1–3 (Thất Huyền Môn)</td><td>51–53</td><td>91–93</td></tr>
+    <tr><td>(5,3) Đông Nam</td><td>2–4</td><td>52–54</td><td>92–94</td></tr>
+    <tr><td>(5,4) Đông</td><td>3–5</td><td>53–55</td><td>93–95</td></tr>
+    <tr><td>(5,5) Đông Bắc</td><td>4–6</td><td>54–56</td><td>94–96</td></tr>
+    <tr><td>(4,5) Bắc</td><td>5–7</td><td>55–57</td><td>95–97</td></tr>
+    <tr><td>(3,5) Tây Bắc</td><td>6–8</td><td>56–58</td><td>96–98</td></tr>
+    <tr><td>(3,4) Tây</td><td>7–9</td><td>57–59</td><td>97–99</td></tr>
+    <tr><td>(3,3) Tây Nam</td><td>8–10</td><td>58–60</td><td>98–100</td></tr>
+  </table>
+
+  <h3>4.3. Cấm địa</h3>
+  <table>
+    <tr><th>Góc</th><th>Ô</th><th>Nhân Giới</th><th>Linh Giới</th><th>Tiên Giới</th><th>Hành của quái</th></tr>
+    <tr><td>Đông Nam</td><td>(6,2)</td><td>Huyết Sắc Cấm Địa, 12–16</td><td>Huyền Vũ Cổ Địa, 60–64</td><td>Hắc Thổ Cấm Địa, 100–108</td><td>Mộc / Mộc / Thổ</td></tr>
+    <tr><td>Đông Bắc</td><td>(6,6)</td><td>Hư Thiên Điện, 30–35</td><td>Lôi Minh Cấm Địa, 65–70</td><td>Tích Lân Không Cảnh, 120–130</td><td>Thủy / Thổ / Thủy</td></tr>
+    <tr><td>Tây Nam</td><td>(2,2)</td><td>Âm Minh Chi Địa, 38–42</td><td>Ma Giới Thông Đạo, 72–82</td><td>Man Hoang Giới Vực, 110–118</td><td>Hỏa / Hỏa / Kim</td></tr>
+    <tr><td>Tây Bắc</td><td>(2,6)</td><td>Đại Tấn Cổ Địa, 45–50</td><td>Thiên Kiếp Phi Thăng Đài, 85–90</td><td>Thiên Cung Thiên Đình, 135–140</td><td>Kim / Thổ / Thổ</td></tr>
+  </table>
+
+  <h3>4.4. Cảnh báo level</h3>
+  <p>Khi bước vào ô mới hiện banner 2.5 s: tên khu + "Gợi ý: &lt;cảnh giới&gt; (Lv a–b)". Màu theo level người chơi <code>Lp</code>:</p>
+  <table>
+    <tr><th>Màu</th><th>Điều kiện</th><th>Chữ thêm</th></tr>
+    <tr><td style="color:#7bd88f">Xanh</td><td>Lp &gt; b</td><td>"Dễ"</td></tr>
+    <tr><td style="color:#f5d76e">Vàng</td><td>a ≤ Lp ≤ b</td><td>—</td></tr>
+    <tr><td style="color:#f0a04b">Cam</td><td>a − 5 ≤ Lp &lt; a</td><td>"Khó"</td></tr>
+    <tr><td style="color:#e5484d">Đỏ</td><td>Lp &lt; a − 5</td><td>"Nguy hiểm – quái mạnh hơn nhiều"</td></tr>
+  </table>
+  <p>Cùng màu dùng cho ô trên bản đồ lớn và số level trên đầu quái.</p>
+
+  <h2>5. Nội dung mỗi ô</h2>
+  <table>
+    <tr><th>Thành phần</th><th>Số lượng</th><th>Luật</th></tr>
+    <tr><td>Nhóm quái (<code>EnemySpawnGroup</code>)</td><td>5 nhóm, mỗi nhóm 4–8 con</td><td>Quái lấy từ danh sách của vùng (mục 6), level ngẫu nhiên trong khoảng của ô. Nhóm bị diệt hết thì hồi sau 45 s. Nhóm cách người chơi &gt; 25 unit thì tạm tắt (trả quái về pool, nhớ số con còn sống)</td></tr>
+    <tr><td>Tinh anh</td><td>1</td><td>Phiên bản mạnh của một quái trong danh sách: HP ×12, sát thương ×1.5, to ×1.4, EXP ×10, chắc chắn rơi 3–5 Linh Thạch. Hồi sau 5 phút</td></tr>
+    <tr><td>Boss thế giới</td><td>1 ở ô vòng 3 b mỗi vùng hướng, 1 ở ô (3,3) Trung tâm</td><td>Mục 7. Hồi sau 15 phút. Có vùng đấu tròn bán kính 12; ra khỏi vùng 5 s thì boss hồi đầy máu và quay về</td></tr>
+    <tr><td>Truyền Tống Trận</td><td>1</td><td>Chạm để mở. Dịch chuyển miễn phí tới mọi trận đã mở trong cùng tầng. Là điểm hồi sinh</td></tr>
+    <tr><td>Điểm linh thảo</td><td>3</td><td>Nhặt được 1 linh thảo của vùng (mục 6), hồi sau 10 phút</td></tr>
+    <tr><td>Cổng Bí Cảnh</td><td>Ô b của mỗi vòng, ô (5,5) Trung tâm, các ô có Bí Cảnh cốt truyện</td><td>Mục 8</td></tr>
+    <tr><td>NPC</td><td>Tùy ô</td><td>Nhiệm vụ chính, tông môn, thương nhân (ở HUB và ô có tông môn)</td></tr>
+  </table>
+  <h3>5.1. Quái ngoài thế giới</h3>
+  <ul>
+    <li>Tầm phát hiện 6 unit; bị đánh thì cả nhóm cùng lao vào. Đuổi xa quá 14 unit khỏi điểm sinh thì quay về và hồi đầy máu.</li>
+    <li>Hành vi lấy từ <code>EnemyData.behavior</code> như trong Bí Cảnh.</li>
+    <li>Không tăng theo phút. HP và sát thương theo level (xem <a href="tu-luyen.html">Tu luyện</a> mục 3).</li>
+    <li>Tối đa 80 quái hoạt động cùng lúc quanh người chơi.</li>
+    <li>Kẹt quá 2 s (không tới gần được người chơi) thì quay về điểm sinh.</li>
+  </ul>
+  <h3>5.2. HUB</h3>
+  <p>Mỗi tầng có một thành ở (4,4): tông môn Trung tâm, Lôi Kiếp Đài (đột phá và phi thăng), Đan Phòng (luyện đan), Kiếm Trủng, cửa Động Phủ, thương nhân, Giới Diện Truyền Tống (sau khi phi thăng).</p>
+
+  <h2>6. Quái và linh thảo theo vùng</h2>
+  <p>Mọi quái trong một vùng mang <b>hành của vùng</b> (dùng cho khắc chế ngũ hành); quái trong cấm địa mang hành ghi ở bảng 4.3. Nhãn phe (Yêu, Ma, Quỷ, Tiên) giữ theo bảng quái ở <a href="noi-dung.html">Quái &amp; Boss</a>.
+  Sprite quái tô thêm màu theo hành (Kim vàng nhạt, Mộc xanh lục, Thủy xanh lam, Hỏa đỏ, Thổ nâu). Id bỏ tiền tố <code>en_</code>.</p>
+  <table>
+    <tr><th>Tầng</th><th>Trung tâm</th><th>Bắc</th><th>Đông</th><th>Nam</th><th>Tây</th></tr>
+    <tr><td>Nhân</td><td>soi, doc_trung, khoi_loi</td><td>hai_xa, ngu_yeu, giap_giai, hai_yeu_phun</td><td>doc_trung, khoi_loi, huyet_doi, soi</td><td>ma_tu, ma_tu_no, huyet_doi, quy_hoa</td><td>mo_lan_ky, phap_su_mo_lan, khoi_loi, soi</td></tr>
+    <tr><td>Linh</td><td>khong_gian_trung, giac_xi, da_xoa</td><td>da_xoa, khong_gian_trung, ma_phap</td><td>moc_toc, giac_xi, da_xoa</td><td>ma_binh, ma_no, da_xoa, ma_phap</td><td>giac_xi, giac_xi_khien, khong_gian_trung</td></tr>
+    <tr><td>Tiên</td><td>tien_binh, tien_cung, tien_ve</td><td>tien_binh, hu_khong_anh, tien_cung</td><td>luan_hoi_hon, man_hoang_thu, tien_cung</td><td>thien_dinh_phap, tien_binh, hu_khong_anh</td><td>man_hoang, man_hoang_thu, tien_ve</td></tr>
+  </table>
+  <table>
+    <tr><th>Cấm địa</th><th>Nhân</th><th>Linh</th><th>Tiên</th></tr>
+    <tr><td>Đông Nam</td><td>huyet_doi, doc_trung, soi_dau</td><td>moc_toc, giac_xi_khien</td><td>man_hoang, tien_ve</td></tr>
+    <tr><td>Đông Bắc</td><td>am_hon, cuc_am_tu, hai_yeu_phun</td><td>khong_gian_trung, da_xoa</td><td>hu_khong_anh, luan_hoi_hon, thien_dinh_phap</td></tr>
+    <tr><td>Tây Nam</td><td>quy_vat, cuong_thi, quy_hoa, huyet_anh</td><td>ma_binh, ma_phap, ma_no</td><td>man_hoang, man_hoang_thu, hu_khong_anh</td></tr>
+    <tr><td>Tây Bắc</td><td>am_la_tu, huyet_anh, cuong_thi</td><td>ma_binh, giac_xi, khong_gian_trung</td><td>tien_binh, tien_cung, tien_ve, thien_dinh_phap</td></tr>
+  </table>
+  <table>
+    <tr><th>Tầng</th><th>Linh thảo theo vùng (Trung tâm / Bắc / Đông / Nam / Tây)</th></tr>
+    <tr><td>Nhân</td><td><code>herb_thanh_linh</code> / <code>herb_hai_tao</code> / <code>herb_tu_diep</code> / <code>herb_huyet_sam</code> / <code>herb_am_linh_chi</code></td></tr>
+    <tr><td>Linh</td><td><code>herb_loi_minh_truc</code> / <code>herb_hai_tao</code> / <code>herb_tu_diep</code> / <code>herb_huyet_lien</code> / <code>herb_loi_minh_truc</code></td></tr>
+    <tr><td>Tiên</td><td><code>herb_tien_lo</code> cho mọi vùng</td></tr>
+  </table>
+
+  <h2>7. Boss thế giới</h2>
+  <p>Dùng <code>BossData</code> ở <a href="noi-dung.html">Quái &amp; Boss</a> với chỉ số gốc (mục 0 trang đó), level = level cao nhất của ô.</p>
+  <table>
+    <tr><th>Tầng</th><th>Trung tâm (3,3)</th><th>Bắc B3b</th><th>Đông Đ3b</th><th>Nam N3b</th><th>Tây T3b</th></tr>
+    <tr><td>Nhân</td><td>Lang Vương</td><td>Hải Xà Vương</td><td>Huyết Văn Mãng</td><td>Hộ pháp Ma Diễm Tông</td><td>Mộ Lan Kỵ Tướng</td></tr>
+    <tr><td>Linh</td><td>Không Gian Trùng Mẫu</td><td>Ma Soái</td><td>Trưởng Lão Mộc Tộc</td><td>Ma Tướng</td><td>Giác Xi Bách Phu Trưởng</td></tr>
+    <tr><td>Tiên</td><td>Đội Trưởng Tiên Binh</td><td>Chấp Sự Thiên Đình</td><td>Man Hoang Thú Vương</td><td>Thần Tướng Thiên Đình</td><td>Thạch Tướng Hắc Thổ</td></tr>
+  </table>
+  <p>Thưởng boss thế giới: EXP = 100 × EXP quái thường cùng level, Linh Thạch = 20 + 2 × level, 2 linh thảo của vùng, +10 cống hiến nếu là thành viên tông môn của vùng.</p>
+
+  <h2>8. Bí Cảnh</h2>
+  <table>
+    <tr><th>Loại</th><th>Vị trí</th><th>Level</th><th>Nội dung</th></tr>
+    <tr><td>Bí Cảnh cốt truyện (19)</td><td>Bảng ở <a href="gdd.html">Cốt truyện</a></td><td>Cố định</td><td>Wave và boss của chương tương ứng (chương 1–4 ở <a href="can-bang.html">Cân bằng</a>, 5–19 ở <a href="noi-dung.html">Quái &amp; Boss</a>). Chơi lại được</td></tr>
+    <tr><td>Bí Cảnh vùng (13 mỗi tầng)</td><td>Ô b của mỗi vòng trong 4 vùng hướng (12) + ô (5,5) Trung tâm</td><td>Giữa khoảng level của ô</td><td>Khung wave chung (đoạn A/B/C ở Quái &amp; Boss mục 5) với quái của vùng. Phút 5: tinh anh của vùng. Phút 10: boss thế giới của vùng (bảng mục 7). Chơi lại không giới hạn</td></tr>
+  </table>
+  <p>Cửa Bí Cảnh hiện pop-up: tên, level gợi ý (có màu như mục 4.4), phần thưởng, ô chọn đan. Luật trong trận ở <a href="gameplay.html">Gameplay</a> mục 3.</p>
+
+  <h2>9. Di chuyển, hồi sinh</h2>
+  <ul>
+    <li><b>Truyền Tống:</b> miễn phí, trong cùng tầng, tới trận đã mở. Không dùng được khi có quái đang đuổi trong 8 unit.</li>
+    <li><b>Ngự khí phi hành</b> (mở khi lên Trúc Cơ, Lv 11): giữ nút Dash 0.5 s để bay, tốc độ ×2, quái không đuổi kịp, không tấn công được khi bay. Tắt khi bị đánh.</li>
+    <li><b>Chết ngoài thế giới:</b> hiện <code>RevivePopup</code> 5 s:
+      <ul>
+        <li>"Hồi sinh tại chỗ (Xem QC)": hồi 100% HP, bất tử 3 s, không mất gì. Tối đa 1 lần mỗi 10 phút.</li>
+        <li>"Hồi sinh tại chỗ" bằng Huyền Thiên Đan nếu có.</li>
+        <li>Không chọn: về Truyền Tống Trận gần nhất đã mở trong tầng, mất 10% Linh Thạch đang có (tối đa 50 × level).</li>
+      </ul></li>
+  </ul>
+
+  <h2>10. Bản đồ lớn và bản đồ nhỏ</h2>
+  <ul>
+    <li><b>Bản đồ nhỏ</b> góc phải trên, bán kính 30 unit quanh người chơi: địa hình, quái tinh anh, boss, Truyền Tống, cổng Bí Cảnh, NPC có nhiệm vụ.</li>
+    <li><b>Bản đồ lớn</b> (nút trên HUD): cả 81 ô của tầng; ô chưa tới phủ sương; mỗi ô đã tới hiện tên và màu theo mục 4.4; chạm Truyền Tống đã mở để dịch chuyển; nút đổi tầng (chỉ xem tầng đã mở).</li>
+    <li>Ảnh bản đồ mỗi tầng (720 × 720 px, 1 px = 1 unit) do Editor script sinh từ dữ liệu ô.</li>
+  </ul>
+
+  <h2>11. Kỹ thuật thế giới</h2>
+  <ul>
+    <li>Mỗi ô là một scene <code>Cell_&lt;tầng&gt;_&lt;x&gt;_&lt;y&gt;</code> (ví dụ <code>Cell_N_4_3</code>). Scene <code>World</code> giữ người chơi, camera, HUD, Manager.</li>
+    <li><code>WorldStreamer</code> nạp cộng dồn (<code>LoadSceneAsync</code> Additive) các ô trong phạm vi 3 × 3 quanh người chơi, gỡ ô cách 2 ô trở lên. Không nạp/gỡ đồng bộ.</li>
+    <li>Trong ô: Tilemap nền, Tilemap trang trí, Tilemap va chạm (<code>TilemapCollider2D</code> + <code>CompositeCollider2D</code>), Tilemap Renderer chế độ Chunk.</li>
+    <li>Camera: Cinemachine (package của Unity) bám người chơi, giới hạn trong biên 720 × 720.</li>
+    <li>Vào Bí Cảnh: lưu vị trí, nạp scene <code>Combat</code> (Single). Ra Bí Cảnh: nạp lại <code>World</code> ở vị trí cũ.</li>
+    <li>Tự lưu mỗi 60 s ngoài thế giới, và khi: đổi ô, dịch chuyển, lên level, hoàn thành nhiệm vụ, vào/ra Bí Cảnh.</li>
+    <li>Editor <code>VkdkWorldBuilder</code> sinh 49 scene ô mỗi tầng từ <code>WorldLayout</code> (ScriptableObject): địa hình tạm bằng nhiễu Perlin, giữ đường mòn nối tâm các ô, đặt nhóm quái, Truyền Tống, linh thảo, cổng Bí Cảnh, NPC theo dữ liệu.</li>
+  </ul>
+</main>
+<footer>Tài liệu nội bộ – Vạn Kiếm Độ Kiếp</footer>
+</body>
+</html>
