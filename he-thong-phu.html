@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hướng dẫn, Vô Tận, Cài đặt – Vạn Kiếm Độ Kiếp</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <h1>Hướng dẫn người chơi mới, Vô Tận, Cài đặt, Debug</h1>
+  <nav>
+    <a href="index.html">Tổng quan</a>
+    <a href="gdd.html">Cốt truyện &amp; Thế giới</a>
+    <a href="gameplay.html">Gameplay</a>
+    <a href="tu-luyen.html">Tu luyện</a>
+    <a href="chien-dau.html">Chiến đấu</a>
+    <a href="noi-dung.html">Nội dung ch.5–19</a>
+    <a href="he-thong-phu.html" class="active">Hướng dẫn &amp; Cài đặt</a>
+    <a href="vfx.html">VFX</a>
+    <a href="am-thanh.html">Âm thanh</a>
+    <a href="ui-quang-cao.html">UI &amp; Quảng cáo</a>
+    <a href="ui-kit.html">Bộ UI</a>
+    <a href="cong-cu-asset.html">Công cụ Asset</a>
+    <a href="can-bang.html">Cân bằng</a>
+    <a href="ky-thuat.html">Kỹ thuật</a>
+    <a href="phat-hanh.html">Phát hành</a>
+  </nav>
+</header>
+<main>
+  <h2>1. Hướng dẫn người chơi mới (<code>TutorialManager</code>)</h2>
+  <p>Chạy trong lần chơi chương 1 đầu tiên và vài lần vào Lobby đầu tiên. Mỗi bước là một <code>TutorialStep</code> (ScriptableObject) có điều kiện bắt đầu, nội dung,
+  phần tử được làm nổi bật và điều kiện kết thúc. Tiến độ lưu bằng <code>tutorialFlags</code> (bit) trong save. Có nút <b>Bỏ qua hướng dẫn</b> trong menu tạm dừng.</p>
+
+  <h3>1.1. Trong trận chương 1 lần đầu</h3>
+  <table>
+    <tr><th>#</th><th>Id</th><th>Bắt đầu khi</th><th>Hiển thị</th><th>Kết thúc khi</th><th>Dừng game?</th></tr>
+    <tr><td>1</td><td><code>tut_move</code></td><td>Vào trận</td><td>Bàn tay động kéo ở nửa trái + chữ "Kéo để di chuyển"</td><td>Đi được tổng 3 unit</td><td>Không (quái chưa sinh tới khi xong)</td></tr>
+    <tr><td>2</td><td><code>tut_sword</code></td><td>Xong bước 1</td><td>Chữ "Phi kiếm tự tấn công yêu thú" 3 s, sinh 5 Yêu Lang phía trước</td><td>Hạ 5 con</td><td>Không</td></tr>
+    <tr><td>3</td><td><code>tut_pickup</code></td><td>Linh Châu đầu tiên rơi</td><td>Mũi tên chỉ Linh Châu + "Nhặt Linh Châu để tăng tu vi"</td><td>Nhặt 1 viên</td><td>Không</td></tr>
+    <tr><td>4</td><td><code>tut_card</code></td><td>Lên cấp lần đầu</td><td>Làm nổi bật pop-up, "Chọn 1 Kỳ Ngộ". Ẩn 2 nút quảng cáo</td><td>Chọn thẻ</td><td>Có (pop-up vốn dừng game)</td></tr>
+    <tr><td>5</td><td><code>tut_dash</code></td><td>Phút 1:00, sinh 1 Lang Đầu Đàn</td><td>Làm nổi bật <code>Btn_Dash</code>, chậm thời gian còn 0.3 khi đường lao cảnh báo xuất hiện</td><td>Bấm Dash</td><td>Chậm 0.3</td></tr>
+    <tr><td>6</td><td><code>tut_tribulation</code></td><td>Đủ Tu Vi lần đầu</td><td>Làm nổi bật <code>Btn_Tribulation</code>, "Vượt Lôi Kiếp để đột phá. Né vòng đỏ!"</td><td>Bấm nút</td><td>Có, tới khi bấm</td></tr>
+    <tr><td>7</td><td><code>tut_tribulation_easy</code></td><td>Lôi Kiếp đầu tiên của tài khoản</td><td>Chỉ 5 tia, sát thương 50%</td><td>Hết Lôi Kiếp</td><td>Không</td></tr>
+    <tr><td>8</td><td><code>tut_transform</code></td><td>Lần đầu đầy Nộ sau khi có Thanh Lôi</td><td>Làm nổi bật <code>Btn_Transform</code></td><td>Bấm nút</td><td>Có, tới khi bấm</td></tr>
+    <tr><td>9</td><td><code>tut_boss</code></td><td>Boss tinh anh đầu tiên xuất hiện</td><td>Chữ lớn "Lang Vương xuất hiện!" + mũi tên ngoài màn hình chỉ hướng boss</td><td>2.5 s</td><td>Không</td></tr>
+  </table>
+  <p>Trong trận hướng dẫn: không hiện Interstitial, không hiện nút quảng cáo ở thẻ Kỳ Ngộ; <code>RevivePopup</code> có nút hồi sinh miễn phí một lần (không cần quảng cáo).</p>
+
+  <h3>1.2. Ngoài trận</h3>
+  <table>
+    <tr><th>#</th><th>Id</th><th>Bắt đầu khi</th><th>Nội dung</th></tr>
+    <tr><td>10</td><td><code>tut_cave</code></td><td>Về Lobby sau trận đầu</td><td>Làm nổi bật nút Động Phủ → tab Linh Căn → nút nâng HP gốc. Tặng 100 Linh Thạch nếu không đủ</td></tr>
+    <tr><td>11</td><td><code>tut_vial</code></td><td>Qua chương 1</td><td>Mở Chưởng Thiên Bình, tặng sẵn 1 giọt Lục Dịch</td></tr>
+    <tr><td>12</td><td><code>tut_alchemy</code></td><td>Qua chương 2</td><td>Gieo Thanh Linh Thảo → tưới Lục Dịch → luyện Tuyết Phách Hoàn (tặng nguyên liệu còn thiếu)</td></tr>
+    <tr><td>13</td><td><code>tut_sword_tomb</code></td><td>Lần đầu đủ 800 Linh Thạch</td><td>Làm nổi bật Kiếm Trủng, mở thử Lôi Kiếm</td></tr>
+    <tr><td>14</td><td><code>tut_pill_select</code></td><td>Lần đầu có đan trong kho</td><td>Làm nổi bật ô chọn đan ở <code>ChapterSelectUI</code></td></tr>
+  </table>
+
+  <h3>1.3. UI hướng dẫn</h3>
+  <ul>
+    <li><code>TutorialOverlay</code>: lớp tối 70% với lỗ tròn quanh phần tử được nổi bật (dùng shader UI hoặc 4 Image bao quanh), chặn chạm ngoài lỗ.</li>
+    <li>Khung chữ dùng <code>UI_Panel</code> nhỏ, mũi tên nhấp nháy.</li>
+    <li>Phần tử được nổi bật đánh dấu bằng component <code>TutorialAnchor</code> (có <code>anchorId</code>), không tìm theo tên GameObject.</li>
+  </ul>
+
+  <h2>2. Chế độ Vô Tận</h2>
+  <table>
+    <tr><th>Mục</th><th>Luật</th></tr>
+    <tr><td>Mở</td><td>Qua chương <code>endlessUnlockChapter</code> (mặc định 19). Trong bản dev có thể mở bằng Debug menu</td></tr>
+    <tr><td>Cảnh giới</td><td>Bắt đầu ở cảnh giới cốt truyện cao nhất đã đạt − 3 (tối thiểu Luyện Khí). Đột phá tới Đạo Tổ</td></tr>
+    <tr><td>Bản đồ</td><td>Đổi tileset mỗi 5 phút: Thiên Nam → Loạn Tinh Hải → Âm Minh → Thiên Uyên Thành → Ma Giới → Bắc Hàn → Trung Thổ, lặp lại</td></tr>
+    <tr><td>Quái</td><td>Mỗi 5 phút đổi bộ quái theo bản đồ (lấy thành phần đoạn C của chương tương ứng). Trần 150</td></tr>
+    <tr><td>Hệ số quái</td><td><code>HP × (2 × 1.18^phút)</code>, <code>sát thương × (2 × 1.08^phút)</code>, không nhân <code>enemyStatMultiplier</code></td></tr>
+    <tr><td>Boss</td><td>Mỗi 5 phút một boss chương lấy ngẫu nhiên trong các chương đã qua. <code>HP = HP gốc của boss ÷ enemyStatMultiplier của chương đó × 2 × 1.18^phút</code> (Chạm tính tương tự với 1.08^phút)</td></tr>
+    <tr><td>Lôi Kiếp</td><td>Sau 3 lần đầu, mỗi 1.500 Tu Vi thêm được Độ Kiếp tiếp; mỗi lần thành công +10% sát thương trong trận (cộng dồn) thay vì đổi Biến Thân</td></tr>
+    <tr><td>Thưởng</td><td>20 Linh Thạch mỗi phút sống sót + Linh Thạch nhặt được. Không có thưởng qua chương</td></tr>
+    <tr><td>Quảng cáo</td><td>Như trận thường (hồi sinh 1 lần, x2 cuối trận)</td></tr>
+    <tr><td>Kỷ lục</td><td>Lưu thời gian sống lâu nhất và cảnh giới cao nhất trong save. Bảng xếp hạng online để bản sau (Google Play Games Services)</td></tr>
+  </table>
+
+  <h2>3. Màn hình Cài đặt (<code>SettingsPopup</code>)</h2>
+  <table>
+    <tr><th>Mục</th><th>Kiểu</th><th>Mặc định</th><th>Tác dụng</th></tr>
+    <tr><td>Nhạc nền</td><td>Thanh trượt 0–100</td><td>80</td><td>Tham số <code>BGMVolume</code> của AudioMixer (đổi sang dB: <code>20 × log10(v)</code>, v = 0 thì −80 dB)</td></tr>
+    <tr><td>Hiệu ứng âm thanh</td><td>Thanh trượt 0–100</td><td>100</td><td>Tham số <code>SFXVolume</code></td></tr>
+    <tr><td>Chất lượng đồ họa</td><td>Thấp / Cao</td><td>Cao (tự chọn Thấp nếu RAM &lt; 3 GB)</td><td>Thấp: tắt Bloom, giảm số hạt VFX 50%, tắt hào quang lặp, target 30 FPS</td></tr>
+    <tr><td>Giới hạn FPS</td><td>30 / 60</td><td>60</td><td><code>Application.targetFrameRate</code>; tắt <code>QualitySettings.vSyncCount</code></td></tr>
+    <tr><td>Rung</td><td>Bật / Tắt</td><td>Bật</td><td>Rung ngắn khi bị đánh mạnh, Lôi Kiếp trúng, đột phá (<code>Handheld.Vibrate()</code>)</td></tr>
+    <tr><td>Rung màn hình</td><td>Bật / Tắt</td><td>Bật</td><td>Camera shake</td></tr>
+    <tr><td>Số sát thương</td><td>Bật / Tắt</td><td>Bật</td><td>Ẩn <code>DamagePopup</code> (vẫn hiện chí mạng)</td></tr>
+    <tr><td>Kiểu joystick</td><td>Nổi / Cố định</td><td>Nổi</td><td>Cố định: joystick luôn ở góc trái dưới</td></tr>
+    <tr><td>Ngôn ngữ</td><td>Danh sách</td><td>Tiếng Việt</td><td>Bản đầu chỉ có Tiếng Việt; mục hiện để mở rộng sau</td></tr>
+    <tr><td>Tùy chọn quyền riêng tư</td><td>Nút</td><td>—</td><td>Chỉ hiện khi <code>ConsentInformation.PrivacyOptionsRequirementStatus == Required</code>; gọi <code>ConsentForm.ShowPrivacyOptionsForm</code></td></tr>
+    <tr><td>Chính sách quyền riêng tư</td><td>Nút</td><td>—</td><td><code>Application.OpenURL(privacyPolicyUrl)</code></td></tr>
+    <tr><td>Xóa dữ liệu</td><td>Nút</td><td>—</td><td>Hỏi xác nhận 2 lần (lần 2 phải gõ "XOA"), xóa file save, về Boot</td></tr>
+    <tr><td>Phiên bản</td><td>Chữ</td><td>—</td><td><code>Application.version</code></td></tr>
+  </table>
+  <p>Cài đặt lưu trong <code>PlayerSaveData.settings</code> (không dùng <code>PlayerPrefs</code> để giữ một nguồn dữ liệu). Mở từ nút Cài đặt ở Lobby và từ menu tạm dừng.</p>
+
+  <h2>4. Menu tạm dừng (<code>PausePopup</code>)</h2>
+  <ul>
+    <li>Mở bằng nút góc phải trên hoặc khi app vào nền (<code>OnApplicationPause(true)</code>).</li>
+    <li>Nút: Tiếp tục, Cài đặt, Độn Thổ Phù (rút lui), Bỏ qua hướng dẫn (chỉ khi đang hướng dẫn).</li>
+    <li>Hiện danh sách thẻ Kỳ Ngộ đang có và cấp của từng thẻ.</li>
+  </ul>
+
+  <h2>5. Chuỗi chữ hiển thị</h2>
+  <p>Mọi chữ hiện trên UI lấy từ <code>StringTable</code> (ScriptableObject: danh sách <code>key → text</code>), gọi qua <code>Loc.Get("key")</code>.
+  Không viết chữ thẳng vào prefab hay code. Khi cần thêm ngôn ngữ chỉ cần thêm <code>StringTable</code> mới.
+  Ví dụ key: <code>btn.battle</code>, <code>popup.revive.ad</code>, <code>realm.ket_dan</code>, <code>tut.move</code>.</p>
+
+  <h2>6. Debug menu (chỉ bản Development)</h2>
+  <p>Bọc trong <code>#if DEVELOPMENT_BUILD || UNITY_EDITOR</code>. Mở bằng chạm 3 ngón tay giữ 2 s, hoặc phím F1 trong Editor.</p>
+  <table>
+    <tr><th>Lệnh</th><th>Tác dụng</th></tr>
+    <tr><td>Mở mọi chương</td><td><code>highestChapterCleared = 19</code></td></tr>
+    <tr><td>+10.000 Linh Thạch</td><td>—</td></tr>
+    <tr><td>+3 Lục Dịch, +5 mỗi linh thảo</td><td>—</td></tr>
+    <tr><td>Bất tử</td><td>Bật/tắt</td></tr>
+    <tr><td>Nhảy tới phút</td><td>4:55 / 9:55 (gọi boss ngay)</td></tr>
+    <tr><td>+Tu Vi tới ngưỡng Độ Kiếp kế tiếp</td><td>—</td></tr>
+    <tr><td>Đầy Nộ</td><td>—</td></tr>
+    <tr><td>Chọn thẻ Kỳ Ngộ bất kỳ</td><td>Danh sách tất cả thẻ</td></tr>
+    <tr><td>Tốc độ game ×1 / ×2 / ×4</td><td><code>Time.timeScale</code></td></tr>
+    <tr><td>Hiện FPS, số quái, số đạn, số object trong pool</td><td>Góc trên trái</td></tr>
+    <tr><td>Reset hướng dẫn</td><td><code>tutorialFlags = 0</code></td></tr>
+    <tr><td>Giả lập hết quảng cáo / mất mạng</td><td>Kiểm tra luồng lỗi</td></tr>
+  </table>
+</main>
+<footer>Tài liệu nội bộ – Vạn Kiếm Độ Kiếp</footer>
+</body>
+</html>
