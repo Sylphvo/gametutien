@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UI &amp; Quảng cáo – Vạn Kiếm Độ Kiếp</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <h1>UI &amp; Quảng cáo (AdMob)</h1>
+  <nav>
+    <a href="index.html">Tổng quan</a>
+    <a href="gdd.html">Cốt truyện &amp; Thế giới</a>
+    <a href="gameplay.html">Gameplay</a>
+    <a href="tu-luyen.html">Tu luyện</a>
+    <a href="chien-dau.html">Chiến đấu</a>
+    <a href="noi-dung.html">Nội dung ch.5–19</a>
+    <a href="he-thong-phu.html">Hướng dẫn &amp; Cài đặt</a>
+    <a href="vfx.html">VFX</a>
+    <a href="am-thanh.html">Âm thanh</a>
+    <a href="ui-quang-cao.html" class="active">UI &amp; Quảng cáo</a>
+    <a href="ui-kit.html">Bộ UI</a>
+    <a href="cong-cu-asset.html">Công cụ Asset</a>
+    <a href="can-bang.html">Cân bằng</a>
+    <a href="ky-thuat.html">Kỹ thuật</a>
+    <a href="phat-hanh.html">Phát hành</a>
+  </nav>
+</header>
+<main>
+  <p>Ảnh, prefab, font và quy tắc dựng các màn hình dưới đây nằm ở trang <a href="ui-kit.html">Bộ UI</a>.</p>
+
+  <h2>1. Phong cách &amp; Canvas</h2>
+  <table>
+    <tr><th>Mục</th><th>Giá trị</th></tr>
+    <tr><td>Phong cách</td><td>Cổ phong Tiên Hiệp, font chữ có viền/đổ bóng</td></tr>
+    <tr><td>Khung</td><td>Ngọc bích đậm bán trong suốt <code>#0D2622E6</code>
+      <span style="display:inline-block;width:14px;height:14px;background:#0D2622E6;border:1px solid #555;vertical-align:middle"></span></td></tr>
+    <tr><td>Viền</td><td>Vàng đồng <code>#D4AF37</code>
+      <span style="display:inline-block;width:14px;height:14px;background:#D4AF37;vertical-align:middle"></span></td></tr>
+    <tr><td>UI Scale Mode</td><td>Scale With Screen Size, Reference 1920 × 1080, Match 0.5</td></tr>
+    <tr><td>Safe Area</td><td>Bắt buộc gắn <code>SafeAreaHandler.cs</code> cho Panel gốc để né tai thỏ/camera đục lỗ</td></tr>
+  </table>
+
+  <h2>2. Sảnh chính (<code>LobbyUI</code>)</h2>
+  <table>
+    <tr><th>Vùng</th><th>Thành phần</th></tr>
+    <tr><td>Top Bar (trái)</td><td>Avatar Hàn Lập + cảnh giới cốt truyện</td></tr>
+    <tr><td>Top Bar (phải)</td><td>Linh Thạch + nút <code>+</code> (xem QC nhận Linh Thạch) + nút Cài đặt</td></tr>
+    <tr><td>Center</td><td>Hàn Lập thiền/bay lơ lửng, phi kiếm đang trang bị xoay quanh, linh thú đứng cạnh</td></tr>
+    <tr><td>Bottom Bar</td><td>Nút <code>Kiếm Trủng</code> (phi kiếm, Thần Luân, Cánh, Linh Thú), nút <code>Động Phủ</code> (Linh Căn, Chưởng Thiên Bình, linh điền, luyện đan), nút lớn phát sáng <code>XUẤT CHINH</code></td></tr>
+    <tr><td>Banner Ad</td><td>Cố định sát mép dưới, tự ẩn khi vào trận</td></tr>
+  </table>
+  <div class="note">File <code>.md</code> gốc gọi nút giữa là <code>Linh Căn</code>. Bản thống nhất đổi thành <code>Động Phủ</code> vì màn này giờ chứa cả Chưởng Thiên Bình và luyện đan; Linh Căn là một tab bên trong.</div>
+
+  <h2>3. Chọn chương (<code>ChapterSelectUI</code>)</h2>
+  <ul>
+    <li>Mở khi bấm <code>XUẤT CHINH</code>. Bản đồ cuộn ngang theo 3 giới diện, mỗi chương là một điểm trên bản đồ.</li>
+    <li>Chương đã qua có thể chơi lại để kiếm Linh Thạch và linh thảo.</li>
+    <li>Ô chọn đan dược dùng cho trận (tối đa 1 viên).</li>
+  </ul>
+
+  <h2>4. Hội thoại (<code>DialogueUI</code>)</h2>
+  <ul>
+    <li>Chân dung nhân vật trái/phải, khung chữ ngọc bích ở dưới, chạm để tiếp, nút <code>Bỏ qua</code> góc trên phải.</li>
+    <li>Hiện trước và sau trận theo dữ liệu chương.</li>
+  </ul>
+
+  <h2>5. Màn hình chiến đấu (<code>CombatHUD</code>)</h2>
+  <table>
+    <tr><th>Vùng</th><th>Thành phần</th></tr>
+    <tr><td>Top-Left (<code>CharacterStatusHUD</code>)</td><td>Avatar, thanh HP, thanh Linh Lực (EXP), tên cảnh giới trong trận. Hàm <code>UpdateThemeColor(Color themeColor)</code> đổi màu viền theo Biến Thân.</td></tr>
+    <tr><td>Top-Center</td><td>Đồng hồ wave + thanh máu Boss (chỉ hiện khi Boss xuất hiện)</td></tr>
+    <tr><td>Top-Right</td><td>Nút tạm dừng (menu có <code>Độn Thổ Phù</code> để rút lui)</td></tr>
+    <tr><td>Bottom-Left</td><td><code>FloatingJoystick</code>, ẩn mặc định, hiện tại chỗ chạm ở nửa trái màn hình</td></tr>
+    <tr><td>Bottom-Right</td><td>
+      <ul>
+        <li><code>Btn_Dash</code>: lướt, có vòng đếm ngược cooldown</li>
+        <li><code>Btn_Transform</code>: Biến Thân, sáng rực khi đầy Nộ</li>
+        <li><code>Btn_Tribulation</code>: Độ Kiếp, chỉ hiện và rung nhẹ khi đủ Tu Vi</li>
+      </ul></td></tr>
+  </table>
+
+  <h2>6. Pop-up</h2>
+  <ul>
+    <li><b><code>UpgradeCardPopup</code>:</b> 3 thẻ Kỳ Ngộ ngang màn hình (<code>Card_1</code>, <code>Card_2</code>, <code>Card_3</code>). Thẻ tiến hóa có viền vàng.</li>
+    <li><b><code>RevivePopup</code>:</b> đếm ngược 5 giây. Nếu mang Huyền Thiên Đan thì có thêm nút hồi sinh miễn phí.</li>
+    <li><b><code>ResultPopup</code>:</b> thời gian sống sót, cảnh giới đạt được, tổng sát thương, Linh Thạch, linh thảo rơi; nút <code>Nhận Thường</code>.</li>
+  </ul>
+
+  <h2>7. Điểm đặt quảng cáo</h2>
+  <table>
+    <tr><th>#</th><th>Loại</th><th>Vị trí</th><th>Nút / Điều kiện</th><th>Phần thưởng</th></tr>
+    <tr><td>—</td><td>Banner</td><td><code>LobbyUI</code></td><td>Cố định mép dưới, ẩn khi vào trận</td><td>—</td></tr>
+    <tr><td>—</td><td>Rewarded</td><td><code>LobbyUI</code> Top Bar</td><td>Nút <code>+</code> cạnh Linh Thạch</td><td>Thêm Linh Thạch</td></tr>
+    <tr><td>1</td><td>Rewarded</td><td><code>UpgradeCardPopup</code></td><td><code>Làm Mới (Xem QC)</code> → <code>AdMobManager.ShowRewardedAd()</code></td><td>Random lại 3 thẻ</td></tr>
+    <tr><td>2</td><td>Rewarded</td><td><code>UpgradeCardPopup</code></td><td><code>Nhận Cả 3 (Xem QC)</code>, 1 lần/trận</td><td>Nhận cả 3 thẻ</td></tr>
+    <tr><td>3</td><td>Rewarded</td><td><code>RevivePopup</code></td><td><code>Dùng Đan Hồi Sinh (Xem QC)</code></td><td>Hồi 100% HP, đẩy lùi quái, bất tử 3 giây</td></tr>
+    <tr><td>4</td><td>Rewarded</td><td><code>ResultPopup</code></td><td><code>Nhận x2 Linh Thạch (Xem QC)</code></td><td>x2 Linh Thạch</td></tr>
+    <tr><td>5</td><td>Interstitial</td><td><code>ResultPopup</code> → <code>LobbyUI</code></td><td>Cooldown ≥ 180 giây; bỏ qua ở ván đầu tiên; không hiện ngay sau một Rewarded</td><td>—</td></tr>
+  </table>
+  <div class="note">Không hiện Interstitial giữa hội thoại cốt truyện hoặc ngay trước trận boss. Quảng cáo chỉ xuất hiện ở các điểm trong bảng.</div>
+</main>
+<footer>Tài liệu nội bộ – Vạn Kiếm Độ Kiếp</footer>
+</body>
+</html>
