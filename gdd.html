@@ -10,121 +10,81 @@
 <header>
   <h1>Cốt truyện &amp; Thế giới</h1>
   <nav>
-    <a href="index.html">Tổng quan</a>
-    <a href="gdd.html" class="active">Cốt truyện &amp; Thế giới</a>
-    <a href="gameplay.html">Gameplay</a>
-    <a href="tu-luyen.html">Tu luyện</a>
-    <a href="chien-dau.html">Chiến đấu</a>
-    <a href="noi-dung.html">Nội dung ch.5–19</a>
-    <a href="he-thong-phu.html">Hướng dẫn &amp; Cài đặt</a>
-    <a href="vfx.html">VFX</a>
-    <a href="am-thanh.html">Âm thanh</a>
-    <a href="ui-quang-cao.html">UI &amp; Quảng cáo</a>
-    <a href="ui-kit.html">Bộ UI</a>
-    <a href="cong-cu-asset.html">Công cụ Asset</a>
-    <a href="can-bang.html">Cân bằng</a>
-    <a href="ky-thuat.html">Kỹ thuật</a>
-    <a href="phat-hanh.html">Phát hành</a>
   </nav>
 </header>
 <main>
-  <div class="note warn"><b>Bản quyền:</b> nội dung trang này lấy từ <i>Phàm Nhân Tu Tiên</i> (Vong Ngữ). Xem lưu ý ở <a href="index.html">Tổng quan</a>.</div>
+  <div class="note warn"><b>Bản quyền:</b> nội dung trang này lấy từ <i>Phàm Nhân Tu Tiên</i> (Vong Ngữ). Phát hành thương mại cần giấy phép.</div>
 
   <h2>1. Ý tưởng</h2>
-  <p>Hàn Lập là thiếu niên nghèo có tư chất <b>Tứ Linh Căn</b> (ngụy linh căn, cực kém). Nhờ <b>Chưởng Thiên Bình</b> và tính cẩn trọng
-  ("thấy lợi không ham, gặp nguy bỏ chạy"), hắn đi từ phàm nhân đến Chí Cao Đạo Tổ. Biệt danh: Hàn Lão Ma, Hàn Thiên Tôn, "Hàn Chạy Trốn".</p>
-
-  <h3>Cách kể chuyện trên mobile</h3>
-  <ul>
-    <li>Mỗi chương là một <b>Bí Cảnh</b> (một trận 10–15 phút).</li>
-    <li>Truyện kể bằng hội thoại 2D (chân dung nhân vật + khung chữ) trước và sau trận, mỗi đoạn dưới 1 phút, có nút bỏ qua.</li>
-    <li>Boss phút 10 của mỗi chương là nhân vật hoặc kẻ địch trong truyện.</li>
-    <li>Qua chương thì mở chương tiếp theo và các phần thưởng cốt truyện (linh thú, pháp bảo, đồng đội).</li>
-  </ul>
+  <p>Hàn Lập là thiếu niên nghèo có tư chất <b>Tứ Linh Căn</b> (ngụy linh căn). Nhờ <b>Chưởng Thiên Bình</b> và tính cẩn trọng ("thấy lợi không ham, gặp nguy bỏ chạy"),
+  hắn đi từ phàm nhân đến Chí Cao Đạo Tổ. Biệt danh: Hàn Lão Ma, Hàn Thiên Tôn, "Hàn Chạy Trốn".</p>
+  <p>Người chơi tự do đi khắp bản đồ 5 vùng (<a href="the-gioi.html">Thế giới mở</a>). Cốt truyện là <b>chuỗi nhiệm vụ chính</b> gồm 19 chương.
+  Mỗi chương có 3–6 bước (đi tới khu, nói chuyện NPC, hạ quái/boss, nhặt vật phẩm) và kết thúc bằng một <b>Bí Cảnh cốt truyện</b>.
+  Nhiệm vụ chính chỉ gợi ý đường đi; người chơi có thể đi vùng khác để lên level hoặc học công pháp trước.</p>
+  <p>Hội thoại: chân dung 2D + khung chữ, phát qua <code>DialogueRunner</code>, có nút bỏ qua.</p>
 
   <h2>2. Chương truyện</h2>
-  <p>Cột "Cảnh giới trong trận" là 4 bậc người chơi đi qua trong một trận khi vượt 3 lần Lôi Kiếp (xem <a href="tu-luyen.html">Tu luyện</a>).</p>
+  <p>Ô dùng ký hiệu ở <a href="the-gioi.html">Thế giới mở</a> mục 2. "Lv gợi ý" là level nên có khi bắt đầu chương. EXP thưởng tính theo Need(L) tại level người chơi lúc nhận.</p>
 
   <h3>Phần 1 – Nhân Giới</h3>
   <table>
-    <tr><th>Ch.</th><th>Bí Cảnh</th><th>Nội dung truyện</th><th>Cảnh giới trong trận</th><th>Boss phút 10</th><th>Phần thưởng mở khóa</th></tr>
-    <tr><td>1</td><td>Thất Huyền Môn</td><td>Gia nhập Thất Huyền Môn, kết bạn Lệ Phi Vũ, theo học Mặc Đại Phu, nhặt được Chưởng Thiên Bình.</td><td rowspan="4">Luyện Khí → Trúc Cơ → Kết Đan → Nguyên Anh</td><td>Yêu Lang Huyết Nhãn</td><td>Chưởng Thiên Bình, Động Phủ</td></tr>
-    <tr><td>2</td><td>Mật thất Mặc phủ</td><td>Phát hiện âm mưu đoạt xá của Mặc Đại Phu, thoát chết.</td><td>Mặc Đại Phu</td><td>Luyện đan</td></tr>
-    <tr><td>3</td><td>Huyết Sắc Cấm Địa</td><td>Gia nhập Hoàng Phong Cốc, thử luyện lấy dược liệu Trúc Cơ Đan. Gặp Nam Cung Uyển.</td><td>Huyết Văn Mãng Vương</td><td>Huyết Ngọc Tri Nhện</td></tr>
-    <tr><td>4</td><td>Việt Quốc thất thủ</td><td>Ma Đạo Lục Tông tấn công, Hàn Lập rời Thiên Nam qua truyền tống trận.</td><td>Trưởng lão Hợp Hoan Tông</td><td>Kiếm: Thanh Trúc Phong Vân Kiếm</td></tr>
-    <tr><td>5</td><td>Loạn Tinh Hải</td><td>Lưu lạc ra biển, giữa tranh chấp Tinh Cung – Nghịch Tinh Minh. Gặp Tử Linh Tiên Tử.</td><td rowspan="5">Trúc Cơ → Kết Đan → Nguyên Anh → Hóa Thần</td><td>Yêu thú biển Ngoại Hải</td><td>Phệ Kim Trùng</td></tr>
-    <tr><td>6</td><td>Hư Thiên Điện</td><td>Đoạt Hư Thiên Đỉnh, Càn Lam Băng Diễm. Gặp Đại Diễn Thần Quân.</td><td>Lão ma Cực Âm Đảo</td><td>Thần Luân: Hư Thiên Đỉnh</td></tr>
-    <tr><td>7</td><td>Mộ Lan Thảo Nguyên</td><td>Kết Nguyên Anh, bảo vệ Thiên Nam khỏi Mộ Lan và Đột Ngột Nhân.</td><td>Thánh nữ Mộ Lan</td><td>Lục Dực Sương Ngô</td></tr>
-    <tr><td>8</td><td>Âm Minh Chi Địa</td><td>Vùng âm khí, quỷ vật. Luyện Tịch Tà Thần Lôi.</td><td>Quỷ vương Âm Minh</td><td>Đề Hồn Thú</td></tr>
-    <tr><td>9</td><td>Đại Tấn – Tiết điểm phi thăng</td><td>Hóa Thần, tìm tiết điểm không gian, phi thăng Linh Giới.</td><td>Lão tổ Âm La Tông</td><td>Mở Linh Giới</td></tr>
+    <tr><th>Ch.</th><th>Tên</th><th>Nội dung</th><th>Nơi diễn ra</th><th>Lv gợi ý</th><th>Bí Cảnh (level)</th><th>Boss Bí Cảnh</th><th>Thưởng chương</th></tr>
+    <tr><td>1</td><td>Thất Huyền Môn</td><td>Vào Thất Huyền Môn, kết bạn Lệ Phi Vũ, theo học Mặc Đại Phu, nhặt Chưởng Thiên Bình</td><td>(4,3)</td><td>1</td><td>Hậu Sơn Thất Huyền (3)</td><td>Yêu Lang Huyết Nhãn</td><td>Trường Xuân Công, Hỏa Đạn Thuật, Chưởng Thiên Bình, Động Phủ; 150 Linh Thạch</td></tr>
+    <tr><td>2</td><td>Âm mưu đoạt xá</td><td>Phát hiện Mặc Đại Phu muốn đoạt xá, thoát chết</td><td>(3,4)</td><td>6</td><td>Mật thất Mặc phủ (8)</td><td>Mặc Đại Phu</td><td>Mở Đan Phòng (luyện đan), công thức Trúc Cơ Đan; 250</td></tr>
+    <tr><td>3</td><td>Huyết Sắc Cấm Địa</td><td>Vào Hoàng Phong Cốc, thử luyện lấy dược liệu Trúc Cơ Đan, gặp Nam Cung Uyển</td><td>HUB → ĐN (6,2)</td><td>11</td><td>Huyết Sắc Cấm Địa (14)</td><td>Huyết Văn Mãng Vương</td><td>Gia nhập Hoàng Phong Cốc, Huyết Ngọc Tri Nhện; 400</td></tr>
+    <tr><td>4</td><td>Việt Quốc thất thủ</td><td>Ma Đạo Lục Tông tấn công từ phía Nam</td><td>N1a–N1c</td><td>15</td><td>Biên Cảnh Nguyên Vũ (18)</td><td>Trưởng lão Hợp Hoan Tông</td><td>Thanh Trúc Phong Vân Kiếm; 600</td></tr>
+    <tr><td>5</td><td>Loạn Tinh Hải</td><td>Ra biển Bắc, giữa Tinh Cung và Nghịch Tinh Minh, gặp Tử Linh Tiên Tử</td><td>B1b → B2b</td><td>20</td><td>Ngoại Hải (24)</td><td>Bát Cước Hải Yêu</td><td>Phệ Kim Trùng; 800</td></tr>
+    <tr><td>6</td><td>Hư Thiên Điện</td><td>Đoạt Hư Thiên Đỉnh, Càn Lam Băng Diễm; gặp Đại Diễn Thần Quân</td><td>ĐB (6,6)</td><td>29</td><td>Hư Thiên Điện (33)</td><td>Lão Ma Cực Âm Đảo</td><td>Thần Luân Hư Thiên Đỉnh; 900</td></tr>
+    <tr><td>7</td><td>Mộ Lan Thảo Nguyên</td><td>Kết Nguyên Anh, chặn Mộ Lan ở phía Tây</td><td>T2a–T2c</td><td>31</td><td>Mộ Lan Thảo Nguyên (35)</td><td>Thánh Nữ Mộ Lan</td><td>Lục Dực Sương Ngô; 1.000</td></tr>
+    <tr><td>8</td><td>Âm Minh Chi Địa</td><td>Vùng quỷ vật, luyện Tịch Tà Thần Lôi</td><td>TN (2,2)</td><td>37</td><td>Âm Minh Chi Địa (40)</td><td>Quỷ Vương Âm Minh</td><td>Đề Hồn Thú; 1.150</td></tr>
+    <tr><td>9</td><td>Đại Tấn – Tiết điểm phi thăng</td><td>Hóa Thần, tìm tiết điểm không gian</td><td>TB (2,6)</td><td>44</td><td>Đại Tấn Cổ Địa (48)</td><td>Lão Tổ Âm La Tông</td><td>Mở phi thăng ở Lv 50; 1.300</td></tr>
   </table>
 
   <h3>Phần 2 – Linh Giới</h3>
   <table>
-    <tr><th>Ch.</th><th>Bí Cảnh</th><th>Nội dung truyện</th><th>Cảnh giới trong trận</th><th>Boss phút 10</th><th>Phần thưởng mở khóa</th></tr>
-    <tr><td>10</td><td>Loạn lưu không gian</td><td>Phi thăng gặp sự cố, tu vi bị áp chế, rơi gần Thiên Uyên Thành.</td><td rowspan="3">Hóa Thần → Luyện Hư → Hợp Thể → Đại Thừa</td><td>Không gian thú</td><td>—</td></tr>
-    <tr><td>11</td><td>Thiên Uyên Thành</td><td>Phòng thủ pháo đài Nhân – Yêu. Gặp lại Ngân Nguyệt, biết thân phận Thiên Hồ tộc của nàng.</td><td>Thống lĩnh Giác Xi</td><td>Đồng đội hỗ trợ: Ngân Nguyệt</td></tr>
-    <tr><td>12</td><td>Huyết Thiên Đại Lục</td><td>Giao chiến Dạ Xoa, Mộc Tộc. Tu luyện Phạm Thánh Chân Ma Công.</td><td>Vua Dạ Xoa</td><td>Cánh: Phong Lôi Sí</td></tr>
-    <tr><td>13</td><td>Ma Giới thông đạo</td><td>Ma Giới xâm lược, đoàn tụ Tử Linh Tiên Tử.</td><td rowspan="2">Luyện Hư → Hợp Thể → Đại Thừa → Độ Kiếp</td><td>Thủy Tổ Ma Tộc Nguyên Yểm</td><td>—</td></tr>
-    <tr><td>14</td><td>Thiên Kiếp phi thăng</td><td>Đánh bại Thủy Tổ Ma Tộc, bình định tam giới, độ kiếp phi thăng Tiên Giới.</td><td>Thủy Tổ Bảo Hoa &amp; Lục Cực</td><td>Mở Tiên Giới</td></tr>
+    <tr><th>Ch.</th><th>Tên</th><th>Nội dung</th><th>Nơi diễn ra</th><th>Lv gợi ý</th><th>Bí Cảnh (level)</th><th>Boss Bí Cảnh</th><th>Thưởng chương</th></tr>
+    <tr><td>10</td><td>Loạn lưu không gian</td><td>Phi thăng gặp sự cố, rơi gần Thiên Uyên Thành</td><td>(4,3) Linh</td><td>51</td><td>Loạn Lưu Không Gian (52)</td><td>Không Gian Thú</td><td>1.600</td></tr>
+    <tr><td>11</td><td>Thiên Uyên Thành</td><td>Phòng thủ pháo đài Nhân – Yêu, gặp lại Ngân Nguyệt</td><td>HUB Linh, (3,3)</td><td>55</td><td>Thủ Thành Thiên Uyên (58)</td><td>Thống Lĩnh Giác Xi</td><td>Đồng đội Ngân Nguyệt, tư cách Thiên Uyên Thành; 1.800</td></tr>
+    <tr><td>12</td><td>Huyết Thiên Đại Lục</td><td>Dạ Xoa, Mộc Tộc; tu Phạm Thánh Chân Ma Công</td><td>N2a–N2c Linh</td><td>68</td><td>Dạ Xoa Hỏa Lĩnh (72)</td><td>Vua Dạ Xoa</td><td>Cánh Phong Lôi Sí; 2.000</td></tr>
+    <tr><td>13</td><td>Ma Giới thông đạo</td><td>Ma Giới xâm lược, đoàn tụ Tử Linh</td><td>TN (2,2) Linh</td><td>75</td><td>Ma Giới Thông Đạo (80)</td><td>Thủy Tổ Nguyên Yểm</td><td>2.300</td></tr>
+    <tr><td>14</td><td>Thiên Kiếp phi thăng</td><td>Đánh bại Thủy Tổ Ma Tộc, bình định tam giới</td><td>TB (2,6) Linh</td><td>84</td><td>Thiên Kiếp Phi Thăng Đài (88)</td><td>Thủy Tổ Bảo Hoa &amp; Lục Cực</td><td>Mở phi thăng ở Lv 90; 2.600</td></tr>
   </table>
 
   <h3>Phần 3 – Tiên Giới</h3>
   <table>
-    <tr><th>Ch.</th><th>Bí Cảnh</th><th>Nội dung truyện</th><th>Cảnh giới trong trận</th><th>Boss phút 10</th><th>Phần thưởng mở khóa</th></tr>
-    <tr><td>15</td><td>Bắc Hàn Tiên Vực</td><td>Bị ám toán, tu vi giảm, mất trí nhớ. Trận này khóa một số nâng cấp Động Phủ để thể hiện tu vi bị mất.</td><td rowspan="3">Chân Tiên → Kim Tiên → Thái Ất → Đại La</td><td>Tiên binh Thiên Đình</td><td>—</td></tr>
-    <tr><td>16</td><td>Hắc Thổ Tiên Vực</td><td>Khôi phục ký ức, tu luyện Thời Gian Pháp Tắc.</td><td>Tiên tướng Thiên Đình</td><td>Kỳ Ngộ Thời Gian Pháp Tắc</td></tr>
-    <tr><td>17</td><td>Luân Hồi Điện</td><td>Phát hiện Điện Chủ là phân thân/kiếp trước của mình. Khám phá Man Hoang Giới Vực, Tích Lân Không Cảnh.</td><td>Thủ lĩnh Man Hoang</td><td>Đồng đội hỗ trợ: Nam Cung Uyển</td></tr>
-    <tr><td>18</td><td>Bí mật Chưởng Thiên Bình</td><td>Vén màn nguồn gốc Chưởng Thiên Bình và âm mưu luân hồi của Thiên Đình.</td><td rowspan="2">Kim Tiên → Thái Ất → Đại La → Đạo Tổ</td><td>Chấp pháp Thiên Đình</td><td>Chưởng Thiên Bình cấp 3</td></tr>
-    <tr><td>19</td><td>Trung Thổ – Thiên Đình</td><td>Chém Thời Gian Đạo Tổ Cổ Hoặc Kim, thoát trói buộc Thiên Đạo, thành Chí Cao Đạo Tổ.</td><td>Cổ Hoặc Kim</td><td>Kết thúc, mở chế độ Vô Tận</td></tr>
+    <tr><th>Ch.</th><th>Tên</th><th>Nội dung</th><th>Nơi diễn ra</th><th>Lv gợi ý</th><th>Bí Cảnh (level)</th><th>Boss Bí Cảnh</th><th>Thưởng chương</th></tr>
+    <tr><td>15</td><td>Bắc Hàn Tiên Vực</td><td>Bị ám toán, mất trí nhớ. Trong Bí Cảnh này bonus Động Phủ Công và tốc độ kiếm chỉ tính 50%</td><td>(4,5) Tiên → B1b</td><td>93</td><td>Bắc Hàn Biên Giới (96)</td><td>Tuần Sát Sứ Thiên Đình</td><td>3.000</td></tr>
+    <tr><td>16</td><td>Hắc Thổ Tiên Vực</td><td>Khôi phục ký ức, tu Thời Gian Pháp Tắc</td><td>ĐN (6,2) Tiên</td><td>100</td><td>Hắc Thổ Cấm Địa (105)</td><td>Tiên Tướng Thiên Đình</td><td>Mở Chân Ngôn Hóa Luân Kinh ở Luân Hồi Điện; 3.400</td></tr>
+    <tr><td>17</td><td>Luân Hồi Điện</td><td>Điện Chủ là phân thân/kiếp trước; Man Hoang Giới Vực</td><td>HUB Tiên → TN (2,2)</td><td>110</td><td>Man Hoang Giới Vực (115)</td><td>Thủ Lĩnh Man Hoang</td><td>Đồng đội Nam Cung Uyển; 3.800</td></tr>
+    <tr><td>18</td><td>Bí mật Chưởng Thiên Bình</td><td>Âm mưu luân hồi của Thiên Đình</td><td>ĐB (6,6) Tiên</td><td>120</td><td>Tích Lân Không Cảnh (126)</td><td>Chấp Pháp Thiên Đình</td><td>Chưởng Thiên Bình cấp 3; 4.200</td></tr>
+    <tr><td>19</td><td>Trung Thổ – Thiên Đình</td><td>Chém Cổ Hoặc Kim, thành Chí Cao Đạo Tổ</td><td>TB (2,6) Tiên</td><td>132</td><td>Thiên Cung (140)</td><td>Cổ Hoặc Kim</td><td>Kết thúc, mở Vô Tận; 5.000</td></tr>
   </table>
-  <div class="note">Tên boss phụ (ví dụ "Thống lĩnh Giác Xi", "Vua Dạ Xoa") là đề xuất cho game, không phải nhân vật cụ thể trong nguyên tác.</div>
+  <ul>
+    <li>Bí Cảnh cốt truyện dùng wave và boss của chương tương ứng (chương 1–4 ở <a href="can-bang.html">Cân bằng</a>, 5–19 ở <a href="noi-dung.html">Quái &amp; Boss</a>), chỉ số theo level Bí Cảnh.</li>
+    <li>Mỗi bước nhiệm vụ chính thưởng EXP = 10% Need; hoàn thành chương thưởng thêm 30% Need (qua Bí Cảnh lần đầu) và Linh Thạch như bảng.</li>
+    <li>Tên Bí Cảnh, boss phụ và tông môn có đánh dấu "đề xuất" là tên tự đặt cho game.</li>
+  </ul>
 
-  <h2>3. Bản đồ</h2>
-  <p>Mỗi Bí Cảnh là một đấu trường 2D cuộn vô hạn với tileset và quái riêng.</p>
+  <h2>3. Nhân vật</h2>
   <table>
-    <tr><th>Giới diện</th><th>Khu vực</th><th>Tileset / không khí</th></tr>
-    <tr><td rowspan="5">Nhân Giới</td><td>Thiên Nam (Việt Quốc, Nguyên Vũ Quốc, Cửu Quốc Minh)</td><td>Núi rừng, tông môn, màu tự nhiên</td></tr>
-    <tr><td>Loạn Tinh Hải (Nội Hải, Ngoại Hải)</td><td>Đảo nhỏ, mặt biển, rạn san hô</td></tr>
-    <tr><td>Mộ Lan Thảo Nguyên / Đột Ngột Nhân</td><td>Thảo nguyên, lều trại</td></tr>
-    <tr><td>Âm Minh Chi Địa</td><td>Sương tím, mộ địa</td></tr>
-    <tr><td>Đại Tấn</td><td>Chùa cổ, đạo quán, ma cung</td></tr>
-    <tr><td rowspan="3">Linh Giới</td><td>Phong Nguyên Đại Lục (Thiên Uyên Thành, Lôi Minh Đại Lục)</td><td>Tường thành, chiến trường, sấm sét</td></tr>
-    <tr><td>Huyết Thiên / Huyền Vũ Đại Lục</td><td>Đất đỏ, rừng cổ thụ của Mộc Tộc</td></tr>
-    <tr><td>Ma Giới</td><td>Dung nham, ma khí đen đỏ</td></tr>
-    <tr><td rowspan="3">Tiên Giới</td><td>Bắc Hàn / Hắc Thổ Tiên Vực</td><td>Băng tuyết / đất đen</td></tr>
-    <tr><td>Man Hoang Giới Vực, Tích Lân Không Cảnh</td><td>Cấm địa, không gian vỡ vụn</td></tr>
-    <tr><td>Trung Thổ Tiên Vực, Luân Hồi Điện</td><td>Cung điện vàng trắng</td></tr>
+    <tr><th>Nhân vật</th><th>Vai trò trong game</th></tr>
+    <tr><td>Hàn Lập</td><td>Nhân vật điều khiển</td></tr>
+    <tr><td>Nam Cung Uyển</td><td>NPC Yểm Nguyệt Tông ở chương 3; đồng đội từ chương 17 (tự hồi sinh 1 lần/trận và 1 lần/30 phút ngoài thế giới)</td></tr>
+    <tr><td>Tử Linh Tiên Tử (Uông Ngưng)</td><td>NPC chương 5 và 13</td></tr>
+    <tr><td>Nguyên Dao</td><td>NPC chương 8–11</td></tr>
+    <tr><td>Ngân Nguyệt</td><td>Đồng đội từ chương 11</td></tr>
+    <tr><td>Đại Diễn Thần Quân</td><td>NPC chương 6, giới thiệu công pháp Đại Diễn Quyết (học ở Hoàng Phong Cốc)</td></tr>
+    <tr><td>Mặc Đại Phu</td><td>Thầy ở chương 1 (dạy Trường Xuân Công), boss chương 2</td></tr>
+    <tr><td>Lệ Phi Vũ</td><td>NPC chương 1</td></tr>
+    <tr><td>Cổ Hoặc Kim</td><td>Boss cuối</td></tr>
   </table>
 
   <h2>4. Tông môn &amp; thế lực</h2>
-  <table>
-    <tr><th>Giới diện</th><th>Thế lực</th><th>Vai trò trong game</th></tr>
-    <tr><td rowspan="5">Nhân Giới</td><td>Thất Huyền Môn</td><td>Chương hướng dẫn</td></tr>
-    <tr><td>Thất Đại Phái Việt Quốc: Hoàng Phong Cốc, Yểm Nguyệt Tông, Linh Thú Sơn, Thanh Hư Môn, Thiên Khuyết Bảo, Hóa Đao Ổ, Cự Kiếm Môn</td><td>Phe ta. Hoàng Phong Cốc là tông môn của Hàn Lập.</td></tr>
-    <tr><td>Ma Đạo Lục Tông: Hợp Hoan Tông, Quỷ Linh Môn, Ngự Linh Tông, Ma Diễm Tông, Thiên Sát Tông, Vạn Pháp Môn</td><td>Quái và boss chương 4</td></tr>
-    <tr><td>Loạn Tinh Hải: Tinh Cung, Nghịch Tinh Minh, Cực Âm Đảo</td><td>Bối cảnh chương 5–6; Cực Âm Đảo là phe địch</td></tr>
-    <tr><td>Đại Tấn: Thái Nhất Môn, Hóa Ý Môn, Âm La Tông, Tiểu Cực Cung</td><td>Bối cảnh chương 9</td></tr>
-    <tr><td rowspan="2">Linh Giới</td><td>Thiên Uyên Thành (Nhân – Yêu)</td><td>Phe ta, chương 10–12</td></tr>
-    <tr><td>Chân Thiền Môn, Cửu Nguyên Quán (phân đà)</td><td>NPC hội thoại</td></tr>
-    <tr><td rowspan="3">Tiên Giới</td><td>Thiên Đình (Cổ Hoặc Kim)</td><td>Phản diện cuối</td></tr>
-    <tr><td>Luân Hồi Điện</td><td>Phe ta</td></tr>
-    <tr><td>Cửu Nguyên Quán, Chúc Long Đạo, Man Hoang Bát Đại Tộc</td><td>Bối cảnh chương 17</td></tr>
-  </table>
-
-  <h2>5. Nhân vật</h2>
-  <table>
-    <tr><th>Nhân vật</th><th>Thân phận</th><th>Vai trò trong game</th></tr>
-    <tr><td><b>Hàn Lập</b></td><td>Nhân vật chính. Trầm ổn, đa nghi, không mạo hiểm khi không có đường lui.</td><td>Nhân vật điều khiển</td></tr>
-    <tr><td>Nam Cung Uyển</td><td>Đạo lữ, Yểm Nguyệt Tông, Tố Nữ Luân Hồi Công, Luân Hồi Pháp Tắc.</td><td>Hội thoại; đồng đội hỗ trợ từ chương 17 (hồi sinh 1 lần/trận)</td></tr>
-    <tr><td>Tử Linh Tiên Tử (Uông Ngưng)</td><td>Mỹ nhân đệ nhất Loạn Tinh Hải, sau phi thăng Ma Giới.</td><td>Hội thoại chương 5 và 13</td></tr>
-    <tr><td>Nguyên Dao</td><td>Nữ tu tu Âm Chi Pháp Tắc.</td><td>Hội thoại chương 8–11</td></tr>
-    <tr><td>Ngân Nguyệt (Tuyết Linh)</td><td>Khí linh Thất Tinh Thanh Nguyệt Kiếm, công chúa Thiên Hồ tộc.</td><td>Đồng đội hỗ trợ từ chương 11 (tăng tầm dò của phi kiếm)</td></tr>
-    <tr><td>Đại Diễn Thần Quân</td><td>Thiên tài khôi lỗi thuật, thầy về thần thức.</td><td>NPC mở nhánh nâng cấp Đại Diễn Quyết</td></tr>
-    <tr><td>Mặc Đại Phu</td><td>Thầy đầu tiên, âm mưu đoạt xá.</td><td>Boss chương 2</td></tr>
-    <tr><td>Lệ Phi Vũ</td><td>Bạn thân thời Thất Huyền Môn.</td><td>NPC chương 1</td></tr>
-    <tr><td>Cổ Hoặc Kim</td><td>Thời Gian Đạo Tổ, chủ Thiên Đình.</td><td>Boss cuối</td></tr>
-  </table>
+  <p>15 tông môn người chơi gia nhập được ở <a href="tong-mon.html">Tông môn &amp; Công pháp</a>. Các thế lực khác là phe địch hoặc NPC:</p>
+  <ul>
+    <li><b>Phe địch:</b> Ma Đạo Lục Tông (Hợp Hoan Tông, Quỷ Linh Môn, Ngự Linh Tông, Thiên Sát Tông, Vạn Pháp Môn; Ma Diễm Tông là ngoại lệ, gia nhập được), Cực Âm Đảo, Âm La Tông, dị tộc Linh Giới (Giác Xi, Dạ Xoa, Mộc Tộc), Ma Tộc, Thiên Đình.</li>
+    <li><b>NPC/bối cảnh:</b> Thất Huyền Môn, các phái còn lại của Thất Đại Phái Việt Quốc (Yểm Nguyệt Tông, Linh Thú Sơn, Thiên Khuyết Bảo, Hóa Đao Ổ), Tinh Cung, Nghịch Tinh Minh, Thái Nhất Môn, Hóa Ý Môn.</li>
+  </ul>
 </main>
 <footer>Tài liệu nội bộ – Vạn Kiếm Độ Kiếp</footer>
 </body>
