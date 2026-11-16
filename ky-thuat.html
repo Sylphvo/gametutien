@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kỹ thuật – Vạn Kiếm Độ Kiếp</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <h1>Kiến trúc kỹ thuật</h1>
+  <nav>
+    <a href="index.html">Tổng quan</a>
+    <a href="gdd.html">Cốt truyện &amp; Thế giới</a>
+    <a href="gameplay.html">Gameplay</a>
+    <a href="tu-luyen.html">Tu luyện</a>
+    <a href="chien-dau.html">Chiến đấu</a>
+    <a href="noi-dung.html">Nội dung ch.5–19</a>
+    <a href="he-thong-phu.html">Hướng dẫn &amp; Cài đặt</a>
+    <a href="vfx.html">VFX</a>
+    <a href="am-thanh.html">Âm thanh</a>
+    <a href="ui-quang-cao.html">UI &amp; Quảng cáo</a>
+    <a href="ui-kit.html">Bộ UI</a>
+    <a href="cong-cu-asset.html">Công cụ Asset</a>
+    <a href="can-bang.html">Cân bằng</a>
+    <a href="ky-thuat.html" class="active">Kỹ thuật</a>
+    <a href="phat-hanh.html">Phát hành</a>
+  </nav>
+</header>
+<main>
+  <h2>0. Phiên bản &amp; package</h2>
+  <table>
+    <tr><th>Thành phần</th><th>Phiên bản / ghi chú</th></tr>
+    <tr><td>Unity Editor</td><td><b>Unity 6.3 LTS</b> (6000.3.x), hỗ trợ tới 12/2027 (<a href="https://unity.com/releases/unity-6/support">nguồn</a>). Không dùng Unity 6.0 LTS vì hết hỗ trợ từ 10/2026. Cả nhóm dùng đúng một bản patch, ghi trong <code>ProjectSettings/ProjectVersion.txt</code>.</td></tr>
+    <tr><td>Template</td><td><b>Universal 2D</b> (tạo sẵn URP + 2D Renderer)</td></tr>
+    <tr><td>Module Editor</td><td>Android Build Support (kèm OpenJDK, Android SDK &amp; NDK Tools)</td></tr>
+  </table>
+  <table>
+    <tr><th>Package</th><th>Cách cài</th><th>Dùng cho</th></tr>
+    <tr><td>Universal RP</td><td>Có sẵn trong template</td><td>Render, 2D Light, Bloom</td></tr>
+    <tr><td>2D Sprite, 2D Animation, 2D PSD Importer</td><td>Package Manager (Unity Registry)</td><td>Sprite Editor, nhân vật <code>.psb</code> có xương</td></tr>
+    <tr><td>Input System</td><td>Package Manager; Player Settings → Active Input Handling = <b>Input System Package (New)</b></td><td>Đa chạm, joystick</td></tr>
+    <tr><td>uGUI (có TextMeshPro)</td><td>Có sẵn. Từ Unity 6, TextMeshPro nằm trong package uGUI. Lần đầu dùng: <i>Window → TextMeshPro → Import TMP Essential Resources</i></td><td>Toàn bộ chữ</td></tr>
+    <tr><td>Shader Graph</td><td>Package Manager</td><td><code>SG_Sprite_Additive</code></td></tr>
+    <tr><td>Google Mobile Ads Unity Plugin</td><td>Bản mới nhất 11.x từ <a href="https://github.com/googleads/googleads-mobile-unity/releases">GitHub releases</a> (gói <code>.unitypackage</code>, có kèm External Dependency Manager). Sau khi import: <i>Assets → Google Mobile Ads → Settings</i> nhập Android App ID; <i>Assets → External Dependency Manager → Android Resolver → Force Resolve</i></td><td>Quảng cáo, UMP</td></tr>
+  </table>
+  <div class="note">
+    <ul>
+      <li>Không thêm thư viện bên ngoài khác (DOTween, Newtonsoft JSON…) nếu tài liệu không yêu cầu. Tween viết bằng coroutine dùng <code>Time.unscaledDeltaTime</code>; lưu game dùng <code>JsonUtility</code>.</li>
+      <li>Player Settings → Other: Scripting Backend IL2CPP, Target Architectures ARM64, API Compatibility .NET Standard 2.1.</li>
+      <li>Device Simulator có sẵn trong Editor (<i>Window → General → Device Simulator</i>) để thử Safe Area.</li>
+    </ul>
+  </div>
+
+  <h2>1. Nguyên tắc code (cho người và AI Coding Agent)</h2>
+  <ul>
+    <li><b>Pattern:</b> <code>Singleton</code> cho Manager cốt lõi; <code>Object Pooling</code> bắt buộc cho đạn, phi kiếm, quái, VFX, số sát thương; <code>Observer</code>/C# Events để tách gameplay khỏi UI.</li>
+    <li><b>Hiệu năng (60 FPS):</b>
+      <ul>
+        <li>Không <code>Instantiate()</code>/<code>Destroy()</code> trong vòng lặp chiến đấu.</li>
+        <li>Không <code>Camera.main</code> hoặc <code>GameObject.Find()</code> trong <code>Update()</code>.</li>
+        <li>GC Alloc = 0 trong combat (dùng <code>OverlapCircleNonAlloc</code>, cache mảng, không LINQ trong Update).</li>
+      </ul></li>
+    <li><b>Input:</b> New Input System hoặc Touch Input, đa chạm (joystick trái + nút phải cùng lúc).</li>
+    <li><b>Mô-đun:</b> chia script đúng thư mục, code hoàn chỉnh, có XML summary comments, gắn được ngay vào Prefab/Scene.</li>
+    <li><b>Dữ liệu:</b> mọi con số cân bằng nằm trong ScriptableObject, không hard-code.</li>
+  </ul>
+
+  <h2>2. Cấu trúc thư mục</h2>
+  <pre><code>Assets/
+├── _Project/
+│   ├── Art/
+│   │   ├── Characters/       # Nhân vật .psb có xương (2D PSD Importer + 2D Animation)
+│   │   ├── Sprites/          # Quái, boss, phi kiếm (Weapons/), vật phẩm (Items/), linh thú
+│   │   ├── Portraits/        # Chân dung nhân vật cho hội thoại
+│   │   ├── Tilesets/         # Tileset theo khu vực (Thiên Nam, Loạn Tinh Hải, ...)
+│   │   ├── UI/               # Khung ngọc bích viền vàng, nút, icon (xem Bộ UI)
+│   │   ├── Atlases/          # Sprite Atlas: UI_Common, UI_Lobby, UI_Combat, Icons
+│   │   └── VFX_Unreal/       # Flipbook 4x4, 6x6 bake từ Niagara (nền đen)
+│   ├── Editor/
+│   │   └── AssetTools/       # VkdkTexturePostprocessor, VkdkFxTool, VkdkDataSeeder (không vào bản build)
+│   ├── Audio/
+│   │   ├── BGM/              # Nhạc nền cổ phong
+│   │   └── SFX/              # Kiếm rít, sét, đột phá, bấm nút
+│   ├── Materials/            # M_FX_Additive_Template, M_FX_Alpha_Template, SG_Sprite_Additive
+│   │   └── FX/               # Material do FX Tool sinh ra
+│   ├── Prefabs/
+│   │   ├── Player/
+│   │   ├── Weapons/          # Phi kiếm quỹ đạo
+│   │   ├── Beasts/           # Linh thú đồng hành
+│   │   ├── Enemies/          # Quái thường &amp; boss
+│   │   ├── VFX/              # Particle System dùng flipbook
+│   │   └── UI/
+│   │       └── Kit/          # UI_Panel, UI_Button, UI_SkillButton, UI_Bar, UI_Card... (xem Bộ UI)
+│   ├── Scenes/               # Boot, Lobby, Combat, UIKit_Preview
+│   ├── ScriptableObjects/
+│   │   ├── Config/           # PlayerBaseStats, TribulationConfig, EconomyConfig, AdConfig, UITheme
+│   │   ├── Enemies/          # EnemyData
+│   │   ├── Waves/            # WaveTable theo chương
+│   │   ├── Realms/           # 14 RealmData
+│   │   ├── Chapters/         # 19 ChapterData (Bí Cảnh, wave, boss, hội thoại)
+│   │   ├── Transformations/  # Thanh Lôi, Kim Lôi, Hồng Lôi
+│   │   ├── Swords/           # Phi kiếm
+│   │   ├── Artifacts/        # Thần Luân, Cánh
+│   │   ├── Beasts/           # Linh thú + giai đoạn tiến hóa
+│   │   ├── Upgrades/         # Thẻ Kỳ Ngộ, tiến hóa, affix
+│   │   ├── Alchemy/          # Linh thảo, đan dược, công thức
+│   │   ├── Bosses/           # Phase và chiêu của boss
+│   │   └── Dialogue/         # Hội thoại theo chương
+│   └── Scripts/
+│       ├── Core/             # GameManager, ObjectPooler, AutoReturnToPool, SaveSystem, AudioManager, TimeService
+│       ├── Data/             # Các class ScriptableObject
+│       ├── Story/            # ChapterManager, DialogueRunner
+│       ├── Player/           # PlayerController, PlayerStats, TransformationHandler
+│       ├── Combat/           # FlyingSwordController, FlyingSword, TribulationSystem, UpgradeSystem, DamagePopup, LinhChauPickup
+│       ├── Companion/        # BeastCompanion
+│       ├── Enemy/            # EnemyAI, WaveSpawner, BossController
+│       ├── Meta/             # CaveDwelling (Động Phủ), HeavenlyVial, AlchemySystem, SwordTomb (Kiếm Trủng)
+│       ├── UI/               # FloatingJoystick, SafeAreaHandler, CombatHUD, LobbyUI, ChapterSelectUI, DialogueUI,
+│       │                     # UpgradeCardUI, Kit/ (UIPanel, UIButton, SkillButton, UIBar, ThemeTint...)
+│       └── Monetization/     # AdMobManager, AdPlacementController</code></pre>
+
+  <h2>3. Dữ liệu chính</h2>
+  <pre><code>using UnityEngine;
+
+// Không đặt tên "Plane" vì trùng với UnityEngine.Plane
+public enum WorldPlane { NhanGioi, LinhGioi, TienGioi }
+
+[CreateAssetMenu(menuName = "VKDK/Realm")]
+public class RealmData : ScriptableObject
+{
+    public string realmName;     // "Kết Đan"
+    public int realmIndex;       // 1..14
+    public WorldPlane plane;
+    public float playerStatMultiplier = 1f; // nhân HP và sát thương người chơi trong trận
+}
+
+[CreateAssetMenu(menuName = "VKDK/Chapter")]
+public class ChapterData : ScriptableObject
+{
+    public int chapterIndex;                       // 1..19
+    public string biCanhName;                      // "Huyết Sắc Cấm Địa"
+    public WorldPlane plane;
+    public RealmData[] runRealms = new RealmData[4];   // 4 bậc trong trận
+    public float tribulationMultiplier = 1f;       // Nhân Giới 1, Linh Giới 1.5, Tiên Giới 2
+    public float enemyStatMultiplier = 1f;
+    public WaveTable waves;
+    public BossData eliteBoss;                     // phút 5
+    public BossData chapterBoss;                   // phút 10
+    public DialogueData introDialogue;
+    public DialogueData outroDialogue;
+    public ScriptableObject[] unlockRewards;       // linh thú, phi kiếm, thần luân...
+}
+
+[CreateAssetMenu(menuName = "VKDK/Transformation")]
+public class TransformationData : ScriptableObject
+{
+    public string displayName;        // "Kim Lôi"
+    public float swordSpeedMultiplier = 2f;
+    public float damageMultiplier = 1.4f;
+    public float duration = 12f;
+    public Color hudColor;
+    public GameObject auraVfxPrefab;  // lấy từ pool theo tag
+}</code></pre>
+  <p>Mỗi ScriptableObject có thêm trường <code>public string id</code> (ví dụ <code>"chapter_01"</code>) để lưu game. <code>ChapterData</code> có thêm <code>firstClearReward</code>, <code>replayReward</code>.
+  <code>TransformationData</code> dùng <code>auraPoolTag</code> (tag trong <code>ObjectPooler</code>) thay cho tham chiếu prefab.</p>
+  <p>SO khác cần tạo theo số liệu trang <a href="can-bang.html">Cân bằng</a>: <code>PlayerBaseStats</code>, <code>EnemyData</code>,
+  <code>WaveTable</code> (danh sách đoạn thời gian: số con mỗi lần, chu kỳ, tối đa cùng lúc, thành phần %, sự kiện), <code>BossData</code> (HP, phase theo % HP, mỗi phase có các chiêu với cooldown và thời gian cảnh báo),
+  <code>SwordData</code>, <code>UpgradeCardData</code>, <code>EvolutionData</code>, <code>TribulationConfig</code>, <code>EconomyConfig</code>, <code>HerbData</code>, <code>PillData</code>, <code>BeastData</code>, <code>DialogueData</code>, <code>AdConfig</code>, <code>UITheme</code>.</p>
+  <p><b><code>VkdkDataSeeder</code></b> (Editor, menu <i>Tools → VKDK → Seed Data</i>): tạo hoặc cập nhật toàn bộ asset SO của chương 1–4 theo trang Cân bằng, để không phải nhập tay.</p>
+  <p>Scene: <code>Boot</code> (khởi tạo Manager, xin đồng ý UMP, khởi tạo AdMob, đọc save) → <code>Lobby</code> → <code>Combat</code>. Manager cốt lõi dùng <code>DontDestroyOnLoad</code>.</p>
+
+  <h2>4. Đặc tả script</h2>
+  <h3>4.1. Script từ tài liệu gốc</h3>
+  <table>
+    <tr><th>Script</th><th>Yêu cầu</th></tr>
+    <tr><td><code>ObjectPooler.cs</code></td><td>Singleton. Dictionary các Queue GameObject theo tag (string). <code>SpawnFromPool(string tag, Vector3 position, Quaternion rotation)</code>, <code>ReturnToPool(string tag, GameObject obj)</code>. Cấu hình pool (tag, prefab, số lượng khởi tạo) trong Inspector; hết thì tự mở rộng và ghi cảnh báo.</td></tr>
+    <tr><td><code>AutoReturnToPool.cs</code></td><td>Gắn trên prefab VFX. Trả object về <code>ObjectPooler</code> trong <code>OnParticleSystemStopped()</code> (Stop Action = Callback). FX Tool tự gắn script này.</td></tr>
+    <tr><td><code>SaveSystem.cs</code></td><td>Lưu <code>PlayerSaveData</code> (mục 5) dạng JSON tại <code>Application.persistentDataPath</code>. Tự lưu khi <code>OnApplicationPause(true)</code>, <code>OnApplicationQuit</code> và hết trận. Ghi file tạm rồi đổi tên để tránh hỏng save. Kiểm tra <code>saveVersion</code> để migrate.</td></tr>
+    <tr><td><code>FlyingSwordController.cs</code></td><td>Kiếm bay quỹ đạo tròn (<code>Mathf.Sin</code>/<code>Mathf.Cos</code>). State machine <code>Orbiting</code> → <code>Attacking</code> (tìm mục tiêu bằng <code>Physics2D.OverlapCircleNonAlloc</code>) → <code>Returning</code>. Khi trúng: <code>DamagePopup</code> và VFX chém từ Pool. Giới hạn 36 kiếm.</td></tr>
+    <tr><td><code>TransformationHandler.cs</code></td><td>Đọc <code>TransformationData</code> (Thanh Lôi, Kim Lôi, Hồng Lôi). Đổi Animator Override Controller / màu sprite, bật hào quang, nhân chỉ số. Bắn <b>static event</b> <code>public static event Action&lt;Color&gt; OnTransformationChanged</code> khi vào và khi hết Biến Thân (gửi màu mặc định).</td></tr>
+    <tr><td><code>TribulationSystem.cs</code></td><td>Tối màn hình, Coroutine gọi sét từ Pool vào vị trí ngẫu nhiên quanh người chơi với vòng cảnh báo đỏ 0.8 giây. Hết 10 giây gọi đột phá lên <code>runRealms[n+1]</code>. Số tia và sát thương nhân <code>tribulationMultiplier</code>.</td></tr>
+    <tr><td><code>FloatingJoystick.cs</code></td><td><code>IPointerDownHandler</code>, <code>IDragHandler</code>, <code>IPointerUpHandler</code>. Hiện tại điểm chạm, giới hạn <code>HandleRange</code>, trả <code>Vector2 Direction</code> chuẩn hóa.</td></tr>
+    <tr><td><code>AdMobManager.cs</code></td><td>Namespace <code>GoogleMobileAds.Api</code>. Khởi tạo SDK, load trước Banner/Interstitial/Rewarded. <code>ShowBanner()</code>/<code>HideBanner()</code>, <code>ShowInterstitial(Action onAdClosed)</code> (cooldown 180 giây), <code>ShowRewardedAd(Action onUserEarnedReward, Action onAdFailed = null)</code> (xử lý mất mạng/chưa load, tự <code>LoadRewardedAd()</code> sau khi đóng). Trước khi khởi tạo SDK phải xin đồng ý của người dùng bằng <b>User Messaging Platform</b> (<code>GoogleMobileAds.Ump.Api</code>), bắt buộc với người dùng ở EEA/Anh. Callback của quảng cáo có thể chạy ngoài main thread: đẩy về main thread trước khi đụng tới Unity API (bật <code>MobileAds.RaiseAdEventsOnUnityMainThread = true</code>). Ad Unit ID lưu trong SO <code>AdConfig</code>, mặc định là Test ID của Google.</td></tr>
+  </table>
+
+  <h3>4.2. Script thêm cho cốt truyện và meta</h3>
+  <table>
+    <tr><th>Script</th><th>Yêu cầu</th></tr>
+    <tr><td><code>ChapterManager.cs</code></td><td>Giữ <code>ChapterData</code> đang chơi, mở chương tiếp khi diệt boss chương, cập nhật cảnh giới cốt truyện.</td></tr>
+    <tr><td><code>DialogueRunner.cs</code></td><td>Phát <code>DialogueData</code> lên <code>DialogueUI</code>, hỗ trợ bỏ qua.</td></tr>
+    <tr><td><code>UpgradeSystem.cs</code></td><td>Bốc 3 thẻ Kỳ Ngộ theo trọng số, kiểm tra điều kiện tiến hóa, áp chỉ số.</td></tr>
+    <tr><td><code>HeavenlyVial.cs</code></td><td>Chưởng Thiên Bình: tính số giọt Lục Dịch theo thời gian thực từ <code>TimeService</code>, tối đa 3 giọt.</td></tr>
+    <tr><td><code>TimeService.cs</code></td><td>Không dùng server riêng. Khi mở game và khi quay lại từ nền, gửi <code>UnityWebRequest.Head("https://www.google.com")</code> và đọc header <code>Date</code> làm giờ tin cậy. Giữa các lần đồng bộ: giờ tin cậy + <code>Time.realtimeSinceStartupAsDouble</code>. Mất mạng: dùng giờ máy nhưng nếu giờ máy lùi so với lần lưu cuối thì không cộng Lục Dịch. Lưu <code>lastTrustedUnix</code> vào save.</td></tr>
+    <tr><td><code>AlchemySystem.cs</code></td><td>Linh điền 3 ô, tưới Lục Dịch, luyện đan theo công thức.</td></tr>
+    <tr><td><code>BeastCompanion.cs</code></td><td>Linh thú đi theo người chơi, hành vi theo <code>BeastData</code>, dùng pool cho đòn đánh.</td></tr>
+    <tr><td><code>BossController.cs</code></td><td>Chạy phase theo % máu từ <code>BossData</code>. Mọi đòn diện rộng có telegraph ≥ 0.6 giây.</td></tr>
+    <tr><td><code>WaveSpawner.cs</code></td><td>Đọc <code>WaveTable</code>, sinh quái từ pool trên vòng bán kính 11 quanh người chơi, không vượt trần 150 quái.</td></tr>
+    <tr><td><code>EnemyAI.cs</code></td><td>Hành vi theo <code>EnemyData</code>: lao thẳng, zigzag, bầy, giữ khoảng cách bắn, tự nổ.</td></tr>
+    <tr><td><code>SafeAreaHandler.cs</code></td><td>Co <code>RectTransform</code> theo <code>Screen.safeArea</code>, cập nhật khi đổi kích thước màn hình.</td></tr>
+  </table>
+
+  <h3>4.3. Script cho nội dung và hệ thống phụ</h3>
+  <table>
+    <tr><th>Script</th><th>Yêu cầu</th></tr>
+    <tr><td><code>EnemyAI.cs</code> (mở rộng)</td><td>Đủ 11 hành vi ở <a href="noi-dung.html">Nội dung</a> mục 2.1, chọn theo <code>EnemyData.behavior</code>; <code>EnemyData.tags</code> dùng cho khắc chế.</td></tr>
+    <tr><td><code>BossSkill</code> + các lớp con</td><td>Thư viện chiêu ở Nội dung mục 6, mỗi chiêu là một class nhận tham số từ <code>BossData</code>. Hỗ trợ boss đôi (2 <code>BossController</code> liên kết, <code>Enrage</code> khi một con chết).</td></tr>
+    <tr><td><code>BeastCompanion.cs</code> (mở rộng)</td><td>4 linh thú và các giai đoạn tiến hóa ở Nội dung mục 8.</td></tr>
+    <tr><td><code>ArtifactController.cs</code></td><td>Thần Luân Hư Thiên Đỉnh, Cánh Phong Lôi Sí (Nội dung mục 9).</td></tr>
+    <tr><td><code>CompanionPassives.cs</code></td><td>Ngân Nguyệt, Nam Cung Uyển (Nội dung mục 9).</td></tr>
+    <tr><td><code>TutorialManager.cs</code>, <code>TutorialStep</code>, <code>TutorialOverlay</code>, <code>TutorialAnchor</code></td><td>Theo <a href="he-thong-phu.html">Hướng dẫn &amp; Cài đặt</a> mục 1.</td></tr>
+    <tr><td><code>EndlessMode.cs</code></td><td>Theo Hướng dẫn &amp; Cài đặt mục 2.</td></tr>
+    <tr><td><code>SettingsPopup.cs</code>, <code>PausePopup.cs</code></td><td>Theo Hướng dẫn &amp; Cài đặt mục 3–4.</td></tr>
+    <tr><td><code>Loc.cs</code> + <code>StringTable</code></td><td>Mọi chữ UI lấy theo key.</td></tr>
+    <tr><td><code>DebugMenu.cs</code></td><td>Chỉ trong <code>DEVELOPMENT_BUILD || UNITY_EDITOR</code>.</td></tr>
+    <tr><td><code>AudioManager.cs</code>, <code>SoundData</code>, <code>SoundLibrary</code></td><td>Theo <a href="am-thanh.html">Âm thanh</a>.</td></tr>
+    <tr><td><code>AnalyticsService.cs</code></td><td>Lớp bọc Firebase, theo <a href="phat-hanh.html">Phát hành</a> mục 1.</td></tr>
+    <tr><td>Editor: <code>VkdkPlaceholderAudio</code></td><td>Sinh âm thanh tạm cho mọi id.</td></tr>
+  </table>
+  <p><code>RealmData</code> có thêm <code>float playerStatMultiplier</code>. <code>EnemyData</code> có <code>EnemyBehavior behavior</code>, <code>EnemyTag[] tags</code>, <code>bool deathPool</code>.</p>
+
+  <h2>5. Dữ liệu lưu</h2>
+  <pre><code>[System.Serializable]
+public class PlayerSaveData
+{
+    public int linhThach;
+    public int highestChapterCleared;          // 0..19
+    public int storyRealmIndex;                // 1..14
+    public int linhCanTier;                    // 0 = Tứ, 1 = Tam, 2 = Song, 3 = Thiên
+    public int[] cavernUpgradeLevels;          // HP, Công, Tốc độ kiếm, Rơi Linh Thạch
+    public string[] unlockedSwordIds;
+    public string[] unlockedArtifactIds;
+    public string[] unlockedBeastIds;
+    public int[] beastEvolutionStages;
+    public string equippedSwordId, equippedRingId, equippedWingId, equippedBeastId;
+    public int vialDrops;
+    public long vialLastTickUnix;
+    public HerbPlot[] herbPlots;
+    public string[] pillInventory;
+    public long lastTrustedUnix;               // TimeService
+    public int lobbyAdCountToday;              // giới hạn 5 lần/ngày
+    public long lobbyAdDayUnix;
+    public int artifactLevels_HuThienDinh, artifactLevels_PhongLoiSi;
+    public long tutorialFlags;                 // bit theo thứ tự bước hướng dẫn
+    public float endlessBestSeconds;
+    public int endlessBestRealm;
+    public SettingsData settings = new SettingsData();
+    public int[] swordLevels;                  // cấp nâng của từng phi kiếm, cùng thứ tự unlockedSwordIds
+    public bool firstRunCompleted;             // để bỏ qua Interstitial ván đầu
+    public int saveVersion = 1;                // tăng khi đổi cấu trúc, để migrate
+}
+
+[System.Serializable]
+public class HerbPlot { public string herbId; public long plantedUnix; public bool ready; }
+
+[System.Serializable]
+public class SettingsData
+{
+    public float bgmVolume = 0.8f, sfxVolume = 1f;
+    public bool highQuality = true;
+    public int targetFps = 60;
+    public bool vibration = true, screenShake = true, damageNumbers = true;
+    public bool fixedJoystick = false;
+    public string language = "vi";
+}</code></pre>
+  <p>Lưu id (chuỗi) của ScriptableObject, không lưu tham chiếu trực tiếp.</p>
+
+  <h2>6. Build Android (Google Play)</h2>
+  <table>
+    <tr><th>Mục</th><th>Giá trị</th></tr>
+    <tr><td>Package Name</td><td><code>com.yourstudio.vankiemdokiep</code></td></tr>
+    <tr><td>Minimum API Level</td><td>Android 7.0 (API 24)</td></tr>
+    <tr><td>Target API Level</td><td>Android 16 (API 36). Từ 31/8/2026 Google Play bắt buộc mức này cho app mới và bản cập nhật (<a href="https://support.google.com/googleplay/android-developer/answer/11926878">nguồn</a>). Google nâng mức tối thiểu hằng năm, kiểm tra Play Console trước khi phát hành.</td></tr>
+    <tr><td>Scripting Backend</td><td>IL2CPP</td></tr>
+    <tr><td>Architectures</td><td>ARM64 bắt buộc (bỏ ARMv7 nếu không cần)</td></tr>
+    <tr><td>Build Format</td><td><code>.aab</code></td></tr>
+    <tr><td>Test Ads</td><td>Dùng Test Ad Unit IDs chính thức của AdMob suốt quá trình phát triển và Closed Testing</td></tr>
+  </table>
+
+  <h2>7. Dùng với Antigravity / Cursor</h2>
+  <p>Đưa cho agent file <code>VANKIEMDOKIEP_SPEC.md</code> (bản gộp toàn bộ tài liệu) và làm theo danh sách prompt trong <code>ANTIGRAVITY_PROMPTS.md</code>.
+  File <code>tailieukientrucgame.md</code> cũ đã bị thay thế, không đưa cho agent.</p>
+
+  <h2>8. Lộ trình</h2>
+  <table>
+    <tr><th>Giai đoạn</th><th>Nội dung</th><th>Ước tính</th></tr>
+    <tr><td>Prototype</td><td>Di chuyển, phi kiếm, 1 Bí Cảnh, Kỳ Ngộ, Lôi Kiếp + Biến Thân, pooling</td><td>1–2 tháng</td></tr>
+    <tr><td>Vertical slice</td><td>Chương 1–4, hội thoại, Động Phủ, Kiếm Trủng, lưu game, AdMob test</td><td>2–3 tháng</td></tr>
+    <tr><td>Soft launch</td><td>Hết Nhân Giới (chương 1–9), Chưởng Thiên Bình, luyện đan, linh thú. Closed Testing trên Google Play.</td><td>3–4 tháng</td></tr>
+    <tr><td>Cập nhật 1</td><td>Linh Giới (chương 10–14)</td><td>2–3 tháng</td></tr>
+    <tr><td>Cập nhật 2</td><td>Tiên Giới (chương 15–19), chế độ Vô Tận</td><td>2–3 tháng</td></tr>
+  </table>
+</main>
+<footer>Tài liệu nội bộ – Vạn Kiếm Độ Kiếp</footer>
+</body>
+</html>
