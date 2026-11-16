@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nội dung chương 5–19 – Vạn Kiếm Độ Kiếp</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <h1>Nội dung chương 5–19</h1>
+  <nav>
+    <a href="index.html">Tổng quan</a>
+    <a href="gdd.html">Cốt truyện &amp; Thế giới</a>
+    <a href="gameplay.html">Gameplay</a>
+    <a href="tu-luyen.html">Tu luyện</a>
+    <a href="chien-dau.html">Chiến đấu</a>
+    <a href="noi-dung.html" class="active">Nội dung ch.5–19</a>
+    <a href="he-thong-phu.html">Hướng dẫn &amp; Cài đặt</a>
+    <a href="vfx.html">VFX</a>
+    <a href="am-thanh.html">Âm thanh</a>
+    <a href="ui-quang-cao.html">UI &amp; Quảng cáo</a>
+    <a href="ui-kit.html">Bộ UI</a>
+    <a href="cong-cu-asset.html">Công cụ Asset</a>
+    <a href="can-bang.html">Cân bằng</a>
+    <a href="ky-thuat.html">Kỹ thuật</a>
+    <a href="phat-hanh.html">Phát hành</a>
+  </nav>
+</header>
+<main>
+  <p>Trang này bổ sung số liệu cho chương 5–19 và các hệ thống chưa có số (linh thú, Thần Luân, Cánh, đồng đội, thẻ Thời Gian Pháp Tắc).
+  Chương 1–4 ở trang <a href="can-bang.html">Cân bằng</a>. Đây là số khởi điểm, chưa playtest. Tên quái và boss phụ là đề xuất cho game.</p>
+
+  <h2>1. Hệ số cảnh giới (áp cho người chơi trong trận)</h2>
+  <p>Mỗi <code>RealmData</code> có <code>playerStatMultiplier</code>. Khi đang ở cảnh giới đó trong trận, <b>HP tối đa và sát thương</b> của người chơi nhân hệ số này.
+  Đột phá trong trận vì vậy làm người chơi mạnh lên, và chương sau (bắt đầu ở cảnh giới cao hơn) có người chơi mạnh hơn để đối đầu quái mạnh hơn.
+  Cảnh giới cốt truyện ở Lobby vẫn không cộng chỉ số.</p>
+  <table>
+    <tr><th>#</th><th>Cảnh giới</th><th>Hệ số</th><th>#</th><th>Cảnh giới</th><th>Hệ số</th></tr>
+    <tr><td>1</td><td>Luyện Khí</td><td>1.00</td><td>8</td><td>Đại Thừa</td><td>2.65</td></tr>
+    <tr><td>2</td><td>Trúc Cơ</td><td>1.15</td><td>9</td><td>Độ Kiếp</td><td>3.00</td></tr>
+    <tr><td>3</td><td>Kết Đan</td><td>1.30</td><td>10</td><td>Chân Tiên</td><td>3.50</td></tr>
+    <tr><td>4</td><td>Nguyên Anh</td><td>1.50</td><td>11</td><td>Kim Tiên</td><td>4.00</td></tr>
+    <tr><td>5</td><td>Hóa Thần</td><td>1.75</td><td>12</td><td>Thái Ất</td><td>4.60</td></tr>
+    <tr><td>6</td><td>Luyện Hư</td><td>2.00</td><td>13</td><td>Đại La</td><td>5.30</td></tr>
+    <tr><td>7</td><td>Hợp Thể</td><td>2.30</td><td>14</td><td>Đạo Tổ</td><td>6.00</td></tr>
+  </table>
+  <div class="note">Hệ số này cũng áp cho chương 1–4 (tối đa ×1.5 ở Nguyên Anh). Khi playtest chương 1–4, chỉnh lại số ở trang Cân bằng nếu thấy quá dễ.</div>
+
+  <h2>2. Hành vi và nhãn quái</h2>
+  <h3>2.1. Hành vi (<code>EnemyBehavior</code>)</h3>
+  <table>
+    <tr><th>Hành vi</th><th>Mô tả và tham số</th></tr>
+    <tr><td><code>Charger</code></td><td>Đi thẳng tới người chơi</td></tr>
+    <tr><td><code>Zigzag</code></td><td>Đi tới người chơi, lắc ngang biên độ 1 unit, chu kỳ 0.8 s</td></tr>
+    <tr><td><code>Swarm</code></td><td>Sinh theo bầy 6–8 con, lượn vòng bán kính 4 trong 2 s rồi lao vào</td></tr>
+    <tr><td><code>Ranged</code></td><td>Giữ khoảng cách 5, mỗi 2.5 s bắn 1 đạn tốc độ 5</td></tr>
+    <tr><td><code>Exploder</code></td><td>Cách người chơi 1 unit thì đứng 0.6 s (cảnh báo) rồi nổ bán kính 1.2</td></tr>
+    <tr><td><code>Tank</code></td><td>Như Charger, chậm, HP cao</td></tr>
+    <tr><td><code>DashElite</code></td><td>Mỗi 4 s lao nhanh ×2.5 tốc độ trong 0.6 s, cảnh báo đường thẳng 0.6 s</td></tr>
+    <tr><td><code>Shielder</code></td><td>Mỗi 6 s tạo khiên bằng 30% HP gốc cho đồng loại trong bán kính 3 (không cộng dồn, tồn tại 5 s). Bản thân đi như Charger, tốc độ thấp</td></tr>
+    <tr><td><code>Teleporter</code></td><td>Mỗi 4 s dịch chuyển 3 unit về phía người chơi; dấu đích hiện 0.6 s trước</td></tr>
+    <tr><td><code>PatternShooter</code></td><td>Giữ khoảng cách 6, mỗi 3 s bắn 8 đạn tỏa tròn tốc độ 4</td></tr>
+    <tr><td><code>Splitter</code></td><td>Như Charger; chết tách 2 con nhỏ 35% HP, tốc độ ×1.3, không tách tiếp</td></tr>
+  </table>
+  <p>Bổ trợ <code>DeathPool</code>: chết để lại vũng 2 s, 2 sát thương mỗi 0.5 s (Độc Trùng, Quỷ Hỏa).</p>
+
+  <h3>2.2. Nhãn (<code>EnemyTag</code>) và khắc chế</h3>
+  <table>
+    <tr><th>Nhãn</th><th>Lôi</th><th>Hỏa</th><th>Băng</th><th>Ghi chú</th></tr>
+    <tr><td>Yêu</td><td>×1</td><td>×1</td><td>×1</td><td>—</td></tr>
+    <tr><td>Ma</td><td>×1.5 (Kim Lôi ×2)</td><td>×1</td><td>×0.7</td><td>Đề Hồn Thú ×2</td></tr>
+    <tr><td>Quỷ</td><td>×1.5 (Kim Lôi ×2)</td><td>×1</td><td>×1</td><td>Đề Hồn Thú ×2</td></tr>
+    <tr><td>Thổ</td><td>×0.7</td><td>×1</td><td>×1</td><td>—</td></tr>
+    <tr><td>Mộc</td><td>×1</td><td>×1.5</td><td>×1</td><td>—</td></tr>
+    <tr><td>Biển</td><td>×1</td><td>×0.7</td><td>×1.5</td><td>—</td></tr>
+    <tr><td>Tiên</td><td>×1</td><td>×1</td><td>×1</td><td>—</td></tr>
+  </table>
+  <p>Nhãn quái chương 1–4: Yêu Lang, Lang Đầu Đàn, Độc Trùng = Yêu; Khôi Lỗi Gỗ = Mộc; Huyết Dơi, Đệ tử Ma Đạo, Huyết Nô = Ma.
+  Hành vi: Yêu Lang <code>Charger</code>, Lang Đầu Đàn <code>DashElite</code>, Độc Trùng <code>Zigzag</code> + <code>DeathPool</code>, Khôi Lỗi Gỗ <code>Tank</code>,
+  Huyết Dơi <code>Swarm</code>, Đệ tử Ma Đạo <code>Ranged</code>, Huyết Nô <code>Exploder</code>.</p>
+
+  <h2>3. Quái chương 5–19</h2>
+  <p>HP và sát thương là giá trị <b>gốc</b>, nhân <code>enemyStatMultiplier</code> của chương và hệ số phút như chương 1–4.</p>
+  <table>
+    <tr><th>Id</th><th>Tên</th><th>Nhãn</th><th>Hành vi</th><th>HP</th><th>Chạm</th><th>Tốc độ</th><th>EXP</th><th>Linh Thạch</th><th>Chương</th></tr>
+    <tr><td><code>en_hai_xa</code></td><td>Hải Xà</td><td>Biển</td><td>Zigzag</td><td>14</td><td>6</td><td>2.6</td><td>1</td><td>8% rơi 1</td><td>5–6</td></tr>
+    <tr><td><code>en_ngu_yeu</code></td><td>Ngư Yêu</td><td>Biển</td><td>Swarm</td><td>10</td><td>5</td><td>3.4</td><td>1</td><td>6% rơi 1</td><td>5</td></tr>
+    <tr><td><code>en_giap_giai</code></td><td>Giáp Giải</td><td>Thổ</td><td>Tank</td><td>50</td><td>9</td><td>1.3</td><td>2</td><td>10% rơi 1</td><td>5–6</td></tr>
+    <tr><td><code>en_hai_yeu_phun</code></td><td>Hải Yêu Phun Nước</td><td>Biển</td><td>Ranged</td><td>28</td><td>6</td><td>1.8</td><td>3</td><td>15% rơi 2</td><td>5–6</td></tr>
+    <tr><td><code>en_am_hon</code></td><td>Âm Hồn</td><td>Quỷ</td><td>Teleporter</td><td>24</td><td>8</td><td>2.0</td><td>2</td><td>10% rơi 1</td><td>6</td></tr>
+    <tr><td><code>en_cuc_am_tu</code></td><td>Đệ tử Cực Âm</td><td>Ma</td><td>PatternShooter</td><td>32</td><td>6</td><td>1.6</td><td>3</td><td>15% rơi 2</td><td>6</td></tr>
+    <tr><td><code>en_mo_lan_ky</code></td><td>Kỵ Sĩ Mộ Lan</td><td>Yêu</td><td>Charger</td><td>20</td><td>8</td><td>3.0</td><td>1</td><td>8% rơi 1</td><td>7</td></tr>
+    <tr><td><code>en_phap_su_mo_lan</code></td><td>Pháp Sư Mộ Lan</td><td>Yêu</td><td>Shielder</td><td>30</td><td>5</td><td>1.6</td><td>3</td><td>15% rơi 2</td><td>7</td></tr>
+    <tr><td><code>en_quy_vat</code></td><td>Quỷ Vật</td><td>Quỷ</td><td>Swarm</td><td>12</td><td>6</td><td>3.2</td><td>1</td><td>6% rơi 1</td><td>8</td></tr>
+    <tr><td><code>en_cuong_thi</code></td><td>Cương Thi</td><td>Quỷ</td><td>Tank</td><td>70</td><td>12</td><td>1.2</td><td>3</td><td>12% rơi 1</td><td>8–9</td></tr>
+    <tr><td><code>en_quy_hoa</code></td><td>Quỷ Hỏa</td><td>Quỷ</td><td>Exploder + DeathPool</td><td>18</td><td>20 (nổ)</td><td>2.6</td><td>2</td><td>10% rơi 1</td><td>8–9</td></tr>
+    <tr><td><code>en_am_la_tu</code></td><td>Đệ tử Âm La Tông</td><td>Ma</td><td>PatternShooter</td><td>34</td><td>7</td><td>1.6</td><td>3</td><td>15% rơi 2</td><td>9</td></tr>
+    <tr><td><code>en_huyet_anh</code></td><td>Huyết Ảnh</td><td>Ma</td><td>Teleporter</td><td>26</td><td>9</td><td>2.2</td><td>2</td><td>10% rơi 1</td><td>8–9</td></tr>
+    <tr><td><code>en_khong_gian_trung</code></td><td>Không Gian Trùng</td><td>Yêu</td><td>Teleporter</td><td>22</td><td>8</td><td>2.4</td><td>2</td><td>10% rơi 1</td><td>10–11, 14</td></tr>
+    <tr><td><code>en_giac_xi</code></td><td>Chiến Binh Giác Xi</td><td>Yêu</td><td>Charger</td><td>26</td><td>9</td><td>2.6</td><td>2</td><td>10% rơi 1</td><td>10–12</td></tr>
+    <tr><td><code>en_giac_xi_khien</code></td><td>Khiên Binh Giác Xi</td><td>Thổ</td><td>Shielder</td><td>45</td><td>8</td><td>1.6</td><td>3</td><td>15% rơi 2</td><td>11–12</td></tr>
+    <tr><td><code>en_da_xoa</code></td><td>Dạ Xoa</td><td>Ma</td><td>Zigzag</td><td>18</td><td>8</td><td>3.4</td><td>1</td><td>8% rơi 1</td><td>10–13</td></tr>
+    <tr><td><code>en_moc_toc</code></td><td>Mộc Tộc</td><td>Mộc</td><td>Splitter</td><td>40</td><td>9</td><td>1.6</td><td>3</td><td>12% rơi 1</td><td>12</td></tr>
+    <tr><td><code>en_ma_binh</code></td><td>Ma Binh</td><td>Ma</td><td>Tank</td><td>70</td><td>12</td><td>1.4</td><td>3</td><td>12% rơi 1</td><td>13–14</td></tr>
+    <tr><td><code>en_ma_phap</code></td><td>Ma Pháp Sư</td><td>Ma</td><td>PatternShooter</td><td>34</td><td>8</td><td>1.6</td><td>3</td><td>15% rơi 2</td><td>13–14</td></tr>
+    <tr><td><code>en_ma_no</code></td><td>Ma Nô</td><td>Ma</td><td>Exploder</td><td>24</td><td>22 (nổ)</td><td>2.8</td><td>2</td><td>10% rơi 1</td><td>13–14</td></tr>
+    <tr><td><code>en_tien_binh</code></td><td>Tiên Binh</td><td>Tiên</td><td>Charger</td><td>28</td><td>9</td><td>2.6</td><td>2</td><td>10% rơi 1</td><td>15–16, 19</td></tr>
+    <tr><td><code>en_tien_cung</code></td><td>Tiên Cung Thủ</td><td>Tiên</td><td>Ranged</td><td>30</td><td>8</td><td>1.8</td><td>3</td><td>15% rơi 2</td><td>15–16, 19</td></tr>
+    <tr><td><code>en_tien_ve</code></td><td>Tiên Vệ Khiên</td><td>Tiên</td><td>Shielder</td><td>50</td><td>9</td><td>1.6</td><td>3</td><td>15% rơi 2</td><td>15, 18–19</td></tr>
+    <tr><td><code>en_man_hoang</code></td><td>Chiến Binh Man Hoang</td><td>Thổ</td><td>Tank</td><td>80</td><td>13</td><td>1.5</td><td>3</td><td>12% rơi 1</td><td>17</td></tr>
+    <tr><td><code>en_man_hoang_thu</code></td><td>Man Hoang Thú</td><td>Yêu</td><td>Swarm</td><td>14</td><td>7</td><td>3.4</td><td>1</td><td>6% rơi 1</td><td>16–17</td></tr>
+    <tr><td><code>en_hu_khong_anh</code></td><td>Hư Không Ảnh</td><td>Quỷ</td><td>Teleporter</td><td>26</td><td>10</td><td>2.4</td><td>2</td><td>10% rơi 1</td><td>17–19</td></tr>
+    <tr><td><code>en_thien_dinh_phap</code></td><td>Pháp Sư Thiên Đình</td><td>Tiên</td><td>PatternShooter</td><td>36</td><td>8</td><td>1.6</td><td>3</td><td>15% rơi 2</td><td>16, 18–19</td></tr>
+    <tr><td><code>en_luan_hoi_hon</code></td><td>Luân Hồi Hồn</td><td>Quỷ</td><td>Splitter</td><td>36</td><td>9</td><td>2.0</td><td>3</td><td>12% rơi 1</td><td>17–18</td></tr>
+  </table>
+
+  <h2>4. Thông số chương</h2>
+  <table>
+    <tr><th>Ch.</th><th>Bí Cảnh</th><th><code>enemyStatMultiplier</code></th><th><code>tribulationMultiplier</code></th><th>Cảnh giới đầu trận</th><th>Qua lần đầu</th><th>Chơi lại</th><th>Linh thảo boss chương</th></tr>
+    <tr><td>5</td><td>Loạn Tinh Hải</td><td>2.8</td><td>1.0</td><td>Trúc Cơ</td><td>800</td><td>160</td><td><code>herb_hai_tao</code></td></tr>
+    <tr><td>6</td><td>Hư Thiên Điện</td><td>2.9</td><td>1.0</td><td>Trúc Cơ</td><td>900</td><td>180</td><td><code>herb_hai_tao</code></td></tr>
+    <tr><td>7</td><td>Mộ Lan Thảo Nguyên</td><td>3.1</td><td>1.0</td><td>Trúc Cơ</td><td>1.000</td><td>200</td><td><code>herb_tu_diep</code></td></tr>
+    <tr><td>8</td><td>Âm Minh Chi Địa</td><td>3.3</td><td>1.0</td><td>Trúc Cơ</td><td>1.150</td><td>230</td><td><code>herb_am_linh_chi</code></td></tr>
+    <tr><td>9</td><td>Đại Tấn</td><td>3.5</td><td>1.0</td><td>Trúc Cơ</td><td>1.300</td><td>260</td><td><code>herb_am_linh_chi</code></td></tr>
+    <tr><td>10</td><td>Loạn lưu không gian</td><td>5.5</td><td>1.25</td><td>Hóa Thần</td><td>1.600</td><td>320</td><td><code>herb_loi_minh_truc</code></td></tr>
+    <tr><td>11</td><td>Thiên Uyên Thành</td><td>5.8</td><td>1.25</td><td>Hóa Thần</td><td>1.800</td><td>360</td><td><code>herb_loi_minh_truc</code></td></tr>
+    <tr><td>12</td><td>Huyết Thiên Đại Lục</td><td>6.0</td><td>1.25</td><td>Hóa Thần</td><td>2.000</td><td>400</td><td><code>herb_huyet_lien</code></td></tr>
+    <tr><td>13</td><td>Ma Giới thông đạo</td><td>7.2</td><td>1.25</td><td>Luyện Hư</td><td>2.300</td><td>460</td><td><code>herb_huyet_lien</code></td></tr>
+    <tr><td>14</td><td>Thiên Kiếp phi thăng</td><td>7.5</td><td>1.25</td><td>Luyện Hư</td><td>2.600</td><td>520</td><td><code>herb_huyet_lien</code></td></tr>
+    <tr><td>15</td><td>Bắc Hàn Tiên Vực</td><td>10.5</td><td>1.5</td><td>Chân Tiên</td><td>3.000</td><td>600</td><td><code>herb_tien_lo</code></td></tr>
+    <tr><td>16</td><td>Hắc Thổ Tiên Vực</td><td>14.2</td><td>1.5</td><td>Chân Tiên</td><td>3.400</td><td>680</td><td><code>herb_tien_lo</code></td></tr>
+    <tr><td>17</td><td>Luân Hồi Điện</td><td>14.7</td><td>1.5</td><td>Chân Tiên</td><td>3.800</td><td>760</td><td><code>herb_tien_lo</code></td></tr>
+    <tr><td>18</td><td>Bí mật Chưởng Thiên Bình</td><td>17.4</td><td>1.5</td><td>Kim Tiên</td><td>4.200</td><td>840</td><td><code>herb_tien_lo</code></td></tr>
+    <tr><td>19</td><td>Trung Thổ – Thiên Đình</td><td>18.0</td><td>1.5</td><td>Kim Tiên</td><td>5.000</td><td>1.000</td><td>—</td></tr>
+  </table>
+  <ul>
+    <li>Linh Thạch rơi từ quái nhân <code>1 + 0.1 × (chương − 1)</code> (làm tròn xuống, tối thiểu 1).</li>
+    <li>Chương 15 (mất trí nhớ): trong trận, bonus Động Phủ của Công gốc và Tốc độ phi kiếm chỉ tính 50%. Hiện thông báo khi vào trận.</li>
+    <li>Linh thảo boss chương: 100% lần đầu, 30% khi chơi lại.</li>
+  </ul>
+
+  <h2>5. Wave chương 5–19</h2>
+  <p>Dùng chung khung thời gian; chỉ thành phần quái thay đổi theo chương.</p>
+  <table>
+    <tr><th>Đoạn</th><th>Phút</th><th>Mỗi lần sinh / chu kỳ</th><th>Tối đa cùng lúc</th></tr>
+    <tr><td>A</td><td>0–3</td><td>6 con / 1.5 s</td><td>100</td></tr>
+    <tr><td>B</td><td>3–5</td><td>7 / 1.4 s</td><td>120</td></tr>
+    <tr><td>—</td><td>5</td><td colspan="2">Boss tinh anh, ngừng sinh tới khi boss chết hoặc 60 s</td></tr>
+    <tr><td>C</td><td>5–10</td><td>9 / 1.2 s</td><td>150</td></tr>
+    <tr><td>—</td><td>10</td><td colspan="2">Boss chương, quái thường sinh 50% mật độ đoạn C</td></tr>
+  </table>
+  <table>
+    <tr><th>Ch.</th><th>Đoạn A</th><th>Đoạn B</th><th>Đoạn C</th></tr>
+    <tr><td>5</td><td>50% hai_xa, 50% ngu_yeu</td><td>40% hai_xa, 30% ngu_yeu, 30% giap_giai</td><td>30% hai_xa, 25% ngu_yeu, 25% giap_giai, 20% hai_yeu_phun</td></tr>
+    <tr><td>6</td><td>40% hai_xa, 30% am_hon, 30% giap_giai</td><td>40% hai_xa, 30% am_hon, 30% hai_yeu_phun</td><td>25% hai_xa, 25% am_hon, 25% cuc_am_tu, 25% giap_giai</td></tr>
+    <tr><td>7</td><td>60% mo_lan_ky, 40% soi</td><td>50% mo_lan_ky, 30% soi, 20% phap_su_mo_lan</td><td>45% mo_lan_ky, 25% phap_su_mo_lan, 25% soi, 5% soi_dau</td></tr>
+    <tr><td>8</td><td>60% quy_vat, 40% quy_hoa</td><td>40% quy_vat, 30% quy_hoa, 30% cuong_thi</td><td>30% quy_vat, 25% quy_hoa, 25% cuong_thi, 20% huyet_anh</td></tr>
+    <tr><td>9</td><td>50% am_la_tu, 50% huyet_anh</td><td>40% am_la_tu, 30% huyet_anh, 30% quy_hoa</td><td>30% am_la_tu, 25% huyet_anh, 25% cuong_thi, 20% quy_hoa</td></tr>
+    <tr><td>10</td><td>70% khong_gian_trung, 30% da_xoa</td><td>50% khong_gian_trung, 50% da_xoa</td><td>40% khong_gian_trung, 30% da_xoa, 30% giac_xi</td></tr>
+    <tr><td>11</td><td>60% giac_xi, 40% da_xoa</td><td>50% giac_xi, 25% giac_xi_khien, 25% da_xoa</td><td>40% giac_xi, 25% giac_xi_khien, 20% da_xoa, 15% khong_gian_trung</td></tr>
+    <tr><td>12</td><td>50% da_xoa, 50% moc_toc</td><td>40% da_xoa, 40% moc_toc, 20% giac_xi_khien</td><td>35% da_xoa, 35% moc_toc, 15% giac_xi, 15% giac_xi_khien</td></tr>
+    <tr><td>13</td><td>60% ma_no, 40% ma_binh</td><td>40% ma_no, 30% ma_binh, 30% ma_phap</td><td>35% ma_no, 25% ma_binh, 25% ma_phap, 15% da_xoa</td></tr>
+    <tr><td>14</td><td>40% ma_binh, 30% ma_phap, 30% ma_no</td><td>35% ma_binh, 30% ma_phap, 35% ma_no</td><td>30% ma_binh, 30% ma_phap, 25% ma_no, 15% khong_gian_trung</td></tr>
+    <tr><td>15</td><td>60% tien_binh, 40% tien_cung</td><td>50% tien_binh, 30% tien_cung, 20% tien_ve</td><td>40% tien_binh, 30% tien_cung, 30% tien_ve</td></tr>
+    <tr><td>16</td><td>50% tien_binh, 50% man_hoang_thu</td><td>40% tien_binh, 30% man_hoang_thu, 30% tien_cung</td><td>30% tien_binh, 25% man_hoang_thu, 25% tien_cung, 20% thien_dinh_phap</td></tr>
+    <tr><td>17</td><td>50% man_hoang_thu, 50% man_hoang</td><td>40% man_hoang_thu, 30% man_hoang, 30% hu_khong_anh</td><td>30% man_hoang_thu, 25% man_hoang, 25% hu_khong_anh, 20% luan_hoi_hon</td></tr>
+    <tr><td>18</td><td>50% luan_hoi_hon, 50% hu_khong_anh</td><td>40% luan_hoi_hon, 30% hu_khong_anh, 30% thien_dinh_phap</td><td>30% luan_hoi_hon, 25% hu_khong_anh, 25% thien_dinh_phap, 20% tien_ve</td></tr>
+    <tr><td>19</td><td>40% tien_binh, 30% tien_cung, 30% tien_ve</td><td>35% tien_binh, 25% tien_cung, 20% tien_ve, 20% thien_dinh_phap</td><td>25% tien_binh, 20% tien_cung, 20% tien_ve, 20% thien_dinh_phap, 15% hu_khong_anh</td></tr>
+  </table>
+  <p>Id trong bảng bỏ tiền tố <code>en_</code> cho gọn.</p>
+
+  <h2>6. Thư viện chiêu boss (<code>BossSkill</code>)</h2>
+  <p>Mỗi boss ghép từ các chiêu dưới đây. Sát thương ghi theo bội số của <b>Chạm</b> của boss. Mọi chiêu có cảnh báo ≥ 0.6 s.</p>
+  <table>
+    <tr><th>Chiêu</th><th>Tham số</th><th>Mô tả</th></tr>
+    <tr><td><code>Charge</code></td><td>distance, warn, repeat</td><td>Lao thẳng; cảnh báo đường thẳng; <code>repeat</code> lần liên tiếp</td></tr>
+    <tr><td><code>Summon</code></td><td>enemyId, count</td><td>Gọi quái quanh boss</td></tr>
+    <tr><td><code>Fan</code></td><td>bullets, angle, speed</td><td>Bắn hình quạt về phía người chơi, 1× Chạm mỗi viên</td></tr>
+    <tr><td><code>Ring</code></td><td>bullets, speed</td><td>Bắn vòng tròn, 1× Chạm mỗi viên</td></tr>
+    <tr><td><code>Slam</code></td><td>radius, damageMul, warn</td><td>Đập vùng tròn quanh boss</td></tr>
+    <tr><td><code>Rain</code></td><td>count, radius, damageMul, warn</td><td>Rơi vào vị trí người chơi lúc cảnh báo</td></tr>
+    <tr><td><code>Trail</code></td><td>duration, tickDamageMul</td><td>Để lại vệt độc/lửa khi di chuyển</td></tr>
+    <tr><td><code>Teleport</code></td><td>mode (behind / random), mark</td><td>Dịch chuyển; hiện dấu trước</td></tr>
+    <tr><td><code>Pull</code></td><td>radius, speed, duration, centerDamageMul</td><td>Hút người chơi về tâm (như Đoạt Xá)</td></tr>
+    <tr><td><code>InvertControls</code></td><td>duration, warn</td><td>Đảo joystick</td></tr>
+    <tr><td><code>Clone</code></td><td>count</td><td>Ảo ảnh 1 HP dùng cùng chiêu, mất khi boss đổi phase</td></tr>
+    <tr><td><code>Burrow</code></td><td>warn, damageMul</td><td>Chui xuống, trồi lên dưới chân người chơi</td></tr>
+    <tr><td><code>Fog</code></td><td>duration, visionRadius</td><td>Thu hẹp tầm nhìn (vignette)</td></tr>
+    <tr><td><code>Laser</code></td><td>width, sweepAngle, duration, damageMul, warn</td><td>Tia quét theo cung</td></tr>
+    <tr><td><code>Shield</code></td><td>percentHp, duration</td><td>Khiên; Phệ Kim Trùng phá khiên ×3</td></tr>
+    <tr><td><code>FreezeZone</code></td><td>radius, duration, warn</td><td>Vùng làm chậm 60%</td></tr>
+    <tr><td><code>TimeStop</code></td><td>duration, warn</td><td>Người chơi đứng yên; cảnh báo bằng màn hình mất màu dần</td></tr>
+    <tr><td><code>Rewind</code></td><td>seconds, maxHealPercent</td><td>Một lần duy nhất: hồi HP về mức của <code>seconds</code> giây trước, tối đa <code>maxHealPercent</code></td></tr>
+    <tr><td><code>Enrage</code></td><td>speedMul, cooldownMul</td><td>Kích hoạt khi điều kiện xảy ra (ví dụ boss đôi chết một)</td></tr>
+  </table>
+  <p>Chương 1–4 cũng nên khai báo bằng thư viện này: Lang Vương = Charge + Summon; Mặc Đại Phu P2 = Pull; Trưởng lão Hợp Hoan Tông P2 = InvertControls + Clone…</p>
+
+  <h2>7. Boss chương 5–19</h2>
+  <p>HP là giá trị cuối (không nhân hệ số phút). Công thức đã dùng: boss tinh anh ≈ 1.000 × hệ số chương, boss chương ≈ 4.000 × hệ số chương, Chạm ≈ 7 × hệ số chương (tinh anh 80%).
+  Cooldown ghi trong ngoặc. P2 bắt đầu khi HP &lt; 50% nếu không ghi khác.</p>
+  <table>
+    <tr><th>Ch.</th><th>Loại</th><th>Boss</th><th>Nhãn</th><th>HP</th><th>Chạm</th><th>Tốc độ</th><th>Chiêu</th></tr>
+    <tr><td rowspan="2">5</td><td>Tinh anh</td><td>Hải Xà Vương</td><td>Biển</td><td>2.800</td><td>16</td><td>2.4</td><td>Charge 7, warn 0.8 (5 s); Trail 3 s, 0.3× (8 s)</td></tr>
+    <tr><td>Chương</td><td>Bát Cước Hải Yêu</td><td>Biển</td><td>11.000</td><td>20</td><td>1.8</td><td>P1: Ring 12, tốc 4 (3 s); Slam r=3, 1.5×, warn 0.8 (6 s); Summon hai_xa ×6 (14 s). P2: thêm Fog 5 s, tầm nhìn 4 (16 s)</td></tr>
+    <tr><td rowspan="2">6</td><td>Tinh anh</td><td>Âm Hồn Thống Lĩnh</td><td>Quỷ</td><td>2.900</td><td>16</td><td>2.2</td><td>Teleport random, mark 0.6 (4 s); Fan 5, 60°, tốc 5 (3 s)</td></tr>
+    <tr><td>Chương</td><td>Lão Ma Cực Âm Đảo</td><td>Ma</td><td>11.600</td><td>20</td><td>2.0</td><td>P1: Ring 16, tốc 4 (3 s); Teleport behind, mark 0.6 (7 s); Summon am_hon ×4 (15 s). P2: thêm FreezeZone r=4, 3 s, warn 0.8 (10 s)</td></tr>
+    <tr><td rowspan="2">7</td><td>Tinh anh</td><td>Mộ Lan Kỵ Tướng</td><td>Yêu</td><td>3.100</td><td>18</td><td>2.8</td><td>Charge 9, warn 0.7, repeat 2 (6 s)</td></tr>
+    <tr><td>Chương</td><td>Thánh Nữ Mộ Lan</td><td>Yêu</td><td>12.400</td><td>22</td><td>1.8</td><td>P1: Rain 4, r=1.5, 1.5×, warn 0.8 (5 s); Shield 20%, 6 s (18 s); Summon phap_su_mo_lan ×3 (16 s). P2: thêm Laser rộng 0.8, quét 120°, 2 s, 1×/0.2 s, warn 1.0 (10 s)</td></tr>
+    <tr><td rowspan="2">8</td><td>Tinh anh</td><td>Cương Thi Vương</td><td>Quỷ</td><td>3.300</td><td>18</td><td>1.6</td><td>Slam r=2.5, 1.5×, warn 0.8 (4 s); Summon cuong_thi ×2 (12 s)</td></tr>
+    <tr><td>Chương</td><td>Quỷ Vương Âm Minh</td><td>Quỷ</td><td>13.200</td><td>23</td><td>2.0</td><td>P1: Fog 6 s, tầm 4.5 (18 s); Summon quy_vat ×8 (12 s); Fan 7, 90°, tốc 5 (3 s). P2: thêm Pull r=6, 2.5 u/s, 3 s, tâm 1.5×/0.5 s, warn 1.0 (13 s); Clone ×2 (một lần khi vào P2)</td></tr>
+    <tr><td rowspan="2">9</td><td>Tinh anh</td><td>Hộ Pháp Âm La Tông</td><td>Ma</td><td>3.500</td><td>20</td><td>2.0</td><td>Ring 12, tốc 4 (3 s); Teleport random, mark 0.6 (6 s)</td></tr>
+    <tr><td>Chương</td><td>Lão Tổ Âm La Tông</td><td>Ma</td><td>14.000</td><td>25</td><td>1.8</td><td>P1: Fan 9, 100°, tốc 5 (3 s); Laser rộng 0.8, quét 90°, 2 s, warn 1.0 (9 s); Summon am_la_tu ×3 (15 s). P2: thêm Rain 6, r=1.4, 1.5×, warn 0.8 (6 s); Shield 25%, 6 s (20 s)</td></tr>
+    <tr><td rowspan="2">10</td><td>Tinh anh</td><td>Không Gian Trùng Mẫu</td><td>Yêu</td><td>5.500</td><td>31</td><td>2.2</td><td>Teleport random, mark 0.6 (4 s); Summon khong_gian_trung ×4 (10 s)</td></tr>
+    <tr><td>Chương</td><td>Không Gian Thú</td><td>Yêu</td><td>22.000</td><td>39</td><td>2.2</td><td>P1: Ring 16, tốc 4.5 (3 s); Teleport behind, mark 0.6 (6 s). P2: thêm Pull r=7, 2.5 u/s, 3 s, tâm 1.5×/0.5 s, warn 1.0 (12 s); Rain 5 "vết nứt", r=1.3, 1.5×, warn 0.8 (6 s)</td></tr>
+    <tr><td rowspan="2">11</td><td>Tinh anh</td><td>Giác Xi Bách Phu Trưởng</td><td>Yêu</td><td>5.800</td><td>33</td><td>2.6</td><td>Charge 8, warn 0.7 (5 s); Slam r=2.5, 1.5×, warn 0.8 (6 s)</td></tr>
+    <tr><td>Chương</td><td>Thống Lĩnh Giác Xi</td><td>Yêu</td><td>23.200</td><td>41</td><td>2.4</td><td>P1: Charge 10, warn 0.7, repeat 2 (6 s); Slam r=3, 1.8×, warn 0.8 (7 s); Summon giac_xi_khien ×3 (15 s). P2: thêm Shield 25%, 8 s (18 s); Enrage khi khiên bị phá: tốc ×1.3 trong 5 s</td></tr>
+    <tr><td rowspan="2">12</td><td>Tinh anh</td><td>Trưởng Lão Mộc Tộc</td><td>Mộc</td><td>6.000</td><td>34</td><td>1.6</td><td>Summon moc_toc ×3 (10 s); Rain 3, r=1.5, 1.5×, warn 0.8 (5 s)</td></tr>
+    <tr><td>Chương</td><td>Vua Dạ Xoa</td><td>Ma</td><td>24.000</td><td>42</td><td>3.0</td><td>P1: Charge 8, warn 0.6, repeat 3 (7 s); Clone ×2 (20 s). P2: thêm Fan 7, 90°, tốc 5.5 (3 s); Trail 3 s, 0.3× (luôn bật)</td></tr>
+    <tr><td rowspan="2">13</td><td>Tinh anh</td><td>Ma Tướng</td><td>Ma</td><td>7.200</td><td>40</td><td>2.2</td><td>Slam r=2.8, 1.5×, warn 0.8 (5 s); Summon ma_no ×4 (10 s)</td></tr>
+    <tr><td>Chương</td><td>Thủy Tổ Nguyên Yểm</td><td>Ma</td><td>28.800</td><td>50</td><td>2.0</td><td>P1: Summon ma_binh ×4 (14 s); Fog 6 s, tầm 4 (18 s); Laser rộng 1.0, quét 120°, 2.5 s, warn 1.0 (9 s). P2: thêm Pull r=7, 3 u/s, 3 s, tâm 2×/0.5 s, warn 1.0 (12 s)</td></tr>
+    <tr><td rowspan="3">14</td><td>Tinh anh</td><td>Ma Soái</td><td>Ma</td><td>7.500</td><td>42</td><td>2.4</td><td>Charge 9, warn 0.7 (5 s); Ring 12, tốc 4.5 (4 s)</td></tr>
+    <tr><td>Chương (đôi)</td><td>Thủy Tổ Bảo Hoa</td><td>Ma</td><td>17.000</td><td>53</td><td>1.8, giữ cách 6</td><td>Ring 18, tốc 4 (3 s); Rain 5, r=1.5, 1.5×, warn 0.8 (6 s). Enrage khi Lục Cực chết: tốc ×1.3, cooldown ×0.7</td></tr>
+    <tr><td>Chương (đôi)</td><td>Thủy Tổ Lục Cực</td><td>Ma</td><td>17.000</td><td>53</td><td>2.6</td><td>Charge 10, warn 0.7, repeat 2 (6 s); Slam r=3, 2×, warn 0.8 (7 s). Enrage khi Bảo Hoa chết</td></tr>
+    <tr><td rowspan="2">15</td><td>Tinh anh</td><td>Đội Trưởng Tiên Binh</td><td>Tiên</td><td>10.500</td><td>59</td><td>2.6</td><td>Charge 8, warn 0.7 (5 s); Shield 20%, 5 s (15 s)</td></tr>
+    <tr><td>Chương</td><td>Tuần Sát Sứ Thiên Đình</td><td>Tiên</td><td>42.000</td><td>74</td><td>2.2</td><td>P1: Fan 7, 80°, tốc 5.5 (3 s); Summon tien_ve ×2 (15 s); Shield 20%, 6 s (18 s). P2: thêm Rain 6, r=1.4, 1.5×, warn 0.8 (6 s)</td></tr>
+    <tr><td rowspan="2">16</td><td>Tinh anh</td><td>Thạch Tướng Hắc Thổ</td><td>Thổ</td><td>14.200</td><td>79</td><td>1.6</td><td>Slam r=3, 1.8×, warn 0.9 (5 s); Burrow warn 1.0, 2× (9 s)</td></tr>
+    <tr><td>Chương</td><td>Tiên Tướng Thiên Đình</td><td>Tiên</td><td>56.800</td><td>99</td><td>2.4</td><td>P1: Charge 10, warn 0.7, repeat 2 (6 s); Laser rộng 1.0, quét 120°, 2 s, warn 1.0 (9 s). P2: thêm Rain 7, r=1.4, 1.5×, warn 0.8 (6 s)</td></tr>
+    <tr><td rowspan="2">17</td><td>Tinh anh</td><td>Man Hoang Thú Vương</td><td>Yêu</td><td>14.700</td><td>82</td><td>2.8</td><td>Charge 9, warn 0.6, repeat 2 (5 s); Summon man_hoang_thu ×8 (12 s)</td></tr>
+    <tr><td>Chương</td><td>Thủ Lĩnh Man Hoang</td><td>Thổ</td><td>58.800</td><td>103</td><td>2.0</td><td>P1: Slam r=4, 2×, warn 1.0 (6 s); Summon man_hoang ×3 (15 s). P2: thêm Charge 10, warn 0.7, repeat 3 (7 s); Shield 25%, 8 s (20 s)</td></tr>
+    <tr><td rowspan="2">18</td><td>Tinh anh</td><td>Chấp Sự Thiên Đình</td><td>Tiên</td><td>17.400</td><td>97</td><td>2.2</td><td>Ring 16, tốc 4.5 (3 s); Teleport behind, mark 0.6 (6 s)</td></tr>
+    <tr><td>Chương</td><td>Chấp Pháp Thiên Đình</td><td>Tiên</td><td>69.600</td><td>122</td><td>2.2</td><td>P1: Laser rộng 1.0, quét 150°, 2.5 s, warn 1.0 (8 s); Ring 18, tốc 4.5 (3 s). P2: thêm TimeStop 1.0 s, warn 1.0 (15 s); Clone ×2 (một lần khi vào P2)</td></tr>
+    <tr><td rowspan="2">19</td><td>Tinh anh</td><td>Thần Tướng Thiên Đình</td><td>Tiên</td><td>18.000</td><td>101</td><td>2.4</td><td>Charge 10, warn 0.7, repeat 2 (5 s); Fan 9, 100°, tốc 5.5 (3 s)</td></tr>
+    <tr><td>Chương (3 phase)</td><td><b>Cổ Hoặc Kim</b></td><td>Tiên</td><td>90.000</td><td>126</td><td>2.2</td><td>
+      <b>P1 (100–60%):</b> Ring 20, tốc 4.5 (3 s); Fan 9, 100°, tốc 6 (4 s); Teleport behind, mark 0.6 (7 s).<br>
+      <b>P2 (60–30%):</b> thêm TimeStop 1.5 s, warn 1.0 bằng màn hình mất màu dần (14 s); Laser rộng 1.2, quét 180°, 2.5 s, warn 1.0 (10 s).<br>
+      <b>P3 (&lt;30%):</b> Rewind 5 s, tối đa +15% HP (một lần khi vào P3); Rain 8, r=1.4, 1.5×, warn 0.8 (6 s); Summon tien_ve ×3 (18 s).</td></tr>
+  </table>
+  <div class="note">Mọi chiêu đạn tính vào trần 300 đạn. Boss đôi chương 14: thanh máu boss hiện 2 thanh chồng nhau; qua chương khi cả hai chết.</div>
+
+  <h2>8. Linh thú</h2>
+  <p>Linh thú dùng Công gốc của người chơi (đã nhân hệ số cảnh giới) để tính sát thương. Tiến hóa trong Động Phủ bằng Lục Dịch + Linh Thạch.</p>
+  <table>
+    <tr><th>Linh thú</th><th>Giai đoạn</th><th>Hiệu quả</th><th>Chi phí tiến hóa</th><th>Điều kiện</th></tr>
+    <tr><td rowspan="2">Huyết Ngọc Tri Nhện</td><td>1</td><td>Mỗi 4 s bắn tơ vào quái gần nhất trong 6 unit, nổ r=1.5: chậm 40% trong 2 s. +10% Linh Thạch rơi</td><td>—</td><td>Qua ch.3</td></tr>
+    <tr><td>2</td><td>Tơ r=2.0, chậm 50%. +15% Linh Thạch</td><td>2 Lục Dịch + 1.500</td><td>Qua ch.6</td></tr>
+    <tr><td rowspan="3">Phệ Kim Trùng</td><td>1</td><td>6 con bám quái, mỗi con cắn 0.3× Công / 0.5 s; quái bị cắn nhận thêm 15% sát thương trong 3 s; sát thương lên khiên ×3</td><td>—</td><td>Qua ch.5</td></tr>
+    <tr><td>2</td><td>10 con, +20%</td><td>3 Lục Dịch + 2.000</td><td>Qua ch.9</td></tr>
+    <tr><td>3 – Phệ Kim Trùng Vương</td><td>16 con, cắn 0.5×, +30%</td><td>6 Lục Dịch + 8.000</td><td>Qua ch.14</td></tr>
+    <tr><td rowspan="2">Lục Dực Sương Ngô</td><td>1</td><td>Mỗi 8 s vòng băng r=3 quanh người chơi: 1× Công, đóng băng 1.5 s (boss: chậm 50%)</td><td>—</td><td>Qua ch.7</td></tr>
+    <tr><td>2</td><td>Mỗi 6 s, r=3.5, 2× Công</td><td>3 Lục Dịch + 3.000</td><td>Qua ch.12</td></tr>
+    <tr><td rowspan="3">Đề Hồn Thú</td><td>1 – Khỉ nhỏ</td><td>Hào quang r=3: quái nhãn Quỷ/Ma nhận 0.5× Công mỗi giây (×2 với Quỷ); mỗi quái bị hạ trong hào quang hồi 1 HP</td><td>—</td><td>Qua ch.8</td></tr>
+    <tr><td>2 – Linh Hầu</td><td>r=3.5, 0.8× Công/s</td><td>3 Lục Dịch + 4.000</td><td>Qua ch.10</td></tr>
+    <tr><td>3 – Hình Thú</td><td>r=4.5, 1.2× Công/s; mỗi 10 s gầm làm choáng 1 s quái thường trong hào quang</td><td>6 Lục Dịch + 10.000</td><td>Qua ch.15</td></tr>
+  </table>
+
+  <h2>9. Thần Luân, Cánh, đồng đội</h2>
+  <table>
+    <tr><th>Trang bị</th><th>Ô</th><th>Hiệu quả cấp 1</th><th>Mỗi cấp (tối đa 5)</th><th>Giá nâng</th><th>Mở</th></tr>
+    <tr><td>Hư Thiên Đỉnh</td><td>Thần Luân</td><td>Mỗi 20 s hút quái trong r=4 về giữa trong 1 s, rồi thiêu Càn Lam Băng Diễm: 3× Công, chậm 30% trong 3 s</td><td>−1 s cooldown, +0.5× sát thương</td><td><code>500 × 1.5^(cấp−1)</code></td><td>Thưởng ch.6</td></tr>
+    <tr><td>Phong Lôi Sí</td><td>Cánh</td><td>Dash xa hơn 50%; để lại vệt sét 1.5 s, 1× Công mỗi 0.3 s cho quái chạm vệt</td><td>−0.2 s cooldown Dash, +0.2× sát thương vệt</td><td><code>600 × 1.5^(cấp−1)</code></td><td>Thưởng ch.12</td></tr>
+  </table>
+  <table>
+    <tr><th>Đồng đội</th><th>Mở</th><th>Hiệu quả (luôn bật khi đã mở)</th></tr>
+    <tr><td>Ngân Nguyệt</td><td>Qua ch.11</td><td>+15% <code>DetectionRadius</code>, +10% tốc độ bay phi kiếm. Hiện hồ ly bạc nhỏ bay cạnh người chơi</td></tr>
+    <tr><td>Nam Cung Uyển</td><td>Qua ch.17</td><td>Mỗi trận 1 lần: khi HP về 0, tự hồi sinh 50% HP, bất tử 2 s. Không tính vào giới hạn hồi sinh bằng quảng cáo/đan</td></tr>
+  </table>
+
+  <h2>10. Thẻ Thời Gian Pháp Tắc</h2>
+  <table>
+    <tr><th>Trọng số</th><th>Xuất hiện</th><th>Cấp 1</th><th>Mỗi cấp (tối đa 5)</th></tr>
+    <tr><td>5</td><td>Chỉ trong chương Tiên Giới và khi đã qua ch.16</td><td>Mỗi 15 s ngưng đọng quái thường trong r=3 trong 2 s; boss bị chậm 60%</td><td>+0.4 s thời gian, +0.3 bán kính</td></tr>
+  </table>
+
+  <h2>11. Linh thảo &amp; đan dược bổ sung</h2>
+  <table>
+    <tr><th>Linh thảo</th><th>Rơi từ</th></tr>
+    <tr><td><code>herb_hai_tao</code> Hải Linh Tảo</td><td>Boss ch.5–6</td></tr>
+    <tr><td><code>herb_am_linh_chi</code> Âm Linh Chi</td><td>Boss ch.8–9</td></tr>
+    <tr><td><code>herb_loi_minh_truc</code> Lôi Minh Trúc</td><td>Boss ch.10–11</td></tr>
+    <tr><td><code>herb_huyet_lien</code> Huyết Liên</td><td>Boss ch.12–14</td></tr>
+    <tr><td><code>herb_tien_lo</code> Tiên Lộ Thảo</td><td>Boss ch.15–18</td></tr>
+  </table>
+  <table>
+    <tr><th>Đan dược</th><th>Công thức</th><th>Mở</th></tr>
+    <tr><td>Trúc Cơ Đan (bản thay thế)</td><td>2 Hải Linh Tảo + 1 Thanh Linh Thảo</td><td>Qua ch.5</td></tr>
+    <tr><td>Giáng Trần Đan (bản thay thế)</td><td>1 Âm Linh Chi + 1 Tử Diệp Hoa</td><td>Qua ch.8</td></tr>
+    <tr><td>Huyền Thiên Đan</td><td>2 Lôi Minh Trúc + 1 Huyết Liên</td><td>Qua ch.12</td></tr>
+    <tr><td>Định Nhan Đan</td><td>1 Tiên Lộ Thảo</td><td>Qua ch.15 (mở trang phục "Thanh Sam")</td></tr>
+  </table>
+  <p>Một đan có nhiều công thức thì hiện tất cả; người chơi chọn công thức đủ nguyên liệu.</p>
+</main>
+<footer>Tài liệu nội bộ – Vạn Kiếm Độ Kiếp</footer>
+</body>
+</html>
