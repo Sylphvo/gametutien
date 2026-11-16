@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Âm thanh – Vạn Kiếm Độ Kiếp</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <h1>Âm thanh</h1>
+  <nav>
+    <a href="index.html">Tổng quan</a>
+    <a href="gdd.html">Cốt truyện &amp; Thế giới</a>
+    <a href="gameplay.html">Gameplay</a>
+    <a href="tu-luyen.html">Tu luyện</a>
+    <a href="chien-dau.html">Chiến đấu</a>
+    <a href="noi-dung.html">Nội dung ch.5–19</a>
+    <a href="he-thong-phu.html">Hướng dẫn &amp; Cài đặt</a>
+    <a href="vfx.html">VFX</a>
+    <a href="am-thanh.html" class="active">Âm thanh</a>
+    <a href="ui-quang-cao.html">UI &amp; Quảng cáo</a>
+    <a href="ui-kit.html">Bộ UI</a>
+    <a href="cong-cu-asset.html">Công cụ Asset</a>
+    <a href="can-bang.html">Cân bằng</a>
+    <a href="ky-thuat.html">Kỹ thuật</a>
+    <a href="phat-hanh.html">Phát hành</a>
+  </nav>
+</header>
+<main>
+  <h2>1. Kiến trúc</h2>
+  <ul>
+    <li><b>AudioMixer</b> <code>MainMixer</code> với nhóm: Master → BGM, SFX, UI. Tham số expose: <code>MasterVolume</code>, <code>BGMVolume</code>, <code>SFXVolume</code>.</li>
+    <li><b><code>AudioManager</code></b> (singleton): 2 AudioSource cho nhạc nền (crossfade 1.5 s, unscaled time), pool 16 AudioSource cho SFX, 2 cho UI.</li>
+    <li>Gọi bằng id: <code>AudioManager.PlaySfx("sfx_sword_hit")</code>, <code>AudioManager.PlayBgm("bgm_nhan_gioi")</code>. Id ánh xạ tới <code>SoundData</code> (ScriptableObject) trong <code>SoundLibrary</code>.</li>
+    <li><code>SoundData</code>: danh sách clip (chọn ngẫu nhiên), âm lượng, dao động pitch, nhóm mixer, <code>maxInstances</code>, <code>minInterval</code>.</li>
+    <li>Chống chồng tiếng: cùng một id không phát quá <code>maxInstances</code> cùng lúc và không gần nhau hơn <code>minInterval</code>. Rất quan trọng với tiếng kiếm trúng khi có 36 kiếm.</li>
+    <li>Khi pop-up dừng game (<code>timeScale = 0</code>): nhạc nền giảm còn 50% qua snapshot <code>Paused</code>, SFX gameplay tạm dừng.</li>
+  </ul>
+
+  <h2>2. Thiết lập import</h2>
+  <table>
+    <tr><th>Loại</th><th>Định dạng nguồn</th><th>Load Type</th><th>Compression</th><th>Khác</th></tr>
+    <tr><td>Nhạc nền</td><td><code>.ogg</code> hoặc <code>.wav</code>, 44.1 kHz stereo</td><td>Streaming</td><td>Vorbis, Quality 60–70</td><td>Loop liền mạch, độ dài 1.5–3 phút</td></tr>
+    <tr><td>SFX ngắn (&lt; 1 s)</td><td><code>.wav</code> mono</td><td>Decompress On Load</td><td>ADPCM</td><td>Force To Mono</td></tr>
+    <tr><td>SFX dài (1–5 s)</td><td><code>.wav</code></td><td>Compressed In Memory</td><td>Vorbis, Quality 70</td><td>—</td></tr>
+  </table>
+  <p>Âm lượng chuẩn hóa: nhạc nền khoảng −16 LUFS, SFX đỉnh không vượt −1 dBFS. Tên file chữ thường không dấu, đúng id trong bảng dưới.</p>
+
+  <h2>3. Nhạc nền</h2>
+  <table>
+    <tr><th>Id</th><th>Dùng ở</th><th>Không khí</th></tr>
+    <tr><td><code>bgm_lobby</code></td><td>Lobby, Động Phủ, Kiếm Trủng</td><td>Cổ cầm, sáo trúc, chậm, yên tĩnh</td></tr>
+    <tr><td><code>bgm_nhan_gioi</code></td><td>Chương 1–4, 7, 9</td><td>Nhạc cụ dân tộc, nhịp vừa</td></tr>
+    <tr><td><code>bgm_loan_tinh_hai</code></td><td>Chương 5–6</td><td>Sóng biển, tiêu, nhịp vừa</td></tr>
+    <tr><td><code>bgm_am_minh</code></td><td>Chương 8</td><td>Âm u, trống trầm</td></tr>
+    <tr><td><code>bgm_linh_gioi</code></td><td>Chương 10–12</td><td>Hào hùng, dàn dây</td></tr>
+    <tr><td><code>bgm_ma_gioi</code></td><td>Chương 13–14</td><td>Nặng, hợp xướng trầm</td></tr>
+    <tr><td><code>bgm_tien_gioi</code></td><td>Chương 15–19</td><td>Thoáng, chuông, hợp xướng cao</td></tr>
+    <tr><td><code>bgm_boss</code></td><td>Boss chương 1–12</td><td>Nhanh, trống chiến</td></tr>
+    <tr><td><code>bgm_boss_final</code></td><td>Boss chương 13–19</td><td>Nhanh, dàn nhạc lớn</td></tr>
+    <tr><td><code>bgm_tribulation</code></td><td>Trong Lôi Kiếp (10 s)</td><td>Đoạn ngắn căng thẳng, có thể là lớp chồng lên nhạc hiện tại</td></tr>
+    <tr><td><code>bgm_endless</code></td><td>Vô Tận</td><td>Tăng dần cường độ</td></tr>
+    <tr><td><code>sting_victory</code>, <code>sting_defeat</code></td><td><code>ResultPopup</code></td><td>Đoạn 3–5 s, không lặp</td></tr>
+  </table>
+
+  <h2>4. Hiệu ứng âm thanh</h2>
+  <table>
+    <tr><th>Id</th><th>Khi nào</th><th>maxInstances</th><th>minInterval</th><th>Pitch ±</th></tr>
+    <tr><td><code>sfx_sword_launch</code></td><td>Kiếm lao đi</td><td>4</td><td>0.05</td><td>8%</td></tr>
+    <tr><td><code>sfx_sword_hit</code></td><td>Kiếm trúng quái</td><td>4</td><td>0.04</td><td>10%</td></tr>
+    <tr><td><code>sfx_sword_crit</code></td><td>Chí mạng</td><td>2</td><td>0.1</td><td>5%</td></tr>
+    <tr><td><code>sfx_lightning_chain</code></td><td>Sét lan, Tịch Tà Thần Lôi</td><td>2</td><td>0.1</td><td>8%</td></tr>
+    <tr><td><code>sfx_fire_burn</code></td><td>Thiêu đốt bắt đầu</td><td>2</td><td>0.15</td><td>8%</td></tr>
+    <tr><td><code>sfx_freeze</code></td><td>Đóng băng</td><td>2</td><td>0.15</td><td>8%</td></tr>
+    <tr><td><code>sfx_enemy_die</code></td><td>Quái chết</td><td>3</td><td>0.05</td><td>12%</td></tr>
+    <tr><td><code>sfx_enemy_explode</code></td><td>Huyết Nô, Ma Nô, Quỷ Hỏa nổ</td><td>2</td><td>0.1</td><td>6%</td></tr>
+    <tr><td><code>sfx_enemy_shoot</code></td><td>Quái bắn đạn</td><td>3</td><td>0.08</td><td>10%</td></tr>
+    <tr><td><code>sfx_player_hurt</code></td><td>Người chơi bị đánh</td><td>1</td><td>0.2</td><td>5%</td></tr>
+    <tr><td><code>sfx_player_dash</code></td><td>Dash</td><td>1</td><td>0.1</td><td>5%</td></tr>
+    <tr><td><code>sfx_pickup_exp</code></td><td>Nhặt Linh Châu</td><td>3</td><td>0.03</td><td>tăng dần theo chuỗi nhặt liên tục (+2% mỗi viên, tối đa +30%)</td></tr>
+    <tr><td><code>sfx_pickup_stone</code></td><td>Nhặt Linh Thạch</td><td>2</td><td>0.05</td><td>5%</td></tr>
+    <tr><td><code>sfx_level_up</code></td><td>Lên cấp</td><td>1</td><td>—</td><td>0</td></tr>
+    <tr><td><code>sfx_tribulation_warn</code></td><td>Vòng cảnh báo sét xuất hiện</td><td>3</td><td>0.1</td><td>5%</td></tr>
+    <tr><td><code>sfx_tribulation_strike</code></td><td>Sét Lôi Kiếp đánh</td><td>2</td><td>0.1</td><td>8%</td></tr>
+    <tr><td><code>sfx_breakthrough</code></td><td>Đột phá thành công</td><td>1</td><td>—</td><td>0</td></tr>
+    <tr><td><code>sfx_transform</code></td><td>Vào Biến Thân</td><td>1</td><td>—</td><td>0</td></tr>
+    <tr><td><code>sfx_boss_appear</code></td><td>Boss xuất hiện</td><td>1</td><td>—</td><td>0</td></tr>
+    <tr><td><code>sfx_boss_warn</code></td><td>Boss bắt đầu chiêu có cảnh báo</td><td>2</td><td>0.2</td><td>5%</td></tr>
+    <tr><td><code>sfx_time_stop</code></td><td>Ngưng đọng thời gian</td><td>1</td><td>—</td><td>0</td></tr>
+    <tr><td><code>sfx_beast_skill</code></td><td>Linh thú dùng chiêu</td><td>2</td><td>0.2</td><td>8%</td></tr>
+    <tr><td><code>sfx_revive</code></td><td>Hồi sinh</td><td>1</td><td>—</td><td>0</td></tr>
+    <tr><td><code>ui_click</code></td><td>Bấm nút</td><td>2</td><td>0.05</td><td>3%</td></tr>
+    <tr><td><code>ui_popup_open</code> / <code>ui_popup_close</code></td><td>Mở/đóng pop-up</td><td>1</td><td>0.1</td><td>0</td></tr>
+    <tr><td><code>ui_card_pick</code></td><td>Chọn thẻ Kỳ Ngộ</td><td>1</td><td>—</td><td>0</td></tr>
+    <tr><td><code>ui_upgrade</code></td><td>Nâng cấp thành công</td><td>1</td><td>—</td><td>0</td></tr>
+    <tr><td><code>ui_coin</code></td><td>Số Linh Thạch tăng</td><td>1</td><td>0.05</td><td>tăng dần</td></tr>
+    <tr><td><code>ui_error</code></td><td>Không đủ tiền, quảng cáo chưa sẵn sàng</td><td>1</td><td>0.2</td><td>0</td></tr>
+    <tr><td><code>ui_dialogue_next</code></td><td>Sang dòng hội thoại</td><td>1</td><td>0.05</td><td>0</td></tr>
+  </table>
+  <p>Âm lượng SFX gameplay giảm 30% khi đang có quảng cáo hoặc pop-up. Khi quảng cáo toàn màn hình mở, tắt tiếng toàn game (<code>AudioListener.pause = true</code>) và bật lại khi đóng.</p>
+
+  <h2>5. Âm thanh tạm để chơi ngay</h2>
+  <p>Editor script <code>VkdkPlaceholderAudio</code> (menu <i>Tools → VKDK → Generate Placeholder Audio</i>) tạo file <code>.wav</code> tạm cho mọi id ở mục 3–4
+  bằng sóng sin/vuông/nhiễu ngắn (ví dụ <code>sfx_sword_hit</code>: nhiễu 60 ms, <code>sfx_level_up</code>: 3 nốt đi lên), và tạo <code>SoundData</code> + <code>SoundLibrary</code>.
+  Khi có âm thanh thật cùng tên file thì ghi đè, không cần sửa code.</p>
+
+  <h2>6. Nguồn âm thanh</h2>
+  <p>Chỉ dùng âm thanh có giấy phép dùng thương mại (tự làm, thuê, hoặc thư viện bản quyền rõ ràng như CC0). Lưu file ghi nguồn và giấy phép của từng file trong <code>Assets/_Project/Audio/LICENSES.md</code>.</p>
+</main>
+<footer>Tài liệu nội bộ – Vạn Kiếm Độ Kiếp</footer>
+</body>
+</html>
