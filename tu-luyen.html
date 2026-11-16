@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tu luyện – Vạn Kiếm Độ Kiếp</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <h1>Tu luyện</h1>
+  <nav>
+    <a href="index.html">Tổng quan</a>
+    <a href="gdd.html">Cốt truyện &amp; Thế giới</a>
+    <a href="gameplay.html">Gameplay</a>
+    <a href="tu-luyen.html" class="active">Tu luyện</a>
+    <a href="chien-dau.html">Chiến đấu</a>
+    <a href="noi-dung.html">Nội dung ch.5–19</a>
+    <a href="he-thong-phu.html">Hướng dẫn &amp; Cài đặt</a>
+    <a href="vfx.html">VFX</a>
+    <a href="am-thanh.html">Âm thanh</a>
+    <a href="ui-quang-cao.html">UI &amp; Quảng cáo</a>
+    <a href="ui-kit.html">Bộ UI</a>
+    <a href="cong-cu-asset.html">Công cụ Asset</a>
+    <a href="can-bang.html">Cân bằng</a>
+    <a href="ky-thuat.html">Kỹ thuật</a>
+    <a href="phat-hanh.html">Phát hành</a>
+  </nav>
+</header>
+<main>
+  <h2>1. Hai lớp tiến trình</h2>
+  <table>
+    <tr><th>Lớp</th><th>Phạm vi</th><th>Cách tăng</th><th>Có reset không</th></tr>
+    <tr><td><b>Cảnh giới trong trận</b></td><td>1 trận</td><td>Vượt Lôi Kiếp (3 lần/trận, 4 bậc)</td><td>Reset sau mỗi trận</td></tr>
+    <tr><td><b>Cảnh giới cốt truyện</b></td><td>Tài khoản</td><td>Qua chương. Bằng bậc cao nhất của chương vừa qua.</td><td>Không</td></tr>
+  </table>
+  <p>Cảnh giới cốt truyện hiển thị trên Lobby (Top Bar) và quyết định chương nào được mở. Nó không cộng chỉ số trực tiếp;
+  chỉ số vĩnh viễn đến từ Động Phủ và Kiếm Trủng.</p>
+
+  <h2>2. 14 cảnh giới</h2>
+  <table>
+    <tr><th>#</th><th>Giới diện</th><th>Cảnh giới</th><th>Ghi chú nguyên tác</th></tr>
+    <tr><td>1</td><td rowspan="5">Nhân Giới</td><td>Luyện Khí</td><td>13 tầng</td></tr>
+    <tr><td>2</td><td>Trúc Cơ</td><td>Trường sinh 200 tuổi, ngự khí phi hành</td></tr>
+    <tr><td>3</td><td>Kết Đan</td><td>—</td></tr>
+    <tr><td>4</td><td>Nguyên Anh</td><td>1.000 tuổi, có thể đoạt xá</td></tr>
+    <tr><td>5</td><td>Hóa Thần</td><td>Đỉnh phong Nhân Giới, 2.000 tuổi</td></tr>
+    <tr><td>6</td><td rowspan="4">Linh Giới</td><td>Luyện Hư</td><td>Hư hóa bản thể, không gian chi lực</td></tr>
+    <tr><td>7</td><td>Hợp Thể</td><td>—</td></tr>
+    <tr><td>8</td><td>Đại Thừa</td><td>Đỉnh phong một tộc, hàng vạn tuổi</td></tr>
+    <tr><td>9</td><td>Độ Kiếp</td><td>Vượt Thiên Kiếp phi thăng</td></tr>
+    <tr><td>10</td><td rowspan="5">Tiên Giới</td><td>Chân Tiên</td><td>—</td></tr>
+    <tr><td>11</td><td>Kim Tiên</td><td>Ngưng tụ Tiên Khiếu</td></tr>
+    <tr><td>12</td><td>Thái Ất</td><td>—</td></tr>
+    <tr><td>13</td><td>Đại La</td><td>Lĩnh ngộ Pháp Tắc, siêu thoát thời không</td></tr>
+    <tr><td>14</td><td>Đạo Tổ</td><td>Nắm bản nguyên Pháp Tắc</td></tr>
+  </table>
+  <div class="note">Trong game, "Kết Đan" là tên chính thức (theo nguyên tác). File <code>tailieukientrucgame.md</code> cũ dùng "Kim Đan", cần sửa khi sinh code.</div>
+
+  <h2>3. Lôi Kiếp trong trận</h2>
+  <ol>
+    <li>Tu Vi tích từ Linh Châu. Đủ ngưỡng thì <code>Btn_Tribulation</code> hiện và rung nhẹ.</li>
+    <li>Người chơi bấm: màn hình tối sầm, quái vẫn tấn công.</li>
+    <li>Trong 10 giây, sét đánh vào vị trí ngẫu nhiên quanh người chơi. Mỗi tia có vòng cảnh báo đỏ trên mặt đất 0.8 giây trước khi đánh.</li>
+    <li>Sống sót: đột phá lên bậc tiếp theo, hồi đầy máu, mở Biến Thân mới. HP và sát thương của người chơi nhân hệ số của cảnh giới mới (bảng ở <a href="noi-dung.html">Nội dung ch.5–19</a> mục 1).</li>
+    <li>Chết trong Lôi Kiếp: hiện <code>RevivePopup</code> như chết thường.</li>
+  </ol>
+  <table>
+    <tr><th>Lần Độ Kiếp</th><th>Tu Vi cần (giá trị khởi điểm)</th><th>Số tia sét</th><th>Mở Biến Thân</th></tr>
+    <tr><td>1</td><td>300</td><td>8</td><td>Thanh Lôi</td></tr>
+    <tr><td>2</td><td>900</td><td>14</td><td>Kim Lôi</td></tr>
+    <tr><td>3</td><td>2.000</td><td>22</td><td>Hồng Lôi</td></tr>
+  </table>
+  <p>Sát thương mỗi tia tính theo % HP tối đa (xem <a href="can-bang.html">Cân bằng</a> mục 9) và nhân thêm theo giới diện: Nhân Giới ×1, Linh Giới ×1.5, Tiên Giới ×2.</p>
+
+  <h2>4. Biến Thân</h2>
+  <p>Bấm <code>Btn_Transform</code> khi đầy thanh Nộ (tích khi gây và nhận sát thương) để vào trạng thái Biến Thân cao nhất đã mở, kéo dài 12 giây.
+  Khi Biến Thân: tốc độ phi kiếm tăng mạnh, hào quang rồng/sấm sét quanh người, khung HUD đổi màu.</p>
+  <table>
+    <tr><th>Trạng thái</th><th>Ý nghĩa theo truyện</th><th>Tốc độ phi kiếm</th><th>Sát thương</th><th>Màu HUD</th></tr>
+    <tr><td>Thanh Lôi</td><td>Lôi lực của Thanh Trúc Phong Vân Kiếm (Kim Lôi Trúc)</td><td>×1.5</td><td>×1.2</td><td>Xanh lục ngọc</td></tr>
+    <tr><td>Kim Lôi</td><td>Tịch Tà Thần Lôi, ×2 sát thương lên ma tu, quỷ vật</td><td>×2.0</td><td>×1.4</td><td>Vàng kim</td></tr>
+    <tr><td>Hồng Lôi</td><td>Thiên Kiếp chi lôi đã luyện hóa</td><td>×2.5</td><td>×1.7</td><td>Đỏ</td></tr>
+  </table>
+  <div class="note">Các con số trên trang này là giá trị khởi điểm để cân bằng, lưu trong ScriptableObject để chỉnh trong Inspector.</div>
+
+  <h2>5. Linh Căn và đan dược</h2>
+  <p>Linh Căn (hệ số EXP) và đan dược hỗ trợ đột phá nằm ở trang <a href="gameplay.html">Gameplay</a> mục Động Phủ và Chưởng Thiên Bình.</p>
+</main>
+<footer>Tài liệu nội bộ – Vạn Kiếm Độ Kiếp</footer>
+</body>
+</html>
