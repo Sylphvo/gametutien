@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vạn Kiếm Độ Kiếp – Tài liệu dự án</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <h1>Vạn Kiếm Độ Kiếp – Tài liệu dự án</h1>
+  <nav>
+    <a href="index.html" class="active">Tổng quan</a>
+    <a href="gdd.html">Cốt truyện &amp; Thế giới</a>
+    <a href="gameplay.html">Gameplay</a>
+    <a href="tu-luyen.html">Tu luyện</a>
+    <a href="chien-dau.html">Chiến đấu</a>
+    <a href="vfx.html">VFX</a>
+    <a href="ui-quang-cao.html">UI &amp; Quảng cáo</a>
+    <a href="ui-kit.html">Bộ UI</a>
+    <a href="cong-cu-asset.html">Công cụ Asset</a>
+    <a href="ky-thuat.html">Kỹ thuật</a>
+  </nav>
+</header>
+<main>
+  <h2>Giới thiệu</h2>
+  <p><b>Vạn Kiếm Độ Kiếp</b> là game 2D Action Roguelike / Arena Survival chủ đề tu tiên trên Android.
+  Người chơi nhập vai <b>Hàn Lập</b>, đi qua 19 chương truyện ở ba giới diện Nhân Giới → Linh Giới → Tiên Giới.
+  Mỗi chương là một <b>Bí Cảnh</b> chơi trong 10–15 phút: phi kiếm tự động chiến đấu, người chơi di chuyển né đòn,
+  chọn thẻ Kỳ Ngộ, vượt Lôi Kiếp để đột phá và biến thân.</p>
+
+  <div class="note warn">
+    <b>Bản quyền:</b> Cốt truyện, nhân vật, địa danh, công pháp và pháp bảo lấy từ tiểu thuyết <i>Phàm Nhân Tu Tiên</i> (Vong Ngữ).
+    Game có quảng cáo AdMob là phát hành thương mại, nên cần giấy phép từ chủ sở hữu bản quyền.
+    Nếu không có giấy phép, phải đổi tên và viết lại nội dung trước khi đưa lên Google Play.
+  </div>
+
+  <h2>Thông số dự án</h2>
+  <table>
+    <tr><th>Mục</th><th>Giá trị</th></tr>
+    <tr><td>Tên dự án</td><td>Vạn Kiếm Độ Kiếp (tiếng Anh gợi ý: <i>Sword Realm: Tribulation</i>)</td></tr>
+    <tr><td>Thể loại</td><td>2D Action Roguelike / Arena Survival (Tiên Hiệp / Huyền Huyễn)</td></tr>
+    <tr><td>Engine</td><td>Unity 2D, Universal Render Pipeline (URP)</td></tr>
+    <tr><td>Nền tảng</td><td>Android (Google Play Store), màn hình ngang 16:9 / 20:9</td></tr>
+    <tr><td>Kiếm tiền</td><td>Free-to-Play + Google AdMob (Rewarded Video, Interstitial, Banner)</td></tr>
+    <tr><td>VFX</td><td>Dựng trong Unreal Niagara, bake thành flipbook, phát bằng Particle System trong Unity</td></tr>
+    <tr><td>Hiệu năng mục tiêu</td><td>60 FPS trên Android tầm trung</td></tr>
+  </table>
+
+  <h2>Danh mục tài liệu</h2>
+  <div class="cards">
+    <div class="card"><a href="gdd.html">Cốt truyện &amp; Thế giới</a><p>19 chương theo 3 giới diện, bản đồ Bí Cảnh, tông môn, nhân vật.</p></div>
+    <div class="card"><a href="gameplay.html">Gameplay</a><p>Vòng lặp trong trận, điều khiển cảm ứng, Động Phủ, Kiếm Trủng, Chưởng Thiên Bình, linh thú.</p></div>
+    <div class="card"><a href="tu-luyen.html">Tu luyện</a><p>14 cảnh giới, Lôi Kiếp trong trận, Biến Thân, Linh Căn, đan dược.</p></div>
+    <div class="card"><a href="chien-dau.html">Chiến đấu</a><p>Phi kiếm, thuộc tính, thẻ Kỳ Ngộ, tiến hóa kỹ năng, kẻ địch và boss.</p></div>
+    <div class="card"><a href="vfx.html">VFX</a><p>Quy trình Niagara Baker → flipbook → Particle System, danh sách hiệu ứng.</p></div>
+    <div class="card"><a href="ui-quang-cao.html">UI &amp; Quảng cáo</a><p>Lobby, HUD, pop-up, điểm đặt quảng cáo AdMob.</p></div>
+    <div class="card"><a href="ui-kit.html">Bộ UI</a><p>Màu, font tiếng Việt, danh sách ảnh cần vẽ, prefab dùng chung, Sprite Atlas, quy tắc hiệu năng UI.</p></div>
+    <div class="card"><a href="cong-cu-asset.html">Công cụ Asset</a><p>Phân tích quy trình PNG → Unity 2D URP, quy ước tên file, công cụ Editor tự áp thiết lập import và tạo VFX.</p></div>
+    <div class="card"><a href="noi-dung.html">Nội dung ch.5–19</a><p>Hệ số cảnh giới, hành vi và nhãn quái, 29 loại quái mới, wave, thư viện chiêu boss, 30 boss, linh thú, Thần Luân, Cánh, đồng đội.</p></div>
+    <div class="card"><a href="he-thong-phu.html">Hướng dẫn &amp; Cài đặt</a><p>14 bước hướng dẫn người chơi mới, chế độ Vô Tận, Cài đặt, menu tạm dừng, bảng chuỗi chữ, Debug menu.</p></div>
+    <div class="card"><a href="am-thanh.html">Âm thanh</a><p>AudioMixer, AudioManager, thiết lập import, 12 nhạc nền, ~30 hiệu ứng âm thanh, âm thanh tạm.</p></div>
+    <div class="card"><a href="phat-hanh.html">Phát hành</a><p>Firebase Analytics/Crashlytics, UMP, chính sách quyền riêng tư, Data Safety, Play Console, trang cửa hàng, kiểm tra trước phát hành.</p></div>
+    <div class="card"><a href="can-bang.html">Cân bằng</a><p>Bộ số khởi điểm chương 1–4: chỉ số nhân vật, quái, wave, boss, Lôi Kiếp, kinh tế, đan dược.</p></div>
+    <div class="card"><a href="ky-thuat.html">Kỹ thuật</a><p>Kiến trúc code, thư mục, ScriptableObject, đặc tả script, lưu game, build Android, lộ trình.</p></div>
+  </div>
+
+  <h2>Quyết định khi gộp hai bộ tài liệu</h2>
+  <table>
+    <tr><th>Chủ đề</th><th>Quyết định</th></tr>
+    <tr><td>Thể loại, nền tảng</td><td>Giữ theo <code>tailieukientrucgame.md</code>: 2D roguelike, Android. Bỏ thiết kế RPG 3D trên PC.</td></tr>
+    <tr><td>VFX</td><td>Dùng flipbook + Particle System. Bỏ VFX Graph vì cần compute shader và nặng trên mobile.</td></tr>
+    <tr><td>Cốt truyện</td><td>Hành trình Hàn Lập, mỗi chương là một Bí Cảnh.</td></tr>
+    <tr><td>Tên cảnh giới</td><td>Dùng "Kết Đan" theo nguyên tác, thay cho "Kim Đan" trong file <code>.md</code>.</td></tr>
+    <tr><td>Đột phá</td><td>Mỗi trận có 3 lần Độ Kiếp (4 bậc cảnh giới). Tên các bậc lấy theo giới diện của chương.</td></tr>
+    <tr><td>Hệ thống từ nguyên tác</td><td>Chưởng Thiên Bình, luyện đan, linh thú, pháp bảo được chuyển thành hệ thống ngoài trận (meta).</td></tr>
+  </table>
+</main>
+<footer>Tài liệu nội bộ – Vạn Kiếm Độ Kiếp</footer>
+</body>
+</html>
